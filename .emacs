@@ -1,12 +1,58 @@
+(require 'package)
+
+(when (>= emacs-major-version 24)
+  (setq package-archives '(("ELPA" . "http://tromey.com/elpa/")
+                           ("gnu" . "http://elpa.gnu.org/packages/")
+                           ("melpa" . "http://melpa.org/packages/")
+                           ("melpa-stable" . "http://stable.melpa.org/packages/")
+                           ("marmalade" . "http://marmalade-repo.org/packages/"))))
+
+;; Check if we're on Emacs 24.4 or newer, if so, use the pinned package feature
+(when (boundp 'package-pinned-packages)
+  (setq package-pinned-packages
+                '((bm                 . "marmalade")
+                  (smex               . "melpa-stable")
+                  (zenburn-theme      . "melpa-stable")
+                  (anti-zenburn-theme . "melpa-stable")
+                  (zen-and-art-theme  . "marmalade")
+                  (cider              . "melpa-stable")
+                  (clojure-mode       . "melpa-stable")
+                  (htmlize            . "marmalade")
+                  (rainbow-delimiters . "melpa-stable")
+                  ;; "unstable" package
+                  (icicles            . "melpa"))))
+
+
+
 (load "~/.emacs.d/init.el")
 
 ;; Modes
 (package-initialize)
 
+
 (toggle-truncate-lines t)
+
 (ido-mode t)
+(prelude-require-package 'ido-vertical-mode)
+(prelude-require-package 'ac-cider)
+(prelude-require-package 'bind-key)
+(prelude-require-package 'tabbar)
+(prelude-require-package 'elpy)
+(prelude-require-package 'clj-refactor)
+(prelude-require-package 'helm-swoop)
+(prelude-require-package 'highlight-symbol)
+(prelude-require-package 'helm-descbinds)
+(prelude-require-package 'autopair)
+(prelude-require-package 'eclipse-theme)
+(prelude-require-package 'flycheck-pos-tip)
+(prelude-require-package 'flycheck-clojure)
+(prelude-require-package 'auto-highlight-symbol)
+(prelude-require-package 'aggressive-indent)
+(prelude-require-package 'bm)
+
+(load-theme 'eclipse)
+
 (ido-vertical-mode t)
-(autopair-mode t)
 (flx-ido-mode t)
 (transient-mark-mode t)
 (ido-everywhere t)
@@ -20,6 +66,8 @@
 (menu-bar-mode -1)
 (undo-tree-mode t)
 (global-whitespace-mode -1)
+
+(prelude-require-package 'cider-eval-sexp-fu)
 
 
 (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
@@ -148,7 +196,6 @@
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 
 (add-hook 'cider-mode-hook #'eldoc-mode)
-(add-hook 'cider-mode-hook #'auto-complete-mode)
 (add-hook 'cider-mode-hook #'paredit-mode)
 (add-hook 'cider-mode-hook #'rainbow-delimiters-mode)
 (add-hook 'cider-mode-hook #'aggressive-indent-mode)
@@ -178,16 +225,6 @@
 
 (add-to-list 'auto-mode-alist '("\\.clj\\'" . clojure-mode))
 
-(require 'package) ;; You might already have this line
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/"))
-(when (< emacs-major-version 24)
-  ;; For important compatibility libraries like cl-lib
-  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
-(package-initialize)
-
-(add-to-list 'package-archives
-             '("melpa-stable" . "https://stable.melpa.org/packages/") t);; You might already have this line
 
 (defun kill-current-buffer ()
   "Kills current buffer"
@@ -280,10 +317,6 @@ downcased, no preceding underscore.
 
 (add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
 
-(when (require 'yasnippet nil 'noerror)
-  (progn
-    (yas/load-directory "~/.emacs.d/snippets")))
-
 (global-set-key (kbd "M-i") 'helm-swoop)
 (global-set-key (kbd "M-I") 'helm-swoop-back-to-last-point)
 (global-set-key (kbd "C-c M-i") 'helm-multi-swoop)
@@ -313,62 +346,11 @@ downcased, no preceding underscore.
 
 ;; prevent prompt for killing emcacsclient buffer
 (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
-(tabbar-mode t)
+; (tabbar-mode t)
 
 (elpy-enable)
 (require 'cl)
 
-(add-to-list 'load-path "~/.emacs.d/el-get/el-get")
-
-(unless (require 'el-get nil t)
-  (url-retrieve
-   "https://github.com/dimitri/el-get/raw/master/el-get-install.el"
-   (lambda (s)
-     (end-of-buffer)
-     (eval-print-last-sexp))))
-
-;; now either el-get is `require'd already, or have been `load'ed by the
-;; el-get installer.
-
-;; set local recipes
-(setq
- el-get-sources
- '((:name buffer-move           ; have to add your own keys
-          :after (lambda ()
-                   (global-set-key (kbd "<C-S-up>")     'buf-move-up)
-                   (global-set-key (kbd "<C-S-down>")   'buf-move-down)
-                   (global-set-key (kbd "<C-S-left>")   'buf-move-left)
-                   (global-set-key (kbd "<C-S-right>")  'buf-move-right)))
-
-   (:name smex              ; a better (ido like) M-x
-          :after (lambda ()
-                   (setq smex-save-file "~/.emacs.d/.smex-items")
-                   (global-set-key (kbd "M-x") 'smex)
-                   (global-set-key (kbd "M-X") 'smex-major-mode-commands)))
-
-   (:name goto-last-change      ; move pointer back to last change
-          :after (lambda ()
-                   ;; when using AZERTY keyboard, consider C-x C-_
-                   (global-set-key (kbd "C-x C-/") 'goto-last-change)))))
-
-;; now set our own packages
-(setq
- my:el-get-packages
- '(el-get               ; el-get is self-hosting
-   escreen                      ; screen for emacs, C-\ C-h
-   switch-window            ; takes over C-x o
-   color-theme                      ; nice looking emacs
-   color-theme-tango))                  ; check out color-theme-solarized
-
-(setq my:el-get-packages
-      (append
-       my:el-get-packages
-       (loop for src in el-get-sources collect (el-get-source-name src))))
-
-;; install new packages and init already installed packages
-(el-get 'sync my:el-get-packages)
-
-;; on to the visual settings
 (setq inhibit-splash-screen t)      ; no splash screen, thanks
 (line-number-mode 1)            ; have line numbers and
 (column-number-mode 1)          ; column numbers in the mode line
@@ -457,8 +439,7 @@ downcased, no preceding underscore.
 (define-key ac-complete-mode-map "\C-n" 'ac-next)
 (define-key ac-complete-mode-map "\C-p" 'ac-previous)
 
-(require 'cider-eval-sexp-fu)
-(load-file "~/.emacs.d/personal/sunrise-commander.el")
+;(require 'cider-eval-sexp-FY)
 
 (setq sgml-basic-offset 4)
 
@@ -469,13 +450,12 @@ downcased, no preceding underscore.
 (setq browse-url-browser-function 'browse-url-generic
       browse-url-generic-program "chromium-browser")
 
-(require 'helm-descbinds)
 (helm-descbinds-mode)
 ;; prior to emacs24
 (helm-descbinds-mode 1)
 
 (add-hook 'malabar-mode-hook
-     (lambda () 
+     (lambda ()
        (add-hook 'after-save-hook 'malabar-http-compile-file-silently
                   nil t)))
 
@@ -510,9 +490,6 @@ downcased, no preceding underscore.
 (fset 'clojure-fix-java-import
       [?\( ?\C-u ?\C-d ?\C-e backspace ?\) ?\C-a ?\C-f ?\M-\\ ?\C-a ?\C-n])
 
-(add-to-list 'load-path ".emacs.d/personal/maven-pom-mode/")
-(load "maven-pom-mode")
-
 (set-face-attribute 'default nil :height 110)
 
 (eval-after-load 'flycheck '(flycheck-clojure-setup))
@@ -523,24 +500,52 @@ downcased, no preceding underscore.
 (eval-after-load 'flycheck
   '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
 
+(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+(add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+(add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
 
 (dolist (mode '(clojure-mode clojurescript-mode cider-mode))
   (eval-after-load mode
     (font-lock-add-keywords
-     mode '(("(\\(\\)[\[[:space:]]"  ; anon funcs 1
+     mode '(
+            ("(\\(defn\\)[\[[:space:]]" ; anon funcs 1
+             (0 (progn (compose-region (match-beginning 1)
+                                       (match-end 1) "ƒ")
+                       nil)))
+            ("(\\(defn-\\)[\[[:space:]]" ; anon funcs 1
+             (0 (progn (compose-region (match-beginning 1)
+                                       (match-end 1) "ƒ-")
+                       nil)))
+            ("(\\(defmacro\\)[\[[:space:]]"  ; anon funcs 1
+             (0 (progn (compose-region (match-beginning 1)
+                                       (match-end 1) "µ")
+                       nil)))
+            ("(\\(fn\\)[\[[:space:]]"  ; anon funcs 1
              (0 (progn (compose-region (match-beginning 1)
                                        (match-end 1) "λ")
                        nil)))
+            ("(\\(if\\)[\[[:space:]]"  ; anon funcs 1
+             (0 (progn (compose-region (match-beginning 1)
+                                       (match-end 1) "≡")
+                       nil)))
             ("\\(#\\)("                ; anon funcs 2
              (0 (progn (compose-region (match-beginning 1)
-                                       (match-end 1) "ƒ")
+                                       (match-end 1) "λ")
+                       nil)))
+            ("\\(Math/PI\\)"                ; anon funcs 2
+             (0 (progn (compose-region (match-beginning 1)
+                                       (match-end 1) "π")
                        nil)))
             ("\\(#\\){"                 ; sets
              (0 (progn (compose-region (match-beginning 1)
                                        (match-end 1) "∈")
                        nil)))))))
 
-(global-set-key "\C-x\ \C-r" 'recentf-interactive-complete)
+(global-set-key "\C-x\ \C-r" 'crux-recentf-ido-find-file)
 
 ;; shortcuts configuration
 (global-set-key (kbd "M-/") 'hippie-expand)
@@ -580,11 +585,16 @@ downcased, no preceding underscore.
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
 
-(global-set-key (kbd "C-c e") 'eval-and-replace)
+(define-key global-map (kbd "C-c SPC") 'avy-goto-char)
 
-;; bind ace jump mode
-(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
-(define-key global-map (kbd "C-c p") 'ace-jump-mode-pop-mark)
+(global-set-key [remap kill-ring-save] 'easy-kill)
 
 (provide '.emacs)
 ;;; .emacs ends here
+(setq exec-path (append exec-path '("/usr/bin")))
+
+(define-key company-active-map "\C-n" 'company-select-next)
+(define-key company-active-map "\C-p" 'company-select-previous)
+
+(define-key ac-complete-mode-map "\C-n" 'ac-next)
+(define-key ac-complete-mode-map "\C-p" 'ac-previous)
