@@ -419,7 +419,6 @@ downcased, no preceding underscore.
 (add-hook 'god-mode-enabled-hook 'my-update-cursor)
 (add-hook 'god-mode-disabled-hook 'my-update-cursor)
 
-
 (setq shift-selection-mode t)
 
 (defun remove-dos-eol ()
@@ -590,6 +589,8 @@ downcased, no preceding underscore.
 
 (define-key ac-complete-mode-map "\C-n" 'ac-next)
 (define-key ac-complete-mode-map "\C-p" 'ac-previous)
+
+(setq prelude-whitespace nil)
 
 (provide '.emacs)
 ;;; .emacs ends here
