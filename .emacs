@@ -1,11 +1,10 @@
 (require 'package)
 
-(when (>= emacs-major-version 24)
-  (setq package-archives '(("ELPA" . "http://tromey.com/elpa/")
-                           ("gnu" . "http://elpa.gnu.org/packages/")
-                           ("melpa" . "http://melpa.org/packages/")
-                           ("melpa-stable" . "http://stable.melpa.org/packages/")
-                           ("marmalade" . "http://marmalade-repo.org/packages/"))))
+(setq package-archives '(("ELPA" . "http://tromey.com/elpa/")
+                         ("gnu" . "http://elpa.gnu.org/packages/")
+                         ("melpa" . "http://melpa.org/packages/")
+                         ("melpa-stable" . "http://stable.melpa.org/packages/")
+                         ("marmalade" . "http://marmalade-repo.org/packages/")))
 
 ;; Check if we're on Emacs 24.4 or newer, if so, use the pinned package feature
 (when (boundp 'package-pinned-packages)
@@ -19,16 +18,9 @@
                   (clojure-mode       . "melpa-stable")
                   (htmlize            . "marmalade")
                   (rainbow-delimiters . "melpa-stable")
-                  ;; "unstable" package
                   (icicles            . "melpa"))))
 
-
-
 (load "~/.emacs.d/init.el")
-
-;; Modes
-(package-initialize)
-
 
 (toggle-truncate-lines t)
 
@@ -66,6 +58,7 @@
 (menu-bar-mode -1)
 (undo-tree-mode t)
 (global-whitespace-mode -1)
+(global-hl-line-mode -1)
 
 (prelude-require-package 'cider-eval-sexp-fu)
 
@@ -528,7 +521,7 @@ downcased, no preceding underscore.
              (0 (progn (compose-region (match-beginning 1)
                                        (match-end 1) "λ")
                        nil)))
-            ("(\\(if\\)[\[[:space:]]"  ; anon funcs 1
+            ("(\\(def\\)[\[[:space:]]"  ; anon funcs 1
              (0 (progn (compose-region (match-beginning 1)
                                        (match-end 1) "≡")
                        nil)))
@@ -589,12 +582,14 @@ downcased, no preceding underscore.
 
 (global-set-key [remap kill-ring-save] 'easy-kill)
 
-(provide '.emacs)
-;;; .emacs ends here
 (setq exec-path (append exec-path '("/usr/bin")))
 
-(define-key company-active-map "\C-n" 'company-select-next)
-(define-key company-active-map "\C-p" 'company-select-previous)
+(define-key company-active-map "\C-p" 'company-select-next)
+(define-key company-active-map "\C-n" 'company-select-previous)
+(define-key company-active-map "\C-j" 'company-complete-selection)
 
 (define-key ac-complete-mode-map "\C-n" 'ac-next)
 (define-key ac-complete-mode-map "\C-p" 'ac-previous)
+
+(provide '.emacs)
+;;; .emacs ends here
