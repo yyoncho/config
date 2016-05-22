@@ -42,7 +42,8 @@
 (prelude-require-package 'aggressive-indent)
 (prelude-require-package 'bm)
 
-(load-theme 'eclipse)
+                                        ;(load-theme 'eclipse)
+(load-theme 'spacemacs-dark)
 
 (ido-vertical-mode t)
 (flx-ido-mode t)
@@ -179,6 +180,7 @@
   (backward-kill-sexp)
   (condition-case nil
       (prin1 (eval (read (current-kill 0)))
+
              (current-buffer))
     (error (message "Invalid expression")
            (insert (current-kill 0)))))
@@ -432,7 +434,8 @@ downcased, no preceding underscore.
 (define-key ac-complete-mode-map "\C-n" 'ac-next)
 (define-key ac-complete-mode-map "\C-p" 'ac-previous)
 
-;(require 'cider-eval-sexp-FY)
+(require 'cider-eval-sexp-fu)
+
 
 (setq sgml-basic-offset 4)
 
@@ -590,6 +593,15 @@ downcased, no preceding underscore.
 
 (define-key ac-complete-mode-map "\C-n" 'ac-next)
 (define-key ac-complete-mode-map "\C-p" 'ac-previous)
+
+(define-key ac-complete-mode-map "C-М-)" 'paredit-forward-slurp-sexp)
+
+(define-key ac-complete-mode-map "\C-p" 'ac-previous)
+(define-key ac-complete-mode-map "\C-p" 'ac-previous)
+
+(global-set-key (kbd "<C-f2>") 'bm-toggle)
+(global-set-key (kbd "<f2>")   'bm-next)
+(global-set-key (kbd "<S-f2>") 'bm-previous)
 
 (provide '.emacs)
 ;;; .emacs ends here
