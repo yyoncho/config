@@ -421,7 +421,6 @@ downcased, no preceding underscore.
 (add-hook 'god-mode-enabled-hook 'my-update-cursor)
 (add-hook 'god-mode-disabled-hook 'my-update-cursor)
 
-
 (setq shift-selection-mode t)
 
 (defun remove-dos-eol ()
@@ -602,6 +601,8 @@ downcased, no preceding underscore.
 (global-set-key (kbd "<C-f2>") 'bm-toggle)
 (global-set-key (kbd "<f2>")   'bm-next)
 (global-set-key (kbd "<S-f2>") 'bm-previous)
+
+(setq prelude-whitespace nil)
 
 (provide '.emacs)
 ;;; .emacs ends here
