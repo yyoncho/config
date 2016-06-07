@@ -616,8 +616,9 @@ downcased, no preceding underscore.
 (global-unset-key (vector (list 'shift 'up)))
 (global-unset-key (vector (list 'shift 'down)))
 
-(fset 'maven-dep-to-lein
-      [?\C-k ?\C-k ?\M-f ?\C-f ?\C-f ?\C-f ?\C-  ?\C-a ?\C-a ?\C-k ?\C-_ ?\C-a ?\C-  ?\M-f ?\C-f ?\C-f ?\C-f ?\C-w ?\C-e M-backspace backspace backspace ?/ ?\M-j ?\M-d ?\C-d ?\C-e M-backspace backspace backspace ?\C-a ?\M-1 ?\[ ?\C-n ?\C-a ?\C-a ?\C-k ?\C-k ?\C-k ?\C-k])
+; (global-set-key (kbd "<s-c>") 'easy-kill)
+; (global-set-key (kbd "<s-v>") 'yank)
+; (global-set-key (kbd "<s-x>") 'kill-region)
 
 (provide '.emacs)
 ;;; .emacs ends here
