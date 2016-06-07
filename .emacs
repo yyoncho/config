@@ -1,6 +1,6 @@
 (require 'package)
 
-(disable-theme 'zenburn)
+
 
 (setq package-archives '(("ELPA" . "http://tromey.com/elpa/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
@@ -12,7 +12,7 @@
 (when (boundp 'package-pinned-packages)
   (setq package-pinned-packages
                 '((bm                 . "marmalade")
-                  ;(smex               . "melpa-stable")
+                  (smex               . "melpa-stable")
                   (zenburn-theme      . "melpa-stable")
                   (anti-zenburn-theme . "melpa-stable")
                   (zen-and-art-theme  . "marmalade")
@@ -23,11 +23,10 @@
                   (icicles            . "melpa"))))
 
 (load "~/.emacs.d/init.el")
-(load-theme 'deeper-blue)
 
 (toggle-truncate-lines t)
 
- (ido-mode t)
+(ido-mode t)
 (prelude-require-package 'ido-vertical-mode)
 (prelude-require-package 'ac-cider)
 (prelude-require-package 'bind-key)
@@ -45,7 +44,6 @@
 (prelude-require-package 'aggressive-indent)
 (prelude-require-package 'bm)
 (prelude-require-package 'helm-projectile)
-(load-theme 'spacemacs-dark)
 
 
 (ido-vertical-mode t)
@@ -114,9 +112,6 @@
 
 ;; disable backup files
 (setq make-backup-files nil)
-
-(global-set-key (kbd "<f9>") 'sr-speedbar-toggle)
-(set-variable 'sr-speedbar-right-side nil)
 
 ;;; SLIME configuration
 (setq inferior-lisp-program "/usr/bin/sbcl")
@@ -418,7 +413,7 @@ downcased, no preceding underscore.
                        (if (frame-parameter nil 'fullscreen) nil 'fullboth)))
 (global-set-key [f11] 'fullscreen)
 
-;(disable-theme 'zenburn)
+
 
 ;; god more configuration
 (defun my-update-cursor ()
@@ -584,7 +579,6 @@ downcased, no preceding underscore.
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
-
 (define-key global-map (kbd "C-c SPC") 'avy-goto-char)
 
 (global-set-key [remap kill-ring-save] 'easy-kill)
@@ -616,10 +610,13 @@ downcased, no preceding underscore.
 (global-set-key (kbd "<f2>")   'bm-next)
 (global-set-key (kbd "<S-f2>") 'bm-previous)
 
-
-(provide '.emacs)
-;;; .emacs ends here
-
+(global-unset-key (vector (list 'shift 'left)))
+(global-unset-key (vector (list 'shift 'right)))
+(global-unset-key (vector (list 'shift 'up)))
+(global-unset-key (vector (list 'shift 'down)))
 
 (fset 'maven-dep-to-lein
       [?\C-k ?\C-k ?\M-f ?\C-f ?\C-f ?\C-f ?\C-  ?\C-a ?\C-a ?\C-k ?\C-_ ?\C-a ?\C-  ?\M-f ?\C-f ?\C-f ?\C-f ?\C-w ?\C-e M-backspace backspace backspace ?/ ?\M-j ?\M-d ?\C-d ?\C-e M-backspace backspace backspace ?\C-a ?\M-1 ?\[ ?\C-n ?\C-a ?\C-a ?\C-k ?\C-k ?\C-k ?\C-k])
+
+(provide '.emacs)
+;;; .emacs ends here
