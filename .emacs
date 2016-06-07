@@ -1,7 +1,6 @@
 (require 'package)
 
 
-
 (setq package-archives '(("ELPA" . "http://tromey.com/elpa/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
                          ("melpa" . "http://melpa.org/packages/")
@@ -37,6 +36,8 @@
 (prelude-require-package 'highlight-symbol)
 (prelude-require-package 'helm-descbinds)
 (prelude-require-package 'autopair)
+(prelude-require-package 'flx-ido)
+(prelude-require-package 'ido-ubiquitous)
 (prelude-require-package 'eclipse-theme)
 (prelude-require-package 'flycheck-pos-tip)
 (prelude-require-package 'flycheck-clojure)
