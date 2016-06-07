@@ -1,5 +1,7 @@
 (require 'package)
 
+(disable-theme 'zenburn)
+
 (setq package-archives '(("ELPA" . "http://tromey.com/elpa/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
                          ("melpa" . "http://melpa.org/packages/")
@@ -10,7 +12,7 @@
 (when (boundp 'package-pinned-packages)
   (setq package-pinned-packages
                 '((bm                 . "marmalade")
-                  (smex               . "melpa-stable")
+                  ;(smex               . "melpa-stable")
                   (zenburn-theme      . "melpa-stable")
                   (anti-zenburn-theme . "melpa-stable")
                   (zen-and-art-theme  . "marmalade")
@@ -21,10 +23,11 @@
                   (icicles            . "melpa"))))
 
 (load "~/.emacs.d/init.el")
+(load-theme 'deeper-blue)
 
 (toggle-truncate-lines t)
 
-(ido-mode t)
+ (ido-mode t)
 (prelude-require-package 'ido-vertical-mode)
 (prelude-require-package 'ac-cider)
 (prelude-require-package 'bind-key)
@@ -41,8 +44,7 @@
 (prelude-require-package 'auto-highlight-symbol)
 (prelude-require-package 'aggressive-indent)
 (prelude-require-package 'bm)
-
-(load-theme 'eclipse)
+(prelude-require-package 'helm-projectile)
 
 (ido-vertical-mode t)
 (flx-ido-mode t)
@@ -64,6 +66,7 @@
 
 
 (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
+
 
 ;; Do not list non user files
 (defun ido-ignore-non-user-except-ielm (name)
@@ -190,6 +193,7 @@
 
 (add-hook 'cider-mode-hook #'eldoc-mode)
 (add-hook 'cider-mode-hook #'paredit-mode)
+(add-hook 'cider-mode-hook #'auto-complete-mode)
 (add-hook 'cider-mode-hook #'rainbow-delimiters-mode)
 (add-hook 'cider-mode-hook #'aggressive-indent-mode)
 (add-hook 'cider-mode-hook #'auto-highlight-symbol-mode)
@@ -208,6 +212,9 @@
 
 (eval-after-load 'cider-mode
   '(define-key cider-mode-map (kbd "C-x C-j") 'projectile-find-implementation-or-test-other-window))
+
+(eval-after-load 'cider-mode
+  '(define-key cider-mode-map (kbd "C-c M-r") 'cider-restart))
 
 
 (add-hook 'cider-repl-mode-hook #'paredit-mode)
@@ -388,14 +395,14 @@ downcased, no preceding underscore.
 (define-key term-raw-map  (kbd "C-y") 'term-paste)
 
 ;; use ido for minibuffer completion
-(require 'ido)
-(setq ido-save-directory-list-file "~/.ido.last")
-(setq ido-enable-flex-matching t)
-(setq ido-use-filename-at-point 'guess)
-(setq ido-show-dot-for-dired t)
+;; (require 'ido)
+;; (setq ido-save-directory-list-file "~/.ido.last")
+;; (setq ido-enable-flex-matching t)
+;; (setq ido-use-filename-at-point 'guess)
+;; (setq ido-show-dot-for-dired t)
 
 ;; default key to switch buffer is C-x b, but that's not easy enough
-(global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
+;; (global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
 (global-set-key (kbd "C-x B") 'ibuffer)
 
 ;; C-x C-j opens dired with the cursor right on the file you're editing
@@ -408,7 +415,7 @@ downcased, no preceding underscore.
                        (if (frame-parameter nil 'fullscreen) nil 'fullboth)))
 (global-set-key [f11] 'fullscreen)
 
-(disable-theme 'zenburn)
+;(disable-theme 'zenburn)
 
 ;; god more configuration
 (defun my-update-cursor ()
@@ -474,9 +481,6 @@ downcased, no preceding underscore.
   (interactive "p")
   (move-line (if (null n) 1 n)))
 
-(global-set-key (kbd "M-p") 'move-line-up)
-(global-set-key (kbd "M-n") 'move-line-down)
-
 (flycheck-pos-tip-mode t)
 
 (fset 'clojure-fix-java-import
@@ -510,7 +514,7 @@ downcased, no preceding underscore.
                        nil)))
             ("(\\(defn-\\)[\[[:space:]]" ; anon funcs 1
              (0 (progn (compose-region (match-beginning 1)
-                                       (match-end 1) "ƒ-")
+                                       (match-end 1) "ƒ")
                        nil)))
             ("(\\(defmacro\\)[\[[:space:]]"  ; anon funcs 1
              (0 (progn (compose-region (match-beginning 1)
@@ -537,7 +541,7 @@ downcased, no preceding underscore.
                                        (match-end 1) "∈")
                        nil)))))))
 
-(global-set-key "\C-x\ \C-r" 'crux-recentf-ido-find-file)
+(global-set-key "\C-x\ \C-r" 'helm-recentf)
 
 ;; shortcuts configuration
 (global-set-key (kbd "M-/") 'hippie-expand)
@@ -583,14 +587,26 @@ downcased, no preceding underscore.
 
 (setq exec-path (append exec-path '("/usr/bin")))
 
-(define-key company-active-map "\C-p" 'company-select-next)
-(define-key company-active-map "\C-n" 'company-select-previous)
+(define-key company-active-map "\C-n" 'company-select-next)
+(define-key company-active-map "\C-p" 'company-select-previous)
 (define-key company-active-map "\C-j" 'company-complete-selection)
+
+(global-set-key (kbd "M-p") 'move-line-up)
+(global-set-key (kbd "M-n") 'move-line-down)
 
 (define-key ac-complete-mode-map "\C-n" 'ac-next)
 (define-key ac-complete-mode-map "\C-p" 'ac-previous)
 
 (setq prelude-whitespace nil)
 
+(global-set-key (kbd "<C-f2>") 'bm-toggle)
+(global-set-key (kbd "<f2>")   'bm-next)
+(global-set-key (kbd "<S-f2>") 'bm-previous)
+
+
 (provide '.emacs)
 ;;; .emacs ends here
+
+
+(fset 'maven-dep-to-lein
+      [?\C-k ?\C-k ?\M-f ?\C-f ?\C-f ?\C-f ?\C-  ?\C-a ?\C-a ?\C-k ?\C-_ ?\C-a ?\C-  ?\M-f ?\C-f ?\C-f ?\C-f ?\C-w ?\C-e M-backspace backspace backspace ?/ ?\M-j ?\M-d ?\C-d ?\C-e M-backspace backspace backspace ?\C-a ?\M-1 ?\[ ?\C-n ?\C-a ?\C-a ?\C-k ?\C-k ?\C-k ?\C-k])
