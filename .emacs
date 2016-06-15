@@ -10,16 +10,16 @@
 ;; Check if we're on Emacs 24.4 or newer, if so, use the pinned package feature
 (when (boundp 'package-pinned-packages)
   (setq package-pinned-packages
-                '((bm                 . "marmalade")
-                  (smex               . "melpa-stable")
-                  (zenburn-theme      . "melpa-stable")
-                  (anti-zenburn-theme . "melpa-stable")
-                  (zen-and-art-theme  . "marmalade")
-                  (cider              . "melpa-stable")
-                  (clojure-mode       . "melpa-stable")
-                  (htmlize            . "marmalade")
-                  (rainbow-delimiters . "melpa-stable")
-                  (icicles            . "melpa"))))
+        '((bm                 . "marmalade")
+          (smex               . "melpa-stable")
+          (zenburn-theme      . "melpa-stable")
+          (anti-zenburn-theme . "melpa-stable")
+          (zen-and-art-theme  . "marmalade")
+          (cider              . "melpa-stable")
+          (clojure-mode       . "melpa-stable")
+          (htmlize            . "marmalade")
+          (rainbow-delimiters . "melpa-stable")
+          (icicles            . "melpa"))))
 
 (load "~/.emacs.d/init.el")
 
@@ -35,8 +35,8 @@
 (prelude-require-package 'helm-swoop)
 (prelude-require-package 'highlight-symbol)
 (prelude-require-package 'helm-descbinds)
-(prelude-require-package 'autopair)
 (prelude-require-package 'flx-ido)
+
 (prelude-require-package 'ido-ubiquitous)
 (prelude-require-package 'eclipse-theme)
 (prelude-require-package 'flycheck-pos-tip)
@@ -45,7 +45,7 @@
 (prelude-require-package 'aggressive-indent)
 (prelude-require-package 'bm)
 (prelude-require-package 'helm-projectile)
-
+(prelude-require-package 'ujelly-theme)
 
 (ido-vertical-mode t)
 (flx-ido-mode t)
@@ -248,7 +248,7 @@
 (define-key global-map (kbd "C-S-k") 'search-selection)
 (define-key global-map (kbd "C-x d") 'elpy-goto-definition)
 
-                                        ; prevent creating backup files
+;; prevent creating backup files
 (setq make-backup-files nil)
 
 (defun join-next-line ()
@@ -260,8 +260,6 @@
     (delete-horizontal-space)))
 
 (global-set-key (kbd "M-j") 'join-next-line)
-
-(add-hook 'prog-mode-hook 'autopair-mode)
 
 (defun set-auto-complete-as-completion-at-point-function ()
   (setq completion-at-point-functions '(auto-complete)))
@@ -345,7 +343,7 @@ downcased, no preceding underscore.
 
 ;; prevent prompt for killing emcacsclient buffer
 (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
-; (tabbar-mode t)
+                                        ; (tabbar-mode t)
 
 (elpy-enable)
 (require 'cl)
@@ -444,7 +442,7 @@ downcased, no preceding underscore.
 
 (add-hook 'xml-mode-hook
           (lambda()
-                        (local-unset-key (kbd "C-M-u"))))
+            (local-unset-key (kbd "C-M-u"))))
 
 (setq browse-url-browser-function 'browse-url-generic
       browse-url-generic-program "chromium-browser")
@@ -454,9 +452,9 @@ downcased, no preceding underscore.
 (helm-descbinds-mode 1)
 
 (add-hook 'malabar-mode-hook
-     (lambda ()
-       (add-hook 'after-save-hook 'malabar-http-compile-file-silently
-                  nil t)))
+          (lambda ()
+            (add-hook 'after-save-hook 'malabar-http-compile-file-silently
+                      nil t)))
 
 (defun move-line (n)
   "Move the current line up or down by N lines."
@@ -486,7 +484,7 @@ downcased, no preceding underscore.
 (fset 'clojure-fix-java-import
       [?\( ?\C-u ?\C-d ?\C-e backspace ?\) ?\C-a ?\C-f ?\M-\\ ?\C-a ?\C-n])
 
-(set-face-attribute 'default nil :height 110)
+(set-face-attribute 'default nil :height 130)
 
 (eval-after-load 'flycheck '(flycheck-clojure-setup))
 (add-hook 'after-init-hook #'global-flycheck-mode)
@@ -616,9 +614,9 @@ downcased, no preceding underscore.
 (global-unset-key (vector (list 'shift 'up)))
 (global-unset-key (vector (list 'shift 'down)))
 
-; (global-set-key (kbd "<s-c>") 'easy-kill)
-; (global-set-key (kbd "<s-v>") 'yank)
-; (global-set-key (kbd "<s-x>") 'kill-region)
+;; (global-set-key (kbd "<s-c>") 'easy-kill)
+;; (global-set-key (kbd "<s-v>") 'yank)
+;; (global-set-key (kbd "<s-x>") 'kill-region)
 
 (provide '.emacs)
 ;;; .emacs ends here
