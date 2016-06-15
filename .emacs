@@ -608,5 +608,8 @@ downcased, no preceding underscore.
 ;; (global-set-key (kbd "<s-v>") 'yank)
 ;; (global-set-key (kbd "<s-x>") 'kill-region)
 
+
+(setq midje-comments ";;.;.")
+
 (provide '.emacs)
 ;;; .emacs ends here
