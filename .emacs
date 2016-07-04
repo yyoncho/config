@@ -258,10 +258,6 @@
 (add-hook 'auto-complete-mode-hook 'set-auto-complete-as-completion-at-point-function)
 (add-hook 'cider-mode-hook 'set-auto-complete-as-completion-at-point-function)
 
-(defun magit-up-status ()
-  (interactive)
-  (magit-status "~/UP"))
-
 (defun un-camelcase-word-at-point ()
   "un-camelcase the word at point, replacing uppercase chars with
 the lowercase version preceded by an underscore.
@@ -276,7 +272,7 @@ downcased, no preceding underscore.
       (downcase-region (car bounds) (cdr bounds)))))
 
 (require 'ac-cider)
-(setq cider-lein-command "/home/kyoncho/.bin/lein")
+(setq cider-lein-command "~/.bin/lein")
 (add-hook 'cider-mode-hook 'ac-flyspell-workaround)
 (add-hook 'cider-mode-hook 'ac-cider-setup)
 (add-hook 'cider-mode-hook 'paredit-mode)
