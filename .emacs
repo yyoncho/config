@@ -74,7 +74,10 @@
   (and (string-match "^\*" name)
        (not (and (string-match "repl" name)
                  (not (string-match "repl-messages" name))))
-       (not (string-match "shell" name))))
+       (not (string-match "shell" name))
+       (not (string-match "magit" name))
+       (not (string-match "Magit" name))
+       (not (string-match "cider" name))))
 (set-variable 'magit-stage-all-confirm nil)
 (setq ido-ignore-buffers '("\\` " ido-ignore-non-user-except-ielm))
 (setq ido-vertical-define-keys 'C-n-C-p-up-and-down)
@@ -297,7 +300,7 @@ downcased, no preceding underscore.
 (defun my-clojure-mode-hook ()
   (clj-refactor-mode 1)
   (yas-minor-mode 1) ; for adding require/use/import
-  (cljr-add-keybindings-with-prefix "C-c C-m"))
+  (cljr-add-keybindings-with-prefix "C-c m"))
 
 (add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
 
@@ -497,10 +500,6 @@ downcased, no preceding underscore.
              (0 (progn (compose-region (match-beginning 1)
                                        (match-end 1) "ƒ")
                        nil)))
-            ("(\\(defn-\\)[\[[:space:]]"
-             (0 (progn (compose-region (match-beginning 1)
-                                       (match-end 1) "ƒ")
-                       nil)))
             ("(\\(defmacro\\)[\[[:space:]]"
              (0 (progn (compose-region (match-beginning 1)
                                        (match-end 1) "µ")
@@ -587,9 +586,10 @@ downcased, no preceding underscore.
 
 (global-set-key (kbd "<C-f2>") 'bm-toggle)
 (global-set-key (kbd "<f2>")   'bm-next)
-(global-set-key (kbd "<S-f2>") 'bm-previous)
+(global-set-key (kbd "<S-f2>") 'bm-previous)(global-set-key (kbd "<S-f2>") 'bm-previous)
 
 (setq prelude-whitespace nil)
+
 
 (global-set-key (kbd "<C-f2>") 'bm-toggle)
 (global-set-key (kbd "<f2>")   'bm-next)
@@ -600,6 +600,11 @@ downcased, no preceding underscore.
 (global-unset-key (vector (list 'shift 'up)))
 (global-unset-key (vector (list 'shift 'down)))
 
+(add-hook 'midje-mode-hook
+          (lambda ()
+            (message "passed ")
+            (define-key midje-mode-map (kbd "C-c p") nil)))
+
 ;; (global-set-key (kbd "<s-c>") 'easy-kill)
 ;; (global-set-key (kbd "<s-v>") 'yank)
 ;; (global-set-key (kbd "<s-x>") 'kill-region)
@@ -609,3 +614,10 @@ downcased, no preceding underscore.
 
 (provide '.emacs)
 ;;; .emacs ends here
+(custom-set-variables
+ '(speedbar-show-unknown-files t))
+
+;; org-mode configuration
+(setq org-hide-leading-stars t)
+
+(setq cider-use-fringe-indicators t)
