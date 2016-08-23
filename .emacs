@@ -584,16 +584,11 @@ downcased, no preceding underscore.
 
 (define-key ac-complete-mode-map "\C-p" 'ac-previous)
 
-(global-set-key (kbd "<C-f2>") 'bm-toggle)
-(global-set-key (kbd "<f2>")   'bm-next)
-(global-set-key (kbd "<S-f2>") 'bm-previous)(global-set-key (kbd "<S-f2>") 'bm-previous)
+(global-set-key (kbd "<C-f8>") 'bm-toggle)
+(global-set-key (kbd "<f8>")   'bm-next)
+(global-set-key (kbd "<M-f8>") 'bm-previous)
 
 (setq prelude-whitespace nil)
-
-
-(global-set-key (kbd "<C-f2>") 'bm-toggle)
-(global-set-key (kbd "<f2>")   'bm-next)
-(global-set-key (kbd "<S-f2>") 'bm-previous)
 
 (global-unset-key (vector (list 'shift 'left)))
 (global-unset-key (vector (list 'shift 'right)))
