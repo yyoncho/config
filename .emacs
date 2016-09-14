@@ -63,10 +63,14 @@
 (global-whitespace-mode -1)
 (global-hl-line-mode -1)
 
+;; Cursor configuration
+(blink-cursor-mode t)
+(setq cursor-type 'bar)
+(set-cursor-color "#ff8800")
+
 (prelude-require-package 'cider-eval-sexp-fu)
 
 (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
-
 
 ;; Do not list non user files
 (defun ido-ignore-non-user-except-ielm (name)
@@ -74,10 +78,7 @@
   (and (string-match "^\*" name)
        (not (and (string-match "repl" name)
                  (not (string-match "repl-messages" name))))
-       (not (string-match "shell" name))
-       (not (string-match "magit" name))
-       (not (string-match "Magit" name))
-       (not (string-match "cider" name))))
+       (not (string-match "shell\\|ansi-term\\|magit\\|Magit\\|cider" name))))
 (set-variable 'magit-stage-all-confirm nil)
 (setq ido-ignore-buffers '("\\` " ido-ignore-non-user-except-ielm))
 (setq ido-vertical-define-keys 'C-n-C-p-up-and-down)
@@ -228,7 +229,8 @@
 (defun go-to-terminal-window ()
   "Goes to terminal window"
   (interactive)
-  (switch-to-buffer "*terminal*"))
+  (switch-to-buffer "*ansi-term*"))
+
 (global-set-key (kbd "<f7>") 'go-to-terminal-window)
 
 (defun search-selection (beg end)
@@ -236,8 +238,7 @@
   (interactive "r")
   (let ((selection (buffer-substring-no-properties beg end)))
     (deactivate-mark)
-    (isearch-mode t nil nil nil)
-    (isearch-yank-string selection)))
+    (search-forward selection)))
 
 (define-key global-map (kbd "C-S-k") 'search-selection)
 (define-key global-map (kbd "C-x d") 'elpy-goto-definition)
@@ -547,6 +548,7 @@ downcased, no preceding underscore.
 (global-set-key (kbd "C-x 9") 'helm-locate)
 (global-set-key (kbd "C-<backspace>") 'subword-backward-kill)
 (global-set-key (kbd "C-x v") 'eval-buffer)
+(global-set-key (kbd "C-c C-c") 'eval-defun)
 (global-set-key (kbd "C-c h") 'helm-google-suggest)
 (global-set-key (kbd "C-x m") 'helm-M-x)
 (global-set-key [f12] 'indent-buffer)
@@ -616,3 +618,14 @@ downcased, no preceding underscore.
 (setq org-hide-leading-stars t)
 
 (setq cider-use-fringe-indicators t)
+
+
+(setq-default ibuffer-saved-filter-groups
+              `(("Default"
+                 ;; I create a group call Dired, which contains all buffer in dired-mode
+                 ("Dired" (mode . dired-mode))
+                 ("Temporary" (name . "\*.*\*"))
+                 )))
+
+(setq browse-url-generic-program (executable-find "conkeror"))
+(setq browse-url-browser-function 'browse-url-generic)
