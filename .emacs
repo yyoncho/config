@@ -21,6 +21,7 @@
           (rainbow-delimiters . "melpa-stable")
           (icicles            . "melpa"))))
 
+
 (load "~/.emacs.d/init.el")
 
 (toggle-truncate-lines t)
@@ -70,6 +71,7 @@
 
 (prelude-require-package 'cider-eval-sexp-fu)
 
+
 (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
 
 ;; Do not list non user files
@@ -88,7 +90,7 @@
 (recentf-mode 1)
 (setq recentf-max-menu-items 50)
 
-(set-face-attribute 'default nil :height 130)
+(set-face-attribute 'default nil :height 110)
 
 ;; Ido recentf files integration
 (defun recentf-interactive-complete ()
@@ -196,13 +198,21 @@
 (add-hook 'cider-mode-hook #'eldoc-mode)
 (add-hook 'cider-mode-hook #'paredit-mode)
 (add-hook 'cider-mode-hook #'auto-complete-mode)
-(add-hook 'cider-mode-hook #'midje-mode)
 (add-hook 'cider-mode-hook #'rainbow-delimiters-mode)
 (add-hook 'cider-mode-hook #'aggressive-indent-mode)
 (add-hook 'cider-mode-hook #'auto-highlight-symbol-mode)
-(add-hook 'cider-repl-mode-hook #'paredit-mode)
-
 (setq cider-auto-mode 't)
+
+(defun clojure-togle-to-tests ()
+  "Toggles between the file and the corresponding test file"
+  (interactive)
+  (find-file-other-window (if (string-match "test" (buffer-name))
+                              (s-replace "test" "src"
+                                         (s-replace  "_test"
+                                                     ""
+                                                     (buffer-file-name)))
+                            (s-replace "/src/" "/test/"
+                                       (s-replace ".clj" "_test.clj" (buffer-file-name))))))
 
 (eval-after-load 'cider-mode
   '(define-key cider-mode-map (kbd "C-x C-j") 'projectile-find-implementation-or-test-other-window))
@@ -210,8 +220,8 @@
 (eval-after-load 'cider-mode
   '(define-key cider-mode-map (kbd "C-c M-r") 'cider-restart))
 
-(add-hook 'cider-repl-mode-hook #'paredit-mode)
 
+(add-hook 'cider-repl-mode-hook #'paredit-mode)
 
 (setq cider-test-show-report-on-success nil)
 (setq cider-prompt-save-file-on-load 'always-save)
@@ -219,11 +229,11 @@
 
 (add-to-list 'auto-mode-alist '("\\.clj\\'" . clojure-mode))
 
+
 (defun kill-current-buffer ()
   "Kills current buffer"
   (interactive)
   (kill-buffer (current-buffer)))
-
 (global-set-key (kbd "C-x k") 'kill-current-buffer)
 
 (defun go-to-terminal-window ()
@@ -497,7 +507,7 @@ downcased, no preceding underscore.
   (eval-after-load mode
     (font-lock-add-keywords
      mode '(
-            ("(\\(defn\\)[\[[:space:]]"
+            ("(\\(defn\\)[\[[:space:]]" ; anon funcs 1
              (0 (progn (compose-region (match-beginning 1)
                                        (match-end 1) "ƒ")
                        nil)))
@@ -505,23 +515,23 @@ downcased, no preceding underscore.
              (0 (progn (compose-region (match-beginning 1)
                                        (match-end 1) "µ")
                        nil)))
-            ("(\\(fn\\)[\[[:space:]]"
+            ("(\\(fn\\)[\[[:space:]]"  ; anon funcs 1
              (0 (progn (compose-region (match-beginning 1)
                                        (match-end 1) "λ")
                        nil)))
-            ("(\\(def\\)[\[[:space:]]"
+            ("(\\(def\\)[\[[:space:]]"  ; anon funcs 1
              (0 (progn (compose-region (match-beginning 1)
                                        (match-end 1) "≡")
                        nil)))
-            ("\\(#\\)("
+            ("\\(#\\)("                ; anon funcs 2
              (0 (progn (compose-region (match-beginning 1)
                                        (match-end 1) "λ")
                        nil)))
-            ("\\(Math/PI\\)"
+            ("\\(Math/PI\\)"                ; anon funcs 2
              (0 (progn (compose-region (match-beginning 1)
                                        (match-end 1) "π")
                        nil)))
-            ("\\(#\\){"
+            ("\\(#\\){"                 ; sets
              (0 (progn (compose-region (match-beginning 1)
                                        (match-end 1) "∈")
                        nil)))))))
@@ -534,7 +544,7 @@ downcased, no preceding underscore.
 (global-set-key (kbd "C-M-u") 'er/expand-region)
 (global-set-key (kbd "C->") 'mc/mark-next-like-this)
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c C->") 'mc/mark-all-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 (global-set-key (kbd "C-M-s") 'helm-swoop)
 (global-set-key (kbd "C-h") 'backward-delete-char)
 (global-set-key (kbd "C-M-y") 'helm-show-kill-ring)
@@ -585,6 +595,7 @@ downcased, no preceding underscore.
 (define-key ac-complete-mode-map "C-М-)" 'paredit-forward-slurp-sexp)
 
 (define-key ac-complete-mode-map "\C-p" 'ac-previous)
+(define-key ac-complete-mode-map "\C-p" 'ac-previous)
 
 (global-set-key (kbd "<C-f8>") 'bm-toggle)
 (global-set-key (kbd "<f8>")   'bm-next)
@@ -611,6 +622,7 @@ downcased, no preceding underscore.
 
 (provide '.emacs)
 ;;; .emacs ends here
+
 (custom-set-variables
  '(speedbar-show-unknown-files t))
 
@@ -628,3 +640,10 @@ downcased, no preceding underscore.
 
 (setq browse-url-generic-program (executable-find "conkeror"))
 (setq browse-url-browser-function 'browse-url-generic)
+
+;; always follow symlinks
+(setq vc-follow-symlinks t)
+
+;; use windows-1251
+(modify-coding-system-alist 'file "\\.txt\\'" 'windows-1251)
+
