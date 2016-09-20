@@ -624,8 +624,7 @@ downcased, no preceding underscore.
               `(("Default"
                  ;; I create a group call Dired, which contains all buffer in dired-mode
                  ("Dired" (mode . dired-mode))
-                 ("Temporary" (name . "\*.*\*"))
-                 )))
+                 ("Temporary" (name . "\*.*\*")))))
 
 (setq browse-url-generic-program (executable-find "conkeror"))
 (setq browse-url-browser-function 'browse-url-generic)
