@@ -647,3 +647,7 @@ downcased, no preceding underscore.
 ;; use windows-1251
 (modify-coding-system-alist 'file "\\.txt\\'" 'windows-1251)
 
+(set-face-attribute 'region nil :background "#666")
+
+(set-cursor-color "#fffdd0") 
+
