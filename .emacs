@@ -47,6 +47,7 @@
 (prelude-require-package 'bm)
 (prelude-require-package 'helm-projectile)
 (prelude-require-package 'ujelly-theme)
+(prelude-require-package 'golden-ratio)
 
 (ido-vertical-mode t)
 (flx-ido-mode t)
@@ -63,11 +64,10 @@
 (undo-tree-mode t)
 (global-whitespace-mode -1)
 (global-hl-line-mode -1)
+(golden-ratio-mode t)
 
 ;; Cursor configuration
 (blink-cursor-mode t)
-(setq cursor-type 'bar)
-(set-cursor-color "#ff8800")
 
 (prelude-require-package 'cider-eval-sexp-fu)
 
@@ -649,5 +649,5 @@ downcased, no preceding underscore.
 
 (set-face-attribute 'region nil :background "#666")
 
-(set-cursor-color "#fffdd0") 
-
+(set-cursor-color "#ff8800")
+(setq cursor-type 'bar)
