@@ -1,3 +1,10 @@
+
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+(package-initialize)
+
 (require 'package)
 
 
@@ -48,6 +55,7 @@
 (prelude-require-package 'helm-projectile)
 (prelude-require-package 'ujelly-theme)
 (prelude-require-package 'golden-ratio)
+(prelude-require-package 'back-button)
 
 (ido-vertical-mode t)
 (flx-ido-mode t)
@@ -84,6 +92,7 @@
 (set-variable 'magit-stage-all-confirm nil)
 (setq ido-ignore-buffers '("\\` " ido-ignore-non-user-except-ielm))
 (setq ido-vertical-define-keys 'C-n-C-p-up-and-down)
+(setq kill-do-not-save-duplicates t)
 
 ;; recent file configuration
 (require 'recentf)
@@ -497,17 +506,18 @@ downcased, no preceding underscore.
 
 (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
 (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+(add-hook 'emacs-lisp-mode-hook       #'aggressive-indent-mode)
 (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
 (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
 (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-mode-hook             #'aggressive-indent-mode)
 (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
 (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
 
 (dolist (mode '(clojure-mode clojurescript-mode cider-mode))
   (eval-after-load mode
     (font-lock-add-keywords
-     mode '(
-            ("(\\(defn\\)[\[[:space:]]" ; anon funcs 1
+     mode '(("(\\(defn\\)[\[[:space:]]" ; anon funcs 1
              (0 (progn (compose-region (match-beginning 1)
                                        (match-end 1) "ƒ")
                        nil)))
@@ -547,6 +557,7 @@ downcased, no preceding underscore.
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 (global-set-key (kbd "C-M-s") 'helm-swoop)
 (global-set-key (kbd "C-h") 'backward-delete-char)
+(global-set-key (kbd "C-M-h") 'backward-kill-word)
 (global-set-key (kbd "C-M-y") 'helm-show-kill-ring)
 (global-set-key (kbd "C-S-l") 'helm-projectile-grep)
 (global-set-key (kbd "C-S-c") 'comment-region)
@@ -613,11 +624,6 @@ downcased, no preceding underscore.
             (message "passed ")
             (define-key midje-mode-map (kbd "C-c p") nil)))
 
-;; (global-set-key (kbd "<s-c>") 'easy-kill)
-;; (global-set-key (kbd "<s-v>") 'yank)
-;; (global-set-key (kbd "<s-x>") 'kill-region)
-
-
 (setq midje-comments ";;.;.")
 
 (provide '.emacs)
@@ -667,3 +673,71 @@ downcased, no preceding underscore.
             (setq answer (+ (expt 10 field-width) answer)))
           (replace-match (format (concat "%0" (int-to-string field-width) "d")
                                  answer)))))))
+
+
+;; back button config
+(define-key global-map (kbd "M-<left>") 'back-button-global-backward)
+(define-key global-map (kbd "M-<right>") 'back-button-global-forward)
+
+(defun mvn-dependency-version-to-properties (&optional arg)
+  (interactive "p")
+  (save-excursion
+    (search-forward "<version>")
+    (kill-region (point) (progn
+                           (search-forward "</version>"
+                                           nil nil arg)
+                           (backward-char 10)
+                           (point)))
+    (let ((version (car kill-ring-yank-pointer)))
+      (search-backward "<dependency>")
+      (search-forward "<artifactId>")
+      (kill-ring-save (point) (progn
+                                (search-forward "</artifactId>"
+                                                nil nil arg)
+                                (backward-char 13)
+                                (point)))
+      (let ((group-id (car kill-ring-yank-pointer)))
+        (search-backward "<dependency>")
+        (search-forward "<version>")
+        (insert "${" group-id ".version}")
+        (search-backward "</properties>")
+        (search-backward ">")
+        (forward-char 1)
+        (insert "\n")
+        (indent-for-tab-command)
+        (insert "<" group-id ".version>" version "</" group-id ".version>" )))))
+
+
+(defun mvn-inline-property (&optional arg)
+  (interactive "p")
+  (save-excursion
+    (search-forward "<")
+    (kill-region (point) (progn
+                           (search-forward ">"
+                                           nil nil arg)
+                           (backward-char 1)
+                           (point)))
+    (let ((property-name (car kill-ring-yank-pointer)))
+      (forward-char 1)
+      (kill-region (point) (progn
+                             (search-forward "<"
+                                             nil nil arg)
+                             (backward-char 1)
+                             (point)))
+      
+      (let ((property-value (car kill-ring-yank-pointer)))
+        (beginning-of-line)
+        (kill-line)
+        (kill-line)
+        (replace-string (concat "${" property-name "}") property-value)))))
+
+
+(defun mvn-sort-properties (&optional arg)
+  (interactive "p")
+  (save-excursion
+    (beginning-of-buffer)
+    (search-forward "<properties>")
+    (set-mark-command (point))
+    (search-forward "</properties>")
+    ;(flush-lines "^\\s-*$"  (region-beginning) (region-end))
+    (sort-lines nil (region-beginning) (region-end))))
