@@ -89,7 +89,11 @@
        (not (and (string-match "repl" name)
                  (not (string-match "repl-messages" name))))
        (not (string-match "shell\\|ansi-term\\|magit\\|Magit\\|cider" name))))
-(set-variable 'magit-stage-all-confirm nil)
+
+;; magit configuration
+(setq magit-stage-all-confirm nil)
+(setq git-commit-summary-max-length 999)
+
 (setq ido-ignore-buffers '("\\` " ido-ignore-non-user-except-ielm))
 (setq ido-vertical-define-keys 'C-n-C-p-up-and-down)
 (setq kill-do-not-save-duplicates t)
@@ -655,8 +659,8 @@ downcased, no preceding underscore.
 
 (set-face-attribute 'region nil :background "#666")
 
-(setq-default cursor-type '(bar . 1))
-(set-cursor-color "#ff0")
+(setq-default cursor-type '(bar . 3))
+(set-cursor-color "pink")
 
 (defun increment-number-decimal (&optional arg)
   "Increment the number forward from point by 'arg'."
@@ -739,5 +743,16 @@ downcased, no preceding underscore.
     (search-forward "<properties>")
     (set-mark-command (point))
     (search-forward "</properties>")
-    ;(flush-lines "^\\s-*$"  (region-beginning) (region-end))
+                                        ;(flush-lines "^\\s-*$"  (region-beginning) (region-end))
     (sort-lines nil (region-beginning) (region-end))))
+
+
+(defun prelude-copy-file-name-to-clipboard ()
+  "Copy the current buffer file name to the clipboard."
+  (interactive)
+  (let ((filename (if (equal major-mode 'dired-mode)
+                      default-directory
+                    (buffer-file-name))))
+    (when filename
+      (kill-new filename)
+      (message "Copied buffer file name '%s' to the clipboard." filename))))
