@@ -37,6 +37,7 @@
 (prelude-require-package 'ido-vertical-mode)
 (prelude-require-package 'ac-cider)
 (prelude-require-package 'bind-key)
+(prelude-require-package 'java-snippets)
 (prelude-require-package 'tabbar)
 (prelude-require-package 'elpy)
 (prelude-require-package 'clj-refactor)
@@ -103,7 +104,7 @@
 (recentf-mode 1)
 (setq recentf-max-menu-items 50)
 
-(set-face-attribute 'default nil :height 110)
+(set-face-attribute 'default nil :height 150)
 
 ;; Ido recentf files integration
 (defun recentf-interactive-complete ()
@@ -216,16 +217,6 @@
 (add-hook 'cider-mode-hook #'auto-highlight-symbol-mode)
 (setq cider-auto-mode 't)
 
-(defun clojure-togle-to-tests ()
-  "Toggles between the file and the corresponding test file"
-  (interactive)
-  (find-file-other-window (if (string-match "test" (buffer-name))
-                              (s-replace "test" "src"
-                                         (s-replace  "_test"
-                                                     ""
-                                                     (buffer-file-name)))
-                            (s-replace "/src/" "/test/"
-                                       (s-replace ".clj" "_test.clj" (buffer-file-name))))))
 
 (eval-after-load 'cider-mode
   '(define-key cider-mode-map (kbd "C-x C-j") 'projectile-find-implementation-or-test-other-window))
@@ -233,6 +224,10 @@
 (eval-after-load 'cider-mode
   '(define-key cider-mode-map (kbd "C-c M-r") 'cider-restart))
 
+(add-hook 'java-mode-hook #'paredit-mode)
+(add-hook 'java-mode-hook #'meghanada-mode)
+(add-hook 'java-mode-hook #'aggressive-indent-mode)
+(add-hook 'java-mode-hook #'yas-minor-mode)
 
 (add-hook 'cider-repl-mode-hook #'paredit-mode)
 
@@ -498,6 +493,9 @@ downcased, no preceding underscore.
 (fset 'clojure-fix-java-import
       [?\( ?\C-u ?\C-d ?\C-e backspace ?\) ?\C-a ?\C-f ?\M-\\ ?\C-a ?\C-n])
 
+
+
+
 (set-face-attribute 'default nil :height 130)
 
 (eval-after-load 'flycheck '(flycheck-clojure-setup))
@@ -596,6 +594,7 @@ downcased, no preceding underscore.
 (global-set-key [remap kill-ring-save] 'easy-kill)
 
 (setq exec-path (append exec-path '("/usr/bin")))
+(setq exec-path (append exec-path '("/usr/bin")))
 
 (define-key company-active-map "\C-n" 'company-select-next)
 (define-key company-active-map "\C-p" 'company-select-previous)
@@ -659,8 +658,8 @@ downcased, no preceding underscore.
 
 (set-face-attribute 'region nil :background "#666")
 
-(setq-default cursor-type '(bar . 3))
-(set-cursor-color "pink")
+(setq-default cursor-type '(bar . 2))
+(setq default-frame-alist '((cursor-color . "white")))
 
 (defun increment-number-decimal (&optional arg)
   "Increment the number forward from point by 'arg'."
@@ -756,3 +755,4 @@ downcased, no preceding underscore.
     (when filename
       (kill-new filename)
       (message "Copied buffer file name '%s' to the clipboard." filename))))
+
