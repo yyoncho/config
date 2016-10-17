@@ -6,7 +6,6 @@
 
 (require 'package)
 
-
 (setq package-archives '(("ELPA" . "http://tromey.com/elpa/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
                          ("melpa" . "http://melpa.org/packages/")
@@ -566,7 +565,7 @@ downcased, no preceding underscore.
 (global-set-key (kbd "C-h") 'backward-delete-char)
 (global-set-key (kbd "C-M-h") 'backward-kill-word)
 (global-set-key (kbd "C-M-y") 'helm-show-kill-ring)
-(global-set-key (kbd "C-S-l") 'helm-projectile-grep)
+(global-set-key (kbd "C-S-l") 'helm-projectile-ack)
 (global-set-key (kbd "C-S-c") 'comment-region)
 (global-set-key (kbd "C-v") 'ace-window)
 (global-set-key (kbd "C-c 9") 'buffer-menu)
@@ -585,11 +584,6 @@ downcased, no preceding underscore.
 ;; unset the suspend frame command
 (global-unset-key (kbd "C-z"))
 (global-unset-key (kbd "C-x C-z"))
-
-(add-to-list 'helm-grep-ignored-files "*.war")
-(add-to-list 'helm-grep-ignored-files "*.class")
-(add-to-list 'helm-grep-ignored-files ".classpath")
-(add-to-list 'helm-grep-ignored-files "*.jar")
 
 
 ;; configuration for multiple cursors
@@ -667,6 +661,7 @@ downcased, no preceding underscore.
 
 (setq-default cursor-type '(bar . 2))
 (setq default-frame-alist '((cursor-color . "white")))
+(set-cursor-color "white")
 
 (defun increment-number-decimal (&optional arg)
   "Increment the number forward from point by 'arg'."
@@ -734,7 +729,7 @@ downcased, no preceding underscore.
                                              nil nil arg)
                              (backward-char 1)
                              (point)))
-      
+
       (let ((property-value (car kill-ring-yank-pointer)))
         (beginning-of-line)
         (kill-line)
@@ -762,3 +757,12 @@ downcased, no preceding underscore.
     (when filename
       (kill-new filename)
       (message "Copied buffer file name '%s' to the clipboard." filename))))
+
+(setq vc-suppress-confirm nil)
+(setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.war"))
+(setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.class"))
+(setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.zip"))
+(setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files ".classpath"))
+(setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.jar"))
+(setq grep-find-ignored-files helm-grep-ignored-files)
+(setq grep-find-ignored-directories (add-to-list 'grep-find-ignored-directories ".meghanada"))
