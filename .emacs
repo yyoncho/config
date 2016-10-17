@@ -1,4 +1,3 @@
-
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
@@ -74,6 +73,7 @@
 (global-whitespace-mode -1)
 (global-hl-line-mode -1)
 (golden-ratio-mode t)
+(global-auto-highlight-symbol-mode t)
 
 ;; Cursor configuration
 (blink-cursor-mode t)
@@ -104,7 +104,7 @@
 (recentf-mode 1)
 (setq recentf-max-menu-items 50)
 
-(set-face-attribute 'default nil :height 150)
+(set-face-attribute 'default nil :height 110)
 
 ;; Ido recentf files integration
 (defun recentf-interactive-complete ()
@@ -225,6 +225,11 @@
   '(define-key cider-mode-map (kbd "C-c M-r") 'cider-restart))
 
 (add-hook 'java-mode-hook #'paredit-mode)
+(add-hook 'java-mode-hook (lambda ()
+                            (setq c-basic-offset 4
+                                  tab-width 4
+                                  indent-tabs-mode nil)
+                            (c-set-offset 'inline-open '=)))
 (add-hook 'java-mode-hook #'meghanada-mode)
 (add-hook 'java-mode-hook #'aggressive-indent-mode)
 (add-hook 'java-mode-hook #'yas-minor-mode)
@@ -233,6 +238,10 @@
 
 (setq cider-test-show-report-on-success nil)
 (setq cider-prompt-save-file-on-load 'always-save)
+
+(eval-after-load 'java-mode
+  '(define-key java-mode-map (kbd "C-x C-j") 'projectile-find-implementation-or-test-other-window))
+
 
 
 (add-to-list 'auto-mode-alist '("\\.clj\\'" . clojure-mode))
@@ -456,8 +465,6 @@ downcased, no preceding underscore.
 (setq browse-url-browser-function 'browse-url-generic
       browse-url-generic-program "chromium-browser")
 
-(helm-descbinds-mode)
-;; prior to emacs24
 (helm-descbinds-mode 1)
 
 (add-hook 'malabar-mode-hook
@@ -492,9 +499,6 @@ downcased, no preceding underscore.
 
 (fset 'clojure-fix-java-import
       [?\( ?\C-u ?\C-d ?\C-e backspace ?\) ?\C-a ?\C-f ?\M-\\ ?\C-a ?\C-n])
-
-
-
 
 (set-face-attribute 'default nil :height 130)
 
@@ -551,6 +555,7 @@ downcased, no preceding underscore.
 (global-set-key "\C-x\ \C-r" 'helm-recentf)
 
 ;; shortcuts configuration
+
 (global-set-key (kbd "M-/") 'hippie-expand)
 (global-set-key (kbd "C-l") 'other-window)
 (global-set-key (kbd "C-M-u") 'er/expand-region)
@@ -574,42 +579,44 @@ downcased, no preceding underscore.
 (global-set-key (kbd "C-c C-c") 'eval-defun)
 (global-set-key (kbd "C-c h") 'helm-google-suggest)
 (global-set-key (kbd "C-x m") 'helm-M-x)
+(global-set-key (kbd "C-x C-j") 'projectile-find-implementation-or-test-other-window)
 (global-set-key [f12] 'indent-buffer)
-
-(fset 'mark-under-cursor
-      [?\C-= ?\C->])
-(global-set-key (kbd "C-c m m") 'mark-under-cursor)
 
 ;; unset the suspend frame command
 (global-unset-key (kbd "C-z"))
 (global-unset-key (kbd "C-x C-z"))
+
+(add-to-list 'helm-grep-ignored-files "*.war")
+(add-to-list 'helm-grep-ignored-files "*.class")
+(add-to-list 'helm-grep-ignored-files ".classpath")
+(add-to-list 'helm-grep-ignored-files "*.jar")
+
 
 ;; configuration for multiple cursors
 (global-set-key (kbd "C->") 'mc/mark-next-like-this)
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
-(define-key global-map (kbd "C-c SPC") 'avy-goto-char)
+(define-key global-map (kbd "C-c SPC") 'avy-goto-word-1)
 
 (global-set-key [remap kill-ring-save] 'easy-kill)
 
 (setq exec-path (append exec-path '("/usr/bin")))
-(setq exec-path (append exec-path '("/usr/bin")))
 
-(define-key company-active-map "\C-n" 'company-select-next)
 (define-key company-active-map "\C-p" 'company-select-previous)
+(define-key company-active-map "\C-n" 'company-select-next)
 (define-key company-active-map "\C-j" 'company-complete-selection)
+
+(define-key java-mode-map "\M-j" 'join-line)
 
 (global-set-key (kbd "M-p") 'move-line-up)
 (global-set-key (kbd "M-n") 'move-line-down)
 
-(define-key ac-complete-mode-map "\C-n" 'ac-next)
-(define-key ac-complete-mode-map "\C-p" 'ac-previous)
+(define-key ac-complete-mode-map "\C-n" 'ac-previous)
+(define-key ac-complete-mode-map "\C-p" 'ac-next)
 
 (define-key ac-complete-mode-map "C-М-)" 'paredit-forward-slurp-sexp)
 
-(define-key ac-complete-mode-map "\C-p" 'ac-previous)
-(define-key ac-complete-mode-map "\C-p" 'ac-previous)
 
 (global-set-key (kbd "<C-f8>") 'bm-toggle)
 (global-set-key (kbd "<f8>")   'bm-next)
@@ -755,4 +762,3 @@ downcased, no preceding underscore.
     (when filename
       (kill-new filename)
       (message "Copied buffer file name '%s' to the clipboard." filename))))
-
