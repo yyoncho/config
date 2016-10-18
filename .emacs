@@ -1,7 +1,10 @@
+(defconst emacs-start-time (current-time))
+
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
+
 (package-initialize)
 
 (require 'package)
@@ -30,8 +33,6 @@
 (load "~/.emacs.d/init.el")
 
 (toggle-truncate-lines t)
-
-(ido-mode t)
 (prelude-require-package 'ido-vertical-mode)
 (prelude-require-package 'ac-cider)
 (prelude-require-package 'bind-key)
@@ -55,13 +56,18 @@
 (prelude-require-package 'ujelly-theme)
 (prelude-require-package 'golden-ratio)
 (prelude-require-package 'back-button)
+(prelude-require-package 'cider-eval-sexp-fu)
+(prelude-require-package 'powerline)
+(prelude-require-package 'recentf)
 
+;; modes
+(ido-mode t)
 (ido-vertical-mode t)
+(winner-mode 1)
 (flx-ido-mode t)
 (transient-mark-mode t)
 (ido-everywhere t)
 (ido-ubiquitous-mode t)
-
 (show-paren-mode 1)
 (setq blink-matching-delay 0.1)
 (global-subword-mode t)
@@ -73,15 +79,20 @@
 (global-hl-line-mode -1)
 (golden-ratio-mode t)
 (global-auto-highlight-symbol-mode t)
-
-;; Cursor configuration
 (blink-cursor-mode t)
-
-(prelude-require-package 'cider-eval-sexp-fu)
-
+(recentf-mode 1)
+(tabbar-mode -1)
+(line-number-mode 1)
+(column-number-mode 1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(global-auto-revert-mode 1)
+(helm-descbinds-mode 1)
+(flycheck-pos-tip-mode t)
 
 (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
 
+;; ido configuration
 ;; Do not list non user files
 (defun ido-ignore-non-user-except-ielm (name)
   "Ignore all non-user (a.k.a. *starred*) buffers except **."
@@ -90,44 +101,19 @@
                  (not (string-match "repl-messages" name))))
        (not (string-match "shell\\|ansi-term\\|magit\\|Magit\\|cider" name))))
 
+(setq ido-ignore-buffers '("\\` " ido-ignore-non-user-except-ielm))
+(setq ido-vertical-define-keys 'C-n-C-p-up-and-down)
+
 ;; magit configuration
 (setq magit-stage-all-confirm nil)
 (setq git-commit-summary-max-length 999)
 
-(setq ido-ignore-buffers '("\\` " ido-ignore-non-user-except-ielm))
-(setq ido-vertical-define-keys 'C-n-C-p-up-and-down)
 (setq kill-do-not-save-duplicates t)
 
 ;; recent file configuration
-(require 'recentf)
-(recentf-mode 1)
 (setq recentf-max-menu-items 50)
 
 (set-face-attribute 'default nil :height 110)
-
-;; Ido recentf files integration
-(defun recentf-interactive-complete ()
-  "find a file in the recently open file using ido for completion"
-  (interactive)
-  (let* ((all-files recentf-list)
-         (file-assoc-list (mapcar (lambda (x) (cons (file-name-nondirectory x) x)) all-files))
-         (filename-list (remove-duplicates (mapcar 'car file-assoc-list) :test 'string=))
-         (ido-make-buffer-list-hook
-          (lambda ()
-            (setq ido-temp-list filename-list)))
-         (filename (ido-read-buffer "Find Recent File: "))
-         (result-list (delq nil (mapcar (lambda (x) (if (string= (car x) filename) (cdr x))) file-assoc-list)))
-         (result-length (length result-list)))
-    (find-file
-     (cond
-      ((= result-length 0) filename)
-      ((= result-length 1) (car result-list))
-      ( t
-        (let ( (ido-make-buffer-list-hook
-                (lambda ()
-                  (setq ido-temp-list result-list))))
-          (ido-read-buffer (format "%d matches:" result-length))))
-      ))))
 
 ;; disable backup files
 (setq make-backup-files nil)
@@ -141,24 +127,18 @@
     (indent-region (point-min) (point-max) nil)))
 
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
+ '(uniquify-buffer-name-style 'reverse)
  '(inhibit-startup-screen t)
  '(ediff-split-window-function (quote split-window-horizontally))
- '(send-mail-function (quote smtpmail-send-it)))
+ '(send-mail-function (quote smtpmail-send-it))
+ '(speedbar-show-unknown-files t)
+ '(x-select-enable-clipboard t))
 
-(setq x-select-enable-clipboard t)
-
-(require 'uniquify)
-(setq uniquify-buffer-name-style 'reverse)
-
-(setq-default tab-width 4)
 (setq sgml-basic-offset 4)
 
 (setq c-basic-indent 2)
 (setq tab-width 4)
+(setq-default tab-width 4)
 
 ;; Descrnibe last command
 (defun describe-last-function()
@@ -190,7 +170,6 @@
 ;; dired - no confirmation when deleting
 (setq dired-deletion-confirmer '(lambda (x) t))
 
-
 ;; eval and replace
 (defun eval-and-replace ()
   "Replace the preceding sexp with its value."
@@ -204,44 +183,46 @@
            (insert (current-kill 0)))))
 
 (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
+
+;; file -> mode configuration
 (add-to-list 'auto-mode-alist '("\\.raml\\'" . yaml-mode))
 (add-to-list 'auto-mode-alist '("\\.tpl\\'" . python-mode))
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 
+;; cider configuration
 (add-hook 'cider-mode-hook #'eldoc-mode)
 (add-hook 'cider-mode-hook #'paredit-mode)
 (add-hook 'cider-mode-hook #'auto-complete-mode)
 (add-hook 'cider-mode-hook #'rainbow-delimiters-mode)
 (add-hook 'cider-mode-hook #'aggressive-indent-mode)
 (add-hook 'cider-mode-hook #'auto-highlight-symbol-mode)
+
+(setq cider-test-show-report-on-success nil)
+(setq cider-prompt-save-file-on-load 'always-save)
+
 (setq cider-auto-mode 't)
-
-
 (eval-after-load 'cider-mode
   '(define-key cider-mode-map (kbd "C-x C-j") 'projectile-find-implementation-or-test-other-window))
 
 (eval-after-load 'cider-mode
   '(define-key cider-mode-map (kbd "C-c M-r") 'cider-restart))
 
+;; java configuration
+(defun java-conf () 
+  (setq c-basic-offset 4
+        tab-width 4
+        indent-tabs-mode nil)
+  (c-set-offset 'inline-open '=))
+
 (add-hook 'java-mode-hook #'paredit-mode)
-(add-hook 'java-mode-hook (lambda ()
-                            (setq c-basic-offset 4
-                                  tab-width 4
-                                  indent-tabs-mode nil)
-                            (c-set-offset 'inline-open '=)))
+(add-hook 'java-mode-hook #'java-conf)
 (add-hook 'java-mode-hook #'meghanada-mode)
 (add-hook 'java-mode-hook #'aggressive-indent-mode)
 (add-hook 'java-mode-hook #'yas-minor-mode)
-
 (add-hook 'cider-repl-mode-hook #'paredit-mode)
-
-(setq cider-test-show-report-on-success nil)
-(setq cider-prompt-save-file-on-load 'always-save)
 
 (eval-after-load 'java-mode
   '(define-key java-mode-map (kbd "C-x C-j") 'projectile-find-implementation-or-test-other-window))
-
-
 
 (add-to-list 'auto-mode-alist '("\\.clj\\'" . clojure-mode))
 
@@ -250,14 +231,12 @@
   "Kills current buffer"
   (interactive)
   (kill-buffer (current-buffer)))
-(global-set-key (kbd "C-x k") 'kill-current-buffer)
 
 (defun go-to-terminal-window ()
   "Goes to terminal window"
   (interactive)
   (switch-to-buffer "*ansi-term*"))
 
-(global-set-key (kbd "<f7>") 'go-to-terminal-window)
 
 (defun search-selection (beg end)
   "search for selected text"
@@ -280,7 +259,6 @@
     (delete-forward-char 1)
     (delete-horizontal-space)))
 
-(global-set-key (kbd "M-j") 'join-next-line)
 
 (defun set-auto-complete-as-completion-at-point-function ()
   (setq completion-at-point-functions '(auto-complete)))
@@ -331,10 +309,6 @@ downcased, no preceding underscore.
 
 (add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
 
-(global-set-key (kbd "M-i") 'helm-swoop)
-(global-set-key (kbd "M-I") 'helm-swoop-back-to-last-point)
-(global-set-key (kbd "C-c M-i") 'helm-multi-swoop)
-(global-set-key (kbd "C-x M-i") 'helm-multi-swoop-all)
 
 ;; better window splitting
 (defun my/vsplit-last-buffer (prefix)
@@ -355,22 +329,15 @@ downcased, no preceding underscore.
 (bind-key "C-x 2" 'my/vsplit-last-buffer)
 (bind-key "C-x 3" 'my/hsplit-last-buffer)
 
-;; use y/n instead of yes/no
 (fset 'yes-or-no-p 'y-or-n-p)
 
 ;; prevent prompt for killing emcacsclient buffer
 (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
-                                        ; (tabbar-mode t)
 
 (elpy-enable)
 (require 'cl)
 
-(setq inhibit-splash-screen t)      ; no splash screen, thanks
-(line-number-mode 1)            ; have line numbers and
-(column-number-mode 1)          ; column numbers in the mode line
-
-(tool-bar-mode -1)          ; no tool bar with icons
-(scroll-bar-mode -1)            ; no scroll bars
+(setq inhibit-splash-screen t)
 
 ;; avoid compiz manager rendering bugs
 (add-to-list 'default-frame-alist '(alpha . 100))
@@ -379,13 +346,12 @@ downcased, no preceding underscore.
 (setq x-select-enable-clipboard t)
 
                                         ; winner-mode provides C-<left> to get back to previous window layout
-(winner-mode 1)
 ;; (set-face-attribute 'default nil :height 100)
 
 ;; whenever an external process changes a file underneath emacs, and there
 ;; was no unsaved changes in the corresponding buffer, just revert its
 ;; content to reflect what's on-disk.
-(global-auto-revert-mode 1)
+
 
 ;; M-x shell is a nice shell interface to use, let's make it colorful.  If
 ;; you need a terminal emulator rather than just a shell, consider M-x term
@@ -403,31 +369,12 @@ downcased, no preceding underscore.
 (require 'term)
 (define-key term-raw-map  (kbd "C-'") 'term-line-mode)
 (define-key term-mode-map (kbd "C-'") 'term-char-mode)
-
-;; Have C-y act as usual in term-mode, to avoid C-' C-y C-'
-;; Well the real default would be C-c C-j C-y C-c C-k.
 (define-key term-raw-map  (kbd "C-y") 'term-paste)
 
-;; use ido for minibuffer completion
-;; (require 'ido)
-;; (setq ido-save-directory-list-file "~/.ido.last")
-;; (setq ido-enable-flex-matching t)
-;; (setq ido-use-filename-at-point 'guess)
-;; (setq ido-show-dot-for-dired t)
-
-;; default key to switch buffer is C-x b, but that's not easy enough
-;; (global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
-(global-set-key (kbd "C-x B") 'ibuffer)
-
-;; C-x C-j opens dired with the cursor right on the file you're editing
-(require 'dired-x)
-
-;; full screen
 (defun fullscreen ()
   (interactive)
   (set-frame-parameter nil 'fullscreen
                        (if (frame-parameter nil 'fullscreen) nil 'fullboth)))
-(global-set-key [f11] 'fullscreen)
 
 
 
@@ -464,12 +411,6 @@ downcased, no preceding underscore.
 (setq browse-url-browser-function 'browse-url-generic
       browse-url-generic-program "chromium-browser")
 
-(helm-descbinds-mode 1)
-
-(add-hook 'malabar-mode-hook
-          (lambda ()
-            (add-hook 'after-save-hook 'malabar-http-compile-file-silently
-                      nil t)))
 
 (defun move-line (n)
   "Move the current line up or down by N lines."
@@ -493,11 +434,6 @@ downcased, no preceding underscore.
   "Move the current line down by N lines."
   (interactive "p")
   (move-line (if (null n) 1 n)))
-
-(flycheck-pos-tip-mode t)
-
-(fset 'clojure-fix-java-import
-      [?\( ?\C-u ?\C-d ?\C-e backspace ?\) ?\C-a ?\C-f ?\M-\\ ?\C-a ?\C-n])
 
 (set-face-attribute 'default nil :height 130)
 
@@ -551,35 +487,9 @@ downcased, no preceding underscore.
                                        (match-end 1) "∈")
                        nil)))))))
 
-(global-set-key "\C-x\ \C-r" 'helm-recentf)
 
 ;; shortcuts configuration
 
-(global-set-key (kbd "M-/") 'hippie-expand)
-(global-set-key (kbd "C-l") 'other-window)
-(global-set-key (kbd "C-M-u") 'er/expand-region)
-(global-set-key (kbd "C->") 'mc/mark-next-like-this)
-(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-(global-set-key (kbd "C-M-s") 'helm-swoop)
-(global-set-key (kbd "C-h") 'backward-delete-char)
-(global-set-key (kbd "C-M-h") 'backward-kill-word)
-(global-set-key (kbd "C-M-y") 'helm-show-kill-ring)
-(global-set-key (kbd "C-S-l") 'helm-projectile-ack)
-(global-set-key (kbd "C-S-c") 'comment-region)
-(global-set-key (kbd "C-v") 'ace-window)
-(global-set-key (kbd "C-c 9") 'buffer-menu)
-(global-set-key (kbd "C-x p") 'previous-buffer)
-(global-set-key (kbd "C-x n") 'next-buffer)
-(global-set-key (kbd "C-M-u") 'er/expand-region)
-(global-set-key (kbd "C-x 9") 'helm-locate)
-(global-set-key (kbd "C-<backspace>") 'subword-backward-kill)
-(global-set-key (kbd "C-x v") 'eval-buffer)
-(global-set-key (kbd "C-c C-c") 'eval-defun)
-(global-set-key (kbd "C-c h") 'helm-google-suggest)
-(global-set-key (kbd "C-x m") 'helm-M-x)
-(global-set-key (kbd "C-x C-j") 'projectile-find-implementation-or-test-other-window)
-(global-set-key [f12] 'indent-buffer)
 
 ;; unset the suspend frame command
 (global-unset-key (kbd "C-z"))
@@ -587,13 +497,9 @@ downcased, no preceding underscore.
 
 
 ;; configuration for multiple cursors
-(global-set-key (kbd "C->") 'mc/mark-next-like-this)
-(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
 (define-key global-map (kbd "C-c SPC") 'avy-goto-word-1)
 
-(global-set-key [remap kill-ring-save] 'easy-kill)
 
 (setq exec-path (append exec-path '("/usr/bin")))
 
@@ -603,18 +509,11 @@ downcased, no preceding underscore.
 
 (define-key java-mode-map "\M-j" 'join-line)
 
-(global-set-key (kbd "M-p") 'move-line-up)
-(global-set-key (kbd "M-n") 'move-line-down)
-
 (define-key ac-complete-mode-map "\C-n" 'ac-previous)
 (define-key ac-complete-mode-map "\C-p" 'ac-next)
 
 (define-key ac-complete-mode-map "C-М-)" 'paredit-forward-slurp-sexp)
 
-
-(global-set-key (kbd "<C-f8>") 'bm-toggle)
-(global-set-key (kbd "<f8>")   'bm-next)
-(global-set-key (kbd "<M-f8>") 'bm-previous)
 
 (setq prelude-whitespace nil)
 
@@ -632,10 +531,6 @@ downcased, no preceding underscore.
 
 (provide '.emacs)
 ;;; .emacs ends here
-
-(custom-set-variables
- '(speedbar-show-unknown-files t))
-
 ;; org-mode configuration
 (setq org-hide-leading-stars t)
 
@@ -736,7 +631,6 @@ downcased, no preceding underscore.
         (kill-line)
         (replace-string (concat "${" property-name "}") property-value)))))
 
-
 (defun mvn-sort-properties (&optional arg)
   (interactive "p")
   (save-excursion
@@ -759,6 +653,7 @@ downcased, no preceding underscore.
       (message "Copied buffer file name '%s' to the clipboard." filename))))
 
 (setq vc-suppress-confirm nil)
+;; helm configuration
 (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.war"))
 (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.class"))
 (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.zip"))
@@ -766,3 +661,48 @@ downcased, no preceding underscore.
 (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.jar"))
 (setq grep-find-ignored-files helm-grep-ignored-files)
 (setq grep-find-ignored-directories (add-to-list 'grep-find-ignored-directories ".meghanada"))
+
+;; global key configuration
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+(global-set-key (kbd "M-p") 'move-line-up)
+(global-set-key (kbd "M-n") 'move-line-down)
+(global-set-key (kbd "<C-f8>") 'bm-toggle)
+(global-set-key (kbd "<f8>")   'bm-next)
+(global-set-key (kbd "<M-f8>") 'bm-previous)
+(global-set-key (kbd "M-i") 'helm-swoop)
+(global-set-key (kbd "M-I") 'helm-swoop-back-to-last-point)
+(global-set-key (kbd "C-c M-i") 'helm-multi-swoop)
+(global-set-key (kbd "C-x M-i") 'helm-multi-swoop-all)
+(global-set-key (kbd "C-x k") 'kill-current-buffer)
+(global-set-key (kbd "<f7>") 'go-to-terminal-window)
+(global-set-key (kbd "<f11>") 'fullscreen)
+(global-set-key (kbd "M-j") 'join-next-line)
+(global-set-key (kbd "C-x B") 'ibuffer)
+(global-set-key (kbd "C-x C-r") 'helm-recentf)
+(global-set-key (kbd "M-/") 'hippie-expand)
+(global-set-key (kbd "C-l") 'other-window)
+(global-set-key (kbd "C-M-u") 'er/expand-region)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+(global-set-key (kbd "C-M-s") 'helm-swoop)
+(global-set-key (kbd "C-h") 'backward-delete-char)
+(global-set-key (kbd "C-M-h") 'backward-kill-word)
+(global-set-key (kbd "C-M-y") 'helm-show-kill-ring)
+(global-set-key (kbd "C-S-l") 'helm-projectile-ack)
+(global-set-key (kbd "C-S-c") 'comment-region)
+(global-set-key (kbd "C-v") 'ace-window)
+(global-set-key (kbd "C-c 9") 'buffer-menu)
+(global-set-key (kbd "C-x p") 'previous-buffer)
+(global-set-key (kbd "C-x n") 'next-buffer)
+(global-set-key (kbd "C-M-u") 'er/expand-region)
+(global-set-key (kbd "C-x 9") 'helm-locate)
+(global-set-key (kbd "C-<backspace>") 'subword-backward-kill)
+(global-set-key (kbd "C-x v") 'eval-buffer)
+(global-set-key (kbd "C-c C-c") 'eval-defun)
+(global-set-key (kbd "C-c h") 'helm-google-suggest)
+(global-set-key (kbd "C-x m") 'helm-M-x)
+(global-set-key (kbd "C-x C-j") 'projectile-find-implementation-or-test-other-window)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key [remap kill-ring-save] 'easy-kill)
