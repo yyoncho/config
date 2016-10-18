@@ -59,6 +59,7 @@
 (prelude-require-package 'cider-eval-sexp-fu)
 (prelude-require-package 'powerline)
 (prelude-require-package 'recentf)
+(prelude-require-package 'cider-eval-sexp-fu)
 
 ;; modes
 (ido-mode t)
@@ -88,7 +89,9 @@
 (scroll-bar-mode -1)
 (global-auto-revert-mode 1)
 (helm-descbinds-mode 1)
+(global-flycheck-mode t)
 (flycheck-pos-tip-mode t)
+
 
 (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
 
@@ -199,6 +202,8 @@
 
 (setq cider-test-show-report-on-success nil)
 (setq cider-prompt-save-file-on-load 'always-save)
+(setq cider-use-fringe-indicators t)
+(setq midje-comments ";;.;.")
 
 (setq cider-auto-mode 't)
 (eval-after-load 'cider-mode
@@ -236,17 +241,6 @@
   "Goes to terminal window"
   (interactive)
   (switch-to-buffer "*ansi-term*"))
-
-
-(defun search-selection (beg end)
-  "search for selected text"
-  (interactive "r")
-  (let ((selection (buffer-substring-no-properties beg end)))
-    (deactivate-mark)
-    (search-forward selection)))
-
-(define-key global-map (kbd "C-S-k") 'search-selection)
-(define-key global-map (kbd "C-x d") 'elpy-goto-definition)
 
 ;; prevent creating backup files
 (setq make-backup-files nil)
@@ -292,9 +286,6 @@ downcased, no preceding underscore.
      (add-to-list 'ac-modes 'cider-repl-mode)))
 (eval-after-load 'cider-mode
   '(define-key cider-mode-map (kbd "C-S-f") 'cider-format-buffer))
-(eval-after-load 'cider-mode
-  '(define-key cider-mode-map (kbd "C-c C-d e") 'cider-eval-buffer))
-
 
 (setenv "PATH" (concat (getenv "PATH") ":~/.bin"))
 (put 'set-goal-column 'disabled nil)
@@ -308,7 +299,6 @@ downcased, no preceding underscore.
   (cljr-add-keybindings-with-prefix "C-c m"))
 
 (add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
-
 
 ;; better window splitting
 (defun my/vsplit-last-buffer (prefix)
@@ -333,25 +323,10 @@ downcased, no preceding underscore.
 
 ;; prevent prompt for killing emcacsclient buffer
 (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
-
-(elpy-enable)
-(require 'cl)
-
 (setq inhibit-splash-screen t)
-
-;; avoid compiz manager rendering bugs
-(add-to-list 'default-frame-alist '(alpha . 100))
 
 ;; Use the clipboard, pretty please, so that copy/paste "works"
 (setq x-select-enable-clipboard t)
-
-                                        ; winner-mode provides C-<left> to get back to previous window layout
-;; (set-face-attribute 'default nil :height 100)
-
-;; whenever an external process changes a file underneath emacs, and there
-;; was no unsaved changes in the corresponding buffer, just revert its
-;; content to reflect what's on-disk.
-
 
 ;; M-x shell is a nice shell interface to use, let's make it colorful.  If
 ;; you need a terminal emulator rather than just a shell, consider M-x term
@@ -376,16 +351,22 @@ downcased, no preceding underscore.
   (set-frame-parameter nil 'fullscreen
                        (if (frame-parameter nil 'fullscreen) nil 'fullboth)))
 
-
-
 ;; god more configuration
 (defun my-update-cursor ()
   (setq cursor-type (if (or god-local-mode buffer-read-only)
                         'box
-                      'bar)))
+                      'bar))
+  (set-cursor-color (if (or god-local-mode buffer-read-only)
+                        "yellow"
+                      "white")))
 
 (add-hook 'god-mode-enabled-hook 'my-update-cursor)
 (add-hook 'god-mode-disabled-hook 'my-update-cursor)
+
+(define-key god-local-mode-map (kbd ".") 'repeat)
+(require 'god-mode-isearch)
+(define-key isearch-mode-map (kbd "<escape>") 'god-mode-isearch-activate)
+(define-key god-mode-isearch-map (kbd "<escape>") 'god-mode-isearch-disable)
 
 (setq shift-selection-mode t)
 
@@ -398,9 +379,6 @@ downcased, no preceding underscore.
 ;; auto complete settings
 (define-key ac-complete-mode-map "\C-n" 'ac-next)
 (define-key ac-complete-mode-map "\C-p" 'ac-previous)
-
-(require 'cider-eval-sexp-fu)
-
 
 (setq sgml-basic-offset 4)
 
@@ -439,8 +417,6 @@ downcased, no preceding underscore.
 
 (eval-after-load 'flycheck '(flycheck-clojure-setup))
 (add-hook 'after-init-hook #'global-flycheck-mode)
-
-(global-flycheck-mode t)
 
 (eval-after-load 'flycheck
   '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
@@ -527,14 +503,10 @@ downcased, no preceding underscore.
             (message "passed ")
             (define-key midje-mode-map (kbd "C-c p") nil)))
 
-(setq midje-comments ";;.;.")
-
 (provide '.emacs)
 ;;; .emacs ends here
 ;; org-mode configuration
 (setq org-hide-leading-stars t)
-
-(setq cider-use-fringe-indicators t)
 
 
 (setq-default ibuffer-saved-filter-groups
@@ -556,7 +528,6 @@ downcased, no preceding underscore.
 
 (setq-default cursor-type '(bar . 2))
 (setq default-frame-alist '((cursor-color . "white")))
-(set-cursor-color "white")
 
 (defun increment-number-decimal (&optional arg)
   "Increment the number forward from point by 'arg'."
@@ -573,11 +544,6 @@ downcased, no preceding underscore.
             (setq answer (+ (expt 10 field-width) answer)))
           (replace-match (format (concat "%0" (int-to-string field-width) "d")
                                  answer)))))))
-
-
-;; back button config
-(define-key global-map (kbd "M-<left>") 'back-button-global-backward)
-(define-key global-map (kbd "M-<right>") 'back-button-global-forward)
 
 (defun mvn-dependency-version-to-properties (&optional arg)
   (interactive "p")
@@ -606,7 +572,6 @@ downcased, no preceding underscore.
         (insert "\n")
         (indent-for-tab-command)
         (insert "<" group-id ".version>" version "</" group-id ".version>" )))))
-
 
 (defun mvn-inline-property (&optional arg)
   (interactive "p")
@@ -641,7 +606,6 @@ downcased, no preceding underscore.
                                         ;(flush-lines "^\\s-*$"  (region-beginning) (region-end))
     (sort-lines nil (region-beginning) (region-end))))
 
-
 (defun prelude-copy-file-name-to-clipboard ()
   "Copy the current buffer file name to the clipboard."
   (interactive)
@@ -661,6 +625,12 @@ downcased, no preceding underscore.
 (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.jar"))
 (setq grep-find-ignored-files helm-grep-ignored-files)
 (setq grep-find-ignored-directories (add-to-list 'grep-find-ignored-directories ".meghanada"))
+
+
+(global-set-key (kbd "C-x C-1") 'delete-other-windows)
+(global-set-key (kbd "C-x C-2") 'split-window-below)
+(global-set-key (kbd "C-x C-3") 'split-window-right)
+(global-set-key (kbd "C-x C-0") 'delete-window)
 
 ;; global key configuration
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
@@ -706,3 +676,8 @@ downcased, no preceding underscore.
 (global-set-key (kbd "C->") 'mc/mark-next-like-this)
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 (global-set-key [remap kill-ring-save] 'easy-kill)
+(global-set-key (kbd "M-<left>") 'back-button-global-backward)
+(global-set-key (kbd "M-<right>") 'back-button-global-forward)
+(global-set-key (kbd "<f6>") 'god-mode)
+
+
