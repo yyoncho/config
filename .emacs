@@ -1,9 +1,9 @@
-(defconst emacs-start-time (current-time))
-
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
+
+(defconst emacs-start-time (current-time))
 
 (package-initialize)
 
@@ -37,7 +37,6 @@
 (prelude-require-package 'ac-cider)
 (prelude-require-package 'bind-key)
 (prelude-require-package 'java-snippets)
-(prelude-require-package 'tabbar)
 (prelude-require-package 'elpy)
 (prelude-require-package 'clj-refactor)
 (prelude-require-package 'helm-swoop)
@@ -228,9 +227,8 @@
 
 (eval-after-load 'java-mode
   '(define-key java-mode-map (kbd "C-x C-j") 'projectile-find-implementation-or-test-other-window))
-
+(define-key java-mode-map (kbd "C-<f11>") 'meghanada-run-junit-recent)
 (add-to-list 'auto-mode-alist '("\\.clj\\'" . clojure-mode))
-
 
 (defun kill-current-buffer ()
   "Kills current buffer"
@@ -483,7 +481,7 @@ downcased, no preceding underscore.
 (define-key company-active-map "\C-n" 'company-select-next)
 (define-key company-active-map "\C-j" 'company-complete-selection)
 
-(define-key java-mode-map "\M-j" 'join-line)
+(define-key java-mode-map "\M-j" 'join-next-line)
 
 (define-key ac-complete-mode-map "\C-n" 'ac-previous)
 (define-key ac-complete-mode-map "\C-p" 'ac-next)
@@ -632,6 +630,8 @@ downcased, no preceding underscore.
 (global-set-key (kbd "C-x C-3") 'split-window-right)
 (global-set-key (kbd "C-x C-0") 'delete-window)
 
+;; clipboard
+
 ;; global key configuration
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 (global-set-key (kbd "M-p") 'move-line-up)
@@ -680,4 +680,4 @@ downcased, no preceding underscore.
 (global-set-key (kbd "M-<right>") 'back-button-global-forward)
 (global-set-key (kbd "<f6>") 'god-mode)
 
-
+;;; .emacs ends here
