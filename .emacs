@@ -42,7 +42,9 @@
 (prelude-require-package 'highlight-symbol)
 (prelude-require-package 'helm-descbinds)
 (prelude-require-package 'flx-ido)
+
 (prelude-require-package 'ido-ubiquitous)
+
 (prelude-require-package 'midje-mode)
 (prelude-require-package 'eclipse-theme)
 (prelude-require-package 'flycheck-pos-tip)
@@ -59,10 +61,13 @@
 (prelude-require-package 'switch-window)
 (prelude-require-package 'recentf)
 (prelude-require-package 'cider-eval-sexp-fu)
+(prelude-require-package 'auto-complete-nxml)
+(prelude-require-package 'sr-speedbar)
+
 
 ;; modes
 (ido-mode t)
-(ido-vertical-mode -1)
+(ido-vertical-mode t)
 (winner-mode 1)
 (flx-ido-mode t)
 (transient-mark-mode t)
@@ -89,10 +94,10 @@
 (global-flycheck-mode t)
 (flycheck-pos-tip-mode t)
 
-
 (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
 
-;; ido configuration
+;;; ido configuration
+
 ;; Do not list non user files
 (defun ido-ignore-non-user-except-ielm (name)
   "Ignore all non-user (a.k.a. *starred*) buffers except **.
@@ -102,9 +107,13 @@ NAME - the name of the buffer."
                  (not (string-match "repl-messages" name))))
        (not (string-match "shell\\|ansi-term\\|magit\\|Magit\\|cider" name))))
 (require 'ido)
+
 (setq ido-ignore-buffers '("\\` " ido-ignore-non-user-except-ielm))
+
 (require 'ido-vertical-mode)
+
 (setq ido-vertical-define-keys 'C-n-C-p-up-and-down)
+
 
 ;; magit configuration
 (require 'magit)
