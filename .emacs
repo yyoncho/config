@@ -1,7 +1,7 @@
-;; Added by Package.el.  This must come before configurations of
-;; installed packages.  Don't delete this line.  If you don't want it,
-;; just comment it out by adding a semicolon to the start of the line.
-;; You may delete these explanatory comments.
+;;; .emacs -- generic command-dispatcher facility.  -*- lexical-binding: t -*-
+;;; Commentary:
+;;; my YY Emacs configuration
+;;; Code:
 
 (defconst emacs-start-time (current-time))
 
@@ -37,7 +37,7 @@
 (prelude-require-package 'ac-cider)
 (prelude-require-package 'bind-key)
 (prelude-require-package 'java-snippets)
-(prelude-require-package 'elpy)
+(prelude-require-package 'elp)
 (prelude-require-package 'clj-refactor)
 (prelude-require-package 'helm-swoop)
 (prelude-require-package 'highlight-symbol)
@@ -57,12 +57,13 @@
 (prelude-require-package 'back-button)
 (prelude-require-package 'cider-eval-sexp-fu)
 (prelude-require-package 'powerline)
+(prelude-require-package 'switch-window)
 (prelude-require-package 'recentf)
 (prelude-require-package 'cider-eval-sexp-fu)
 
 ;; modes
 (ido-mode t)
-(ido-vertical-mode t)
+(ido-vertical-mode -1)
 (winner-mode 1)
 (flx-ido-mode t)
 (transient-mark-mode t)
@@ -77,7 +78,6 @@
 (undo-tree-mode t)
 (global-whitespace-mode -1)
 (global-hl-line-mode -1)
-(golden-ratio-mode t)
 (global-auto-highlight-symbol-mode t)
 (blink-cursor-mode t)
 (recentf-mode 1)
@@ -97,22 +97,25 @@
 ;; ido configuration
 ;; Do not list non user files
 (defun ido-ignore-non-user-except-ielm (name)
-  "Ignore all non-user (a.k.a. *starred*) buffers except **."
+  "Ignore all non-user (a.k.a. *starred*) buffers except **.
+NAME - the name of the buffer."
   (and (string-match "^\*" name)
        (not (and (string-match "repl" name)
                  (not (string-match "repl-messages" name))))
        (not (string-match "shell\\|ansi-term\\|magit\\|Magit\\|cider" name))))
-
+(require 'ido)
 (setq ido-ignore-buffers '("\\` " ido-ignore-non-user-except-ielm))
+(require 'ido-vertical-mode)
 (setq ido-vertical-define-keys 'C-n-C-p-up-and-down)
 
 ;; magit configuration
-(setq magit-stage-all-confirm nil)
+(require 'magit)
 (setq git-commit-summary-max-length 999)
 
 (setq kill-do-not-save-duplicates t)
 
 ;; recent file configuration
+(require 'recentf)
 (setq recentf-max-menu-items 50)
 
 (set-face-attribute 'default nil :height 110)
@@ -120,10 +123,8 @@
 ;; disable backup files
 (setq make-backup-files nil)
 
-;;; SLIME configuration
-(setq inferior-lisp-program "/usr/bin/sbcl")
-
 (defun indent-buffer ()
+  "Indent buffer."
   (interactive)
   (save-excursion
     (indent-region (point-min) (point-max) nil)))
@@ -136,9 +137,10 @@
  '(speedbar-show-unknown-files t)
  '(x-select-enable-clipboard t))
 
+(require 'sgml-mode)
 (setq sgml-basic-offset 4)
 
-(setq c-basic-indent 2)
+;;(setq c-basic-indent 2)
 (setq tab-width 4)
 (setq-default tab-width 4)
 
@@ -155,10 +157,10 @@
 (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
 
 (defun toggle-window-dedicated ()
-  "Toggle whether the current active window is dedicated or not"
+  "Toggle whether the current active window is dedicated or not."
   (interactive)
   (message
-   (if (let (window (get-buffer-window (current-buffer)))
+   (if (let ((window (selected-window)))
          (set-window-dedicated-p window
                                  (not (window-dedicated-p window))))
        "Window '%s' is dedicated"
@@ -199,9 +201,12 @@
 (add-hook 'cider-mode-hook #'aggressive-indent-mode)
 (add-hook 'cider-mode-hook #'auto-highlight-symbol-mode)
 
+(require 'cider)
 (setq cider-test-show-report-on-success nil)
 (setq cider-prompt-save-file-on-load 'always-save)
 (setq cider-use-fringe-indicators t)
+
+(require 'midje-mode)
 (setq midje-comments ";;.;.")
 
 (setq cider-auto-mode 't)
@@ -212,7 +217,10 @@
   '(define-key cider-mode-map (kbd "C-c M-r") 'cider-restart))
 
 ;; java configuration
-(defun java-conf () 
+(require 'cc-vars)
+
+(defun java-conf ()
+  "Java configuration function."
   (setq c-basic-offset 4
         tab-width 4
         indent-tabs-mode nil)
@@ -225,18 +233,20 @@
 (add-hook 'java-mode-hook #'yas-minor-mode)
 (add-hook 'cider-repl-mode-hook #'paredit-mode)
 
+(require 'cc-mode)
+
 (eval-after-load 'java-mode
   '(define-key java-mode-map (kbd "C-x C-j") 'projectile-find-implementation-or-test-other-window))
 (define-key java-mode-map (kbd "C-<f11>") 'meghanada-run-junit-recent)
 (add-to-list 'auto-mode-alist '("\\.clj\\'" . clojure-mode))
 
 (defun kill-current-buffer ()
-  "Kills current buffer"
+  "Kill current buffer."
   (interactive)
   (kill-buffer (current-buffer)))
 
 (defun go-to-terminal-window ()
-  "Goes to terminal window"
+  "Go to terminal window."
   (interactive)
   (switch-to-buffer "*ansi-term*"))
 
@@ -248,22 +258,22 @@
   (interactive)
   (save-excursion
     (move-end-of-line nil)
-    (delete-forward-char 1)
+    (delete-char 1)
     (delete-horizontal-space)))
 
-
+(require 'minibuffer)
 (defun set-auto-complete-as-completion-at-point-function ()
+  "Autocompletion function."
   (setq completion-at-point-functions '(auto-complete)))
 
 (add-hook 'auto-complete-mode-hook 'set-auto-complete-as-completion-at-point-function)
 (add-hook 'cider-mode-hook 'set-auto-complete-as-completion-at-point-function)
 
 (defun un-camelcase-word-at-point ()
-  "un-camelcase the word at point, replacing uppercase chars with
-the lowercase version preceded by an underscore.
+  "Un-camelcase the word at point.
+replacing uppercase chars with the lowercase version preceded by an underscore.
 The first char, if capitalized (eg, PascalCase) is just
-downcased, no preceding underscore.
-"
+downcased, no preceding underscore"
   (interactive)
   (save-excursion
     (let ((bounds (bounds-of-thing-at-point 'word)))
@@ -287,20 +297,25 @@ downcased, no preceding underscore.
 
 (setenv "PATH" (concat (getenv "PATH") ":~/.bin"))
 (put 'set-goal-column 'disabled nil)
-(setq ediff-diff-options "-w")
 
+(require 'magit)
+(require 'ediff-diff)
 (require 'clj-refactor)
 
-(defun my-clojure-mode-hook ()
+(setq ediff-diff-options "-w")
+
+(defun my/clojure-mode-hook ()
+  "Clojure mode hook."
   (clj-refactor-mode 1)
   (yas-minor-mode 1) ; for adding require/use/import
   (cljr-add-keybindings-with-prefix "C-c m"))
 
-(add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
+(add-hook 'clojure-mode-hook #'my/clojure-mode-hook)
 
 ;; better window splitting
 (defun my/vsplit-last-buffer (prefix)
-  "Split the window vertically and display the previous buffer."
+  "Split the window vertically and display the previous buffer.
+PREFIX - whether to switch to the other window."
   (interactive "p")
   (split-window-vertically)
   (other-window 1 nil)
@@ -308,7 +323,8 @@ downcased, no preceding underscore.
       (switch-to-next-buffer)))
 
 (defun my/hsplit-last-buffer (prefix)
-  "Split the window horizontally and display the previous buffer."
+  "Split the window horizontally and display the previous buffer.
+PREFIX - whether to switch to the other window."
   (interactive "p")
   (split-window-horizontally)
   (other-window 1 nil)
@@ -345,12 +361,15 @@ downcased, no preceding underscore.
 (define-key term-raw-map  (kbd "C-y") 'term-paste)
 
 (defun fullscreen ()
+  "Switch to full screen."
   (interactive)
   (set-frame-parameter nil 'fullscreen
                        (if (frame-parameter nil 'fullscreen) nil 'fullboth)))
 
 ;; god more configuration
+(require 'god-mode)
 (defun my-update-cursor ()
+  "Update my cursor."
   (setq cursor-type (if (or god-local-mode buffer-read-only)
                         'box
                       'bar))
@@ -361,6 +380,7 @@ downcased, no preceding underscore.
 (add-hook 'god-mode-enabled-hook 'my-update-cursor)
 (add-hook 'god-mode-disabled-hook 'my-update-cursor)
 
+(require 'god-mode)
 (define-key god-local-mode-map (kbd ".") 'repeat)
 (require 'god-mode-isearch)
 (define-key isearch-mode-map (kbd "<escape>") 'god-mode-isearch-activate)
@@ -384,38 +404,17 @@ downcased, no preceding underscore.
           (lambda()
             (local-unset-key (kbd "C-M-u"))))
 
+(require 'browse-url)
 (setq browse-url-browser-function 'browse-url-generic
       browse-url-generic-program "chromium-browser")
 
-
-(defun move-line (n)
-  "Move the current line up or down by N lines."
-  (interactive "p")
-  (setq col (current-column))
-  (beginning-of-line) (setq start (point))
-  (end-of-line) (forward-char) (setq end (point))
-  (let ((line-text (delete-and-extract-region start end)))
-    (forward-line n)
-    (insert line-text)
-    ;; restore point to original column in moved line
-    (forward-line -1)
-    (forward-char col)))
-
-(defun move-line-up (n)
-  "Move the current line up by N lines."
-  (interactive "p")
-  (move-line (if (null n) -1 (- n))))
-
-(defun move-line-down (n)
-  "Move the current line down by N lines."
-  (interactive "p")
-  (move-line (if (null n) 1 n)))
 
 (set-face-attribute 'default nil :height 130)
 
 (eval-after-load 'flycheck '(flycheck-clojure-setup))
 (add-hook 'after-init-hook #'global-flycheck-mode)
 
+(require 'flycheck)
 (eval-after-load 'flycheck
   '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
 
@@ -465,9 +464,6 @@ downcased, no preceding underscore.
 ;; shortcuts configuration
 
 
-;; unset the suspend frame command
-(global-unset-key (kbd "C-z"))
-(global-unset-key (kbd "C-x C-z"))
 
 
 ;; configuration for multiple cursors
@@ -477,6 +473,7 @@ downcased, no preceding underscore.
 
 (setq exec-path (append exec-path '("/usr/bin")))
 
+(require 'company)
 (define-key company-active-map "\C-p" 'company-select-previous)
 (define-key company-active-map "\C-n" 'company-select-next)
 (define-key company-active-map "\C-j" 'company-complete-selection)
@@ -487,7 +484,6 @@ downcased, no preceding underscore.
 (define-key ac-complete-mode-map "\C-p" 'ac-next)
 
 (define-key ac-complete-mode-map "C-М-)" 'paredit-forward-slurp-sexp)
-
 
 (setq prelude-whitespace nil)
 
@@ -527,8 +523,9 @@ downcased, no preceding underscore.
 (setq-default cursor-type '(bar . 2))
 (setq default-frame-alist '((cursor-color . "white")))
 
-(defun increment-number-decimal (&optional arg)
-  "Increment the number forward from point by 'arg'."
+(defun my/increment-number-decimal (&optional arg)
+  "Increment the number forward from point by 'ARG'.
+ARG - the amount for increasing the value."
   (interactive "p*")
   (save-excursion
     (save-match-data
@@ -543,13 +540,14 @@ downcased, no preceding underscore.
           (replace-match (format (concat "%0" (int-to-string field-width) "d")
                                  answer)))))))
 
-(defun mvn-dependency-version-to-properties (&optional arg)
+(defun my/mvn-dependency-version-to-properties ()
+  "Move dependency version to properties section."
   (interactive "p")
   (save-excursion
     (search-forward "<version>")
     (kill-region (point) (progn
                            (search-forward "</version>"
-                                           nil nil arg)
+                                           nil nil nil)
                            (backward-char 10)
                            (point)))
     (let ((version (car kill-ring-yank-pointer)))
@@ -557,7 +555,7 @@ downcased, no preceding underscore.
       (search-forward "<artifactId>")
       (kill-ring-save (point) (progn
                                 (search-forward "</artifactId>"
-                                                nil nil arg)
+                                                nil nil nil)
                                 (backward-char 13)
                                 (point)))
       (let ((group-id (car kill-ring-yank-pointer)))
@@ -571,20 +569,21 @@ downcased, no preceding underscore.
         (indent-for-tab-command)
         (insert "<" group-id ".version>" version "</" group-id ".version>" )))))
 
-(defun mvn-inline-property (&optional arg)
+(defun my/mvn-inline-property ()
+  "Inline mvn property."
   (interactive "p")
   (save-excursion
     (search-forward "<")
     (kill-region (point) (progn
                            (search-forward ">"
-                                           nil nil arg)
+                                           nil nil nil)
                            (backward-char 1)
                            (point)))
     (let ((property-name (car kill-ring-yank-pointer)))
       (forward-char 1)
       (kill-region (point) (progn
                              (search-forward "<"
-                                             nil nil arg)
+                                             nil nil nil)
                              (backward-char 1)
                              (point)))
 
@@ -592,9 +591,10 @@ downcased, no preceding underscore.
         (beginning-of-line)
         (kill-line)
         (kill-line)
-        (replace-string (concat "${" property-name "}") property-value)))))
+        (replace-match (concat "${" property-name "}") property-value)))))
 
-(defun mvn-sort-properties (&optional arg)
+(defun my/mvn-sort-properties ()
+  "Sort maven properties."
   (interactive "p")
   (save-excursion
     (beginning-of-buffer)
@@ -614,15 +614,31 @@ downcased, no preceding underscore.
       (kill-new filename)
       (message "Copied buffer file name '%s' to the clipboard." filename))))
 
+(defun my/projectile-open-pom ()
+  "Open's pom file from the project."
+  (interactive)
+  (find-file (concat (projectile-project-root) "pom.xml")))
+
+(defun my/find-user-init-file ()
+  "Edit the `user-init-file', in another window."
+  (interactive)
+  (find-file user-init-file))
+
+(require 'vc-dispatcher)
 (setq vc-suppress-confirm nil)
+
 ;; helm configuration
-(setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.war"))
-(setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.class"))
-(setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.zip"))
-(setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files ".classpath"))
-(setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.jar"))
-(setq grep-find-ignored-files helm-grep-ignored-files)
-(setq grep-find-ignored-directories (add-to-list 'grep-find-ignored-directories ".meghanada"))
+(require 'helm)
+(require 'projectile)
+(require 'cider-eval-sexp-fu)
+
+;; (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.war"))
+;; (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.class"))
+;; (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.zip"))
+;; (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files ".classpath"))
+;; (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.jar"))
+;; (setq grep-find-ignored-files helm-grep-ignored-files)
+;; (setq grep-find-ignored-directories (add-to-list 'grep-find-ignored-directories ".meghanada"))
 
 
 (global-set-key (kbd "C-x C-1") 'delete-other-windows)
@@ -632,10 +648,15 @@ downcased, no preceding underscore.
 
 ;; clipboard
 
+;; unset the suspend frame command
+(global-unset-key (kbd "C-z"))
+(global-unset-key (kbd "C-x C-z"))
+(global-unset-key (kbd "C-c I"))
+
 ;; global key configuration
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-(global-set-key (kbd "M-p") 'move-line-up)
-(global-set-key (kbd "M-n") 'move-line-down)
+(global-set-key (kbd "M-p") 'move-text-up)
+(global-set-key (kbd "M-n") 'move-text-down)
 (global-set-key (kbd "<C-f8>") 'bm-toggle)
 (global-set-key (kbd "<f8>")   'bm-next)
 (global-set-key (kbd "<M-f8>") 'bm-previous)
@@ -672,12 +693,25 @@ downcased, no preceding underscore.
 (global-set-key (kbd "C-c C-c") 'eval-defun)
 (global-set-key (kbd "C-c h") 'helm-google-suggest)
 (global-set-key (kbd "C-x m") 'helm-M-x)
+(global-set-key (kbd "C-c p x p") 'my/projectile-open-pom)
 (global-set-key (kbd "C-x C-j") 'projectile-find-implementation-or-test-other-window)
 (global-set-key (kbd "C->") 'mc/mark-next-like-this)
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 (global-set-key [remap kill-ring-save] 'easy-kill)
 (global-set-key (kbd "M-<left>") 'back-button-global-backward)
 (global-set-key (kbd "M-<right>") 'back-button-global-forward)
+(global-set-key (kbd "C-c 1") 'switch-window)
 (global-set-key (kbd "<f6>") 'god-mode)
+(global-set-key (kbd "<f7>") 'sr-speedbar-toggle)
+
+(global-set-key (kbd "C-c I") 'my/find-user-init-file)
+
+(require 'auto-complete-nxml)
+;; Keystroke to popup help about something at point.
+(setq auto-complete-nxml-popup-help-key "C-:")
+;; Keystroke to toggle on/off automatic completion.
+(setq auto-complete-nxml-toggle-automatic-key "C-c C-t")
+(require 'sr-speedbar)
+(setq sr-speedbar-right-side nil)
 
 ;;; .emacs ends here
