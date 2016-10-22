@@ -639,6 +639,14 @@ ARG - the amount for increasing the value."
 (require 'projectile)
 (require 'cider-eval-sexp-fu)
 
+(defun my/other-window ()
+  "Select other window or switch buffer if there is only one window."
+  (interactive)
+  (let ((old-window  (selected-window)))
+    (other-window 1)
+    (when (equal old-window (selected-window))
+      (switch-to-buffer (next-buffer)))))
+
 ;; (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.war"))
 ;; (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.class"))
 ;; (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.zip"))
@@ -710,6 +718,7 @@ ARG - the amount for increasing the value."
 (global-set-key (kbd "C-c 1") 'switch-window)
 (global-set-key (kbd "<f6>") 'god-mode)
 (global-set-key (kbd "<f7>") 'sr-speedbar-toggle)
+(global-set-key (kbd "C-x o") 'my/other-window)
 
 (global-set-key (kbd "C-c I") 'my/find-user-init-file)
 
