@@ -63,6 +63,8 @@
 (prelude-require-package 'cider-eval-sexp-fu)
 (prelude-require-package 'auto-complete-nxml)
 (prelude-require-package 'sr-speedbar)
+(prelude-require-package 'omnisharp)
+(prelude-require-package 'dired+)
 
 
 ;; modes
