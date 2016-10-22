@@ -96,6 +96,8 @@
 (global-flycheck-mode t)
 (flycheck-pos-tip-mode t)
 
+(powerline-default-theme)
+
 (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
 
 ;;; ido configuration
@@ -115,7 +117,6 @@ NAME - the name of the buffer."
 (require 'ido-vertical-mode)
 
 (setq ido-vertical-define-keys 'C-n-C-p-up-and-down)
-
 
 ;; magit configuration
 (require 'magit)
@@ -160,10 +161,13 @@ NAME - the name of the buffer."
 
 (set-face-attribute 'default nil :height 140)
 
-;; skip .dot files
+;; dired files
 (require 'dired-x)
 (setq-default dired-omit-files-p t) ; Buffer-local variable
 (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
+(setq delete-by-moving-to-trash t)
+(setq dired-recursive-deletes 'always)
+(setq dired-deletion-confirmer '(lambda (x) t))
 
 (defun toggle-window-dedicated ()
   "Toggle whether the current active window is dedicated or not."
@@ -175,13 +179,6 @@ NAME - the name of the buffer."
        "Window '%s' is dedicated"
      "Window '%s' is normal")
    (current-buffer)))
-
-;; dired configuration
-(setq delete-by-moving-to-trash t)
-(setq dired-recursive-deletes 'always)
-
-;; dired - no confirmation when deleting
-(setq dired-deletion-confirmer '(lambda (x) t))
 
 ;; eval and replace
 (defun eval-and-replace ()
@@ -305,6 +302,7 @@ downcased, no preceding underscore"
   '(define-key cider-mode-map (kbd "C-S-f") 'cider-format-buffer))
 
 (setenv "PATH" (concat (getenv "PATH") ":~/.bin"))
+
 (put 'set-goal-column 'disabled nil)
 
 (require 'magit)
@@ -649,13 +647,87 @@ ARG - the amount for increasing the value."
     (when (equal old-window (selected-window))
       (switch-to-buffer (next-buffer)))))
 
-;; (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.war"))
-;; (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.class"))
-;; (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.zip"))
-;; (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files ".classpath"))
-;; (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.jar"))
-;; (setq grep-find-ignored-files helm-grep-ignored-files)
-;; (setq grep-find-ignored-directories (add-to-list 'grep-find-ignored-directories ".meghanada"))
+(add-hook 'ido-setup-hook
+          (lambda ()
+            ;; Go straight home
+            (define-key ido-file-completion-map
+              (kbd "~")
+              (lambda ()
+                (interactive)
+                (if (looking-back "/")
+                    (insert "~/")
+                  (call-interactively 'self-insert-command))))))
+
+(defun my/toggle-window-split ()
+  (interactive)
+  (if (= (count-windows) 2)
+      (let* ((this-win-buffer (window-buffer))
+             (next-win-buffer (window-buffer (next-window)))
+             (this-win-edges (window-edges (selected-window)))
+             (next-win-edges (window-edges (next-window)))
+             (this-win-2nd (not (and (<= (car this-win-edges)
+                                         (car next-win-edges))
+                                     (<= (cadr this-win-edges)
+                                         (cadr next-win-edges)))))
+             (splitter
+              (if (= (car this-win-edges)
+                     (car (window-edges (next-window))))
+                  'split-window-horizontally
+                'split-window-vertically)))
+        (delete-other-windows)
+        (let ((first-win (selected-window)))
+          (funcall splitter)
+          (if this-win-2nd (other-window 1))
+          (set-window-buffer (selected-window) this-win-buffer)
+          (set-window-buffer (next-window) next-win-buffer)
+          (select-window first-win)
+          (if this-win-2nd (other-window 1))))))
+
+(defun my/rotate-windows ()
+  "Rotate your windows"
+  (interactive)
+  (cond ((not (> (count-windows)1))
+         (message "You can't rotate a single window!"))
+        (t
+         (setq i 1)
+         (setq numWindows (count-windows))
+         (while  (< i numWindows)
+           (let* (
+                  (w1 (elt (window-list) i))
+                  (w2 (elt (window-list) (+ (% i numWindows) 1)))
+
+                  (b1 (window-buffer w1))
+                  (b2 (window-buffer w2))
+
+                  (s1 (window-start w1))
+                  (s2 (window-start w2))
+                  )
+             (set-window-buffer w1  b2)
+             (set-window-buffer w2 b1)
+             (set-window-start w1 s2)
+             (set-window-start w2 s1)
+             (setq i (1+ i)))))))
+
+;; Auto refresh buffers
+(global-auto-revert-mode 1)
+
+;; Also auto refresh dired, but be quiet about it
+(setq global-auto-revert-non-file-buffers t)
+(setq auto-revert-verbose nil)
+
+;; full screen magit-status
+(defadvice magit-status (around magit-fullscreen activate)
+  (window-configuration-to-register :magit-fullscreen)
+  ad-do-it
+  (delete-other-windows))
+
+(defun my/magit-quit-session ()
+  "Restores the previous window configuration and kills the magit buffer."
+  (interactive)
+  (kill-buffer)
+  (jump-to-register :magit-fullscreen))
+
+(define-key magit-status-mode-map (kbd "q") 'my/magit-quit-session)
 
 
 (global-set-key (kbd "C-x C-1") 'delete-other-windows)
@@ -721,6 +793,8 @@ ARG - the amount for increasing the value."
 (global-set-key (kbd "<f6>") 'god-mode)
 (global-set-key (kbd "<f7>") 'sr-speedbar-toggle)
 (global-set-key (kbd "C-x o") 'my/other-window)
+(global-set-key (kbd "C-v") 'change-inner)
+(global-set-key (kbd "M-v") 'copy-inner)
 
 (global-set-key (kbd "C-c I") 'my/find-user-init-file)
 
