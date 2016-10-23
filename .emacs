@@ -42,7 +42,6 @@
 (prelude-require-package 'highlight-symbol)
 (prelude-require-package 'helm-descbinds)
 (prelude-require-package 'flx-ido)
-
 (prelude-require-package 'ido-ubiquitous)
 
 (prelude-require-package 'midje-mode)
@@ -708,6 +707,11 @@ ARG - the amount for increasing the value."
              (set-window-start w2 s1)
              (setq i (1+ i)))))))
 
+;; Save point position between sessions
+(require 'saveplace)
+(setq-default save-place t)
+(setq save-place-file (expand-file-name ".places" user-emacs-directory))
+
 ;; Auto refresh buffers
 (global-auto-revert-mode 1)
 
@@ -793,9 +797,9 @@ ARG - the amount for increasing the value."
 (global-set-key (kbd "<f6>") 'god-mode)
 (global-set-key (kbd "<f7>") 'sr-speedbar-toggle)
 (global-set-key (kbd "C-x o") 'my/other-window)
+(global-set-key (kbd "C-x d") 'dire)
 (global-set-key (kbd "C-v") 'change-inner)
 (global-set-key (kbd "M-v") 'copy-inner)
-
 (global-set-key (kbd "C-c I") 'my/find-user-init-file)
 
 (require 'auto-complete-nxml)
