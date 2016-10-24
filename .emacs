@@ -1,4 +1,4 @@
-;;; .emacs -- generic command-dispatcher facility.  -*- lexical-binding: t -*-
+;;; .emacs -- generh
 ;;; Commentary:
 ;;; my YY Emacs configuration
 ;;; Code:
@@ -42,7 +42,6 @@
 (prelude-require-package 'highlight-symbol)
 (prelude-require-package 'helm-descbinds)
 (prelude-require-package 'flx-ido)
-
 (prelude-require-package 'ido-ubiquitous)
 
 (prelude-require-package 'midje-mode)
@@ -63,7 +62,8 @@
 (prelude-require-package 'cider-eval-sexp-fu)
 (prelude-require-package 'auto-complete-nxml)
 (prelude-require-package 'sr-speedbar)
-
+(prelude-require-package 'omnisharp)
+(prelude-require-package 'dired+)
 
 ;; modes
 (ido-mode t)
@@ -94,6 +94,8 @@
 (global-flycheck-mode t)
 (flycheck-pos-tip-mode t)
 
+(powerline-default-theme)
+
 (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
 
 ;;; ido configuration
@@ -113,7 +115,6 @@ NAME - the name of the buffer."
 (require 'ido-vertical-mode)
 
 (setq ido-vertical-define-keys 'C-n-C-p-up-and-down)
-
 
 ;; magit configuration
 (require 'magit)
@@ -152,16 +153,19 @@ NAME - the name of the buffer."
 (setq-default tab-width 4)
 
 ;; Descrnibe last command
-(defun describe-last-function()
+(defun my/describe-last-function()
   (interactive)
   (describe-function last-command))
 
 (set-face-attribute 'default nil :height 140)
 
-;; skip .dot files
+;; dired files
 (require 'dired-x)
 (setq-default dired-omit-files-p t) ; Buffer-local variable
 (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
+(setq delete-by-moving-to-trash t)
+(setq dired-recursive-deletes 'always)
+(setq dired-deletion-confirmer '(lambda (x) t))
 
 (defun toggle-window-dedicated ()
   "Toggle whether the current active window is dedicated or not."
@@ -173,13 +177,6 @@ NAME - the name of the buffer."
        "Window '%s' is dedicated"
      "Window '%s' is normal")
    (current-buffer)))
-
-;; dired configuration
-(setq delete-by-moving-to-trash t)
-(setq dired-recursive-deletes 'always)
-
-;; dired - no confirmation when deleting
-(setq dired-deletion-confirmer '(lambda (x) t))
 
 ;; eval and replace
 (defun eval-and-replace ()
@@ -238,7 +235,6 @@ NAME - the name of the buffer."
 (add-hook 'java-mode-hook #'meghanada-mode)
 (add-hook 'java-mode-hook #'aggressive-indent-mode)
 (add-hook 'java-mode-hook #'yas-minor-mode)
-(add-hook 'cider-repl-mode-hook #'paredit-mode)
 
 (require 'cc-mode)
 
@@ -297,6 +293,7 @@ downcased, no preceding underscore"
 (add-hook 'cider-mode-hook 'ac-flyspell-workaround)
 (add-hook 'cider-mode-hook 'ac-cider-setup)
 (add-hook 'cider-mode-hook 'paredit-mode)
+(add-hook 'cider-repl-mode-hook #'paredit-mode)
 (add-hook 'cider-repl-mode-hook 'ac-cider-setup)
 
 (eval-after-load "auto-complete"
@@ -307,11 +304,11 @@ downcased, no preceding underscore"
   '(define-key cider-mode-map (kbd "C-S-f") 'cider-format-buffer))
 
 (setenv "PATH" (concat (getenv "PATH") ":~/.bin"))
+
 (put 'set-goal-column 'disabled nil)
 
 (require 'magit)
 (require 'ediff-diff)
-(require 'clj-refactor)
 
 (setq ediff-diff-options "-w")
 
@@ -340,9 +337,6 @@ PREFIX - whether to switch to the other window."
   (split-window-horizontally)
   (other-window 1 nil)
   (if (= prefix 1) (switch-to-next-buffer)))
-
-(bind-key "C-x 2" 'my/vsplit-last-buffer)
-(bind-key "C-x 3" 'my/hsplit-last-buffer)
 
 (fset 'yes-or-no-p 'y-or-n-p)
 
@@ -643,19 +637,119 @@ ARG - the amount for increasing the value."
 (require 'projectile)
 (require 'cider-eval-sexp-fu)
 
-;; (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.war"))
-;; (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.class"))
-;; (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.zip"))
-;; (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files ".classpath"))
-;; (setq helm-grep-ignored-files (add-to-list 'helm-grep-ignored-files "*.jar"))
-;; (setq grep-find-ignored-files helm-grep-ignored-files)
-;; (setq grep-find-ignored-directories (add-to-list 'grep-find-ignored-directories ".meghanada"))
+(defun my/other-window ()
+  "Select other window or switch buffer if there is only one window."
+  (interactive)
+  (let ((old-window  (selected-window)))
+    (other-window 1)
+    (when (equal old-window (selected-window))
+      (switch-to-buffer (next-buffer)))))
+
+(add-hook 'ido-setup-hook
+          (lambda ()
+            ;; Go straight home
+            (define-key ido-file-completion-map
+              (kbd "~")
+              (lambda ()
+                (interactive)
+                (if (looking-back "/")
+                    (insert "~/")
+                  (call-interactively 'self-insert-command))))))
+
+(defun my/toggle-window-split ()
+  (interactive)
+  (if (= (count-windows) 2)
+      (let* ((this-win-buffer (window-buffer))
+             (next-win-buffer (window-buffer (next-window)))
+             (this-win-edges (window-edges (selected-window)))
+             (next-win-edges (window-edges (next-window)))
+             (this-win-2nd (not (and (<= (car this-win-edges)
+                                         (car next-win-edges))
+                                     (<= (cadr this-win-edges)
+                                         (cadr next-win-edges)))))
+             (splitter
+              (if (= (car this-win-edges)
+                     (car (window-edges (next-window))))
+                  'split-window-horizontally
+                'split-window-vertically)))
+        (delete-other-windows)
+        (let ((first-win (selected-window)))
+          (funcall splitter)
+          (if this-win-2nd (other-window 1))
+          (set-window-buffer (selected-window) this-win-buffer)
+          (set-window-buffer (next-window) next-win-buffer)
+          (select-window first-win)
+          (if this-win-2nd (other-window 1))))))
+
+(defun my/rotate-windows ()
+  "Rotate your windows"
+  (interactive)
+  (cond ((not (> (count-windows)1))
+         (message "You can't rotate a single window!"))
+        (t
+         (setq i 1)
+         (setq numWindows (count-windows))
+         (while  (< i numWindows)
+           (let* (
+                  (w1 (elt (window-list) i))
+                  (w2 (elt (window-list) (+ (% i numWindows) 1)))
+
+                  (b1 (window-buffer w1))
+                  (b2 (window-buffer w2))
+
+                  (s1 (window-start w1))
+                  (s2 (window-start w2))
+                  )
+             (set-window-buffer w1  b2)
+             (set-window-buffer w2 b1)
+             (set-window-start w1 s2)
+             (set-window-start w2 s1)
+             (setq i (1+ i)))))))
+
+;; Save point position between sessions
+(require 'saveplace)
+(setq-default save-place t)
+(setq save-place-file (expand-file-name ".places" user-emacs-directory))
+
+;; Auto refresh buffers
+(global-auto-revert-mode 1)
+
+;; Also auto refresh dired, but be quiet about it
+(setq global-auto-revert-non-file-buffers t)
+(setq auto-revert-verbose nil)
+
+;; full screen magit-status
+(defadvice magit-status (around magit-fullscreen activate)
+  (window-configuration-to-register :magit-fullscreen)
+  ad-do-it
+  (delete-other-windows))
+
+(defun my/magit-quit-session ()
+  "Restores the previous window configuration and kills the magit buffer."
+  (interactive)
+  (kill-buffer)
+  (jump-to-register :magit-fullscreen))
+
+(define-key magit-status-mode-map (kbd "q") 'my/magit-quit-session)
 
 
 (global-set-key (kbd "C-x C-1") 'delete-other-windows)
 (global-set-key (kbd "C-x C-2") 'split-window-below)
 (global-set-key (kbd "C-x C-3") 'split-window-right)
 (global-set-key (kbd "C-x C-0") 'delete-window)
+
+;; redefine emacs state to intercept the escape key like insert-state does:
+(require 'evil)
+(evil-define-state emacs
+                   "Emacs state that can be exited with the escape key."
+                   :tag " <EE> "
+                   :message "-- EMACS WITH ESCAPE --"
+                   :input-method t
+                   ;; :intercept-esc nil)
+                   )
+
+(defadvice evil-insert-state (around emacs-state-instead-of-insert-state activate)
+  (evil-emacs-state))
 
 ;; clipboard
 
@@ -664,58 +758,67 @@ ARG - the amount for increasing the value."
 (global-unset-key (kbd "C-x C-z"))
 (global-unset-key (kbd "C-c I"))
 
-;; global key configuration
-(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-(global-set-key (kbd "M-p") 'move-text-up)
-(global-set-key (kbd "M-n") 'move-text-down)
-(global-set-key (kbd "<C-f8>") 'bm-toggle)
-(global-set-key (kbd "<f8>")   'bm-next)
-(global-set-key (kbd "<M-f8>") 'bm-previous)
-(global-set-key (kbd "M-i") 'helm-swoop)
-(global-set-key (kbd "M-I") 'helm-swoop-back-to-last-point)
-(global-set-key (kbd "C-c M-i") 'helm-multi-swoop)
-(global-set-key (kbd "C-x M-i") 'helm-multi-swoop-all)
-(global-set-key (kbd "C-x k") 'kill-current-buffer)
-(global-set-key (kbd "<f7>") 'go-to-terminal-window)
-(global-set-key (kbd "<f11>") 'fullscreen)
-(global-set-key (kbd "M-j") 'join-next-line)
-(global-set-key (kbd "C-x B") 'ibuffer)
-(global-set-key (kbd "C-x C-r") 'helm-recentf)
-(global-set-key (kbd "M-/") 'hippie-expand)
-(global-set-key (kbd "C-l") 'other-window)
-(global-set-key (kbd "C-M-u") 'er/expand-region)
-(global-set-key (kbd "C->") 'mc/mark-next-like-this)
-(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-(global-set-key (kbd "C-M-s") 'helm-swoop)
-(global-set-key (kbd "C-h") 'backward-delete-char)
-(global-set-key (kbd "C-M-h") 'backward-kill-word)
-(global-set-key (kbd "C-M-y") 'helm-show-kill-ring)
-(global-set-key (kbd "C-S-l") 'helm-projectile-ack)
-(global-set-key (kbd "C-S-c") 'comment-region)
-(global-set-key (kbd "C-v") 'ace-window)
-(global-set-key (kbd "C-c 9") 'buffer-menu)
-(global-set-key (kbd "C-x p") 'previous-buffer)
-(global-set-key (kbd "C-x n") 'next-buffer)
-(global-set-key (kbd "C-M-u") 'er/expand-region)
-(global-set-key (kbd "C-x 9") 'helm-locate)
-(global-set-key (kbd "C-<backspace>") 'subword-backward-kill)
-(global-set-key (kbd "C-x v") 'eval-buffer)
-(global-set-key (kbd "C-c C-c") 'eval-defun)
-(global-set-key (kbd "C-c h") 'helm-google-suggest)
-(global-set-key (kbd "C-x m") 'helm-M-x)
-(global-set-key (kbd "C-c p x p") 'my/projectile-open-pom)
-(global-set-key (kbd "C-x C-j") 'projectile-find-implementation-or-test-other-window)
-(global-set-key (kbd "C->") 'mc/mark-next-like-this)
-(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-(global-set-key [remap kill-ring-save] 'easy-kill)
-(global-set-key (kbd "M-<left>") 'back-button-global-backward)
-(global-set-key (kbd "M-<right>") 'back-button-global-forward)
-(global-set-key (kbd "C-c 1") 'switch-window)
-(global-set-key (kbd "<f6>") 'god-mode)
-(global-set-key (kbd "<f7>") 'sr-speedbar-toggle)
 
-(global-set-key (kbd "C-c I") 'my/find-user-init-file)
+
+;; global key configuration
+(bind-key "C-c C-<" 'mc/mark-all-like-this)
+(bind-key "M-p" 'move-text-up)
+(bind-key "M-n" 'move-text-down)
+(bind-key "<C-f8>" 'bm-toggle)
+(bind-key "<f8>"   'bm-next)
+(bind-key "<M-f8>" 'bm-previous)
+(bind-key "M-i" 'helm-swoop)
+(bind-key "M-I" 'helm-swoop-back-to-last-point)
+(bind-key "C-c M-i" 'helm-multi-swoop)
+(bind-key "C-x M-i" 'helm-multi-swoop-all)
+(bind-key "C-x k" 'kill-current-buffer)
+(bind-key "<f7>" 'go-to-terminal-window)
+(bind-key "<f11>" 'fullscreen)
+(bind-key "M-j" 'join-next-line)
+(bind-key "C-x B" 'ibuffer)
+(bind-key "C-x C-r" 'helm-recentf)
+(bind-key "M-/" 'hippie-expand)
+(bind-key "C-l" 'other-window)
+(bind-key "C-M-u" 'er/expand-region)
+(bind-key "C->" 'mc/mark-next-like-this)
+(bind-key "C-<" 'mc/mark-previous-like-this)
+(bind-key "C-c C-<" 'mc/mark-all-like-this)
+(bind-key "C-M-s" 'helm-swoop)
+(bind-key "C-h" 'backward-delete-char)
+(bind-key "C-M-h" 'backward-kill-word)
+(bind-key "C-M-y" 'helm-show-kill-ring)
+(bind-key "C-S-l" 'helm-projectile-ack)
+(bind-key "C-S-c" 'comment-region)
+(bind-key "C-v" 'ace-window)
+(bind-key "C-c 9" 'buffer-menu)
+(bind-key "C-x p" 'previous-buffer)
+(bind-key "C-x n" 'next-buffer)
+(bind-key "C-M-u" 'er/expand-region)
+(bind-key "C-x 9" 'helm-locate)
+(bind-key "C-<backspace>" 'subword-backward-kill)
+(bind-key "C-x v" 'eval-buffer)
+(bind-key "C-c C-c" 'eval-defun)
+(bind-key "C-c h" 'helm-google-suggest)
+(bind-key "C-x m" 'helm-M-x)
+(bind-key "C-c p x p" 'my/projectile-open-pom)
+(bind-key "C-x C-j" 'projectile-find-implementation-or-test-other-window)
+(bind-key "C->" 'mc/mark-next-like-this)
+(bind-key "C-<" 'mc/mark-previous-like-this)
+(bind-key "M-<left>" 'back-button-global-backward)
+(bind-key "M-<right>" 'back-button-global-forward)
+(bind-key "C-c 1" 'switch-window)
+(bind-key "<f6>" 'god-mode)
+(bind-key "<f7>" 'sr-speedbar-toggle)
+(bind-key "C-x d" 'dired)
+(bind-key "C-v" 'change-inner)
+(bind-key "M-v" 'copy-inner)
+(bind-key "C-c I" 'my/find-user-init-file)
+(bind-key "C-x 2" 'my/vsplit-last-buffer)
+(bind-key "C-x 3" 'my/hsplit-last-buffer)
+(global-set-key [remap kill-ring-save] 'easy-kill)
+(global-set-key [remap other-window] 'my/other-window)
+(require 'dired-x)
+
 
 (require 'auto-complete-nxml)
 ;; Keystroke to popup help about something at point.
