@@ -1,4 +1,4 @@
-;;; .emacs -- generic command-dispatcher facility.  -*- lexical-binding: t -*-
+;;; .emacs -- generh
 ;;; Commentary:
 ;;; my YY Emacs configuration
 ;;; Code:
@@ -735,13 +735,14 @@ ARG - the amount for increasing the value."
 (global-set-key (kbd "C-x C-0") 'delete-window)
 
 ;; redefine emacs state to intercept the escape key like insert-state does:
+(require 'evil)
 (evil-define-state emacs
-  "Emacs state that can be exited with the escape key."
-  :tag " <EE> "
-  :message "-- EMACS WITH ESCAPE --"
-  :input-method t
-  ;; :intercept-esc nil)
-  )
+                   "Emacs state that can be exited with the escape key."
+                   :tag " <EE> "
+                   :message "-- EMACS WITH ESCAPE --"
+                   :input-method t
+                   ;; :intercept-esc nil)
+                   )
 
 (defadvice evil-insert-state (around emacs-state-instead-of-insert-state activate)
   (evil-emacs-state))
@@ -812,6 +813,7 @@ ARG - the amount for increasing the value."
 (bind-key "C-x 3" 'my/hsplit-last-buffer)
 (global-set-key [remap kill-ring-save] 'easy-kill)
 (global-set-key [remap other-window] 'my/other-window)
+(require 'dired-x)
 
 
 (require 'auto-complete-nxml)
