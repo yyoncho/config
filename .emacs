@@ -242,9 +242,13 @@ NAME - the name of the buffer."
 
 (require 'cc-mode)
 
-(eval-after-load 'java-mode
-  '(define-key java-mode-map (kbd "C-x C-j") 'projectile-find-implementation-or-test-other-window))
+(define-key java-mode-map (kbd "C-x C-j")
+  'projectile-find-implementation-or-test-other-window)
+
+(require 'paredit)
+(define-key paredit-mode-map (kbd "C-M-u") 'er/expand-region)
 (define-key java-mode-map (kbd "C-<f11>") 'meghanada-run-junit-recent)
+
 (add-to-list 'auto-mode-alist '("\\.clj\\'" . clojure-mode))
 
 (defun kill-current-buffer ()
