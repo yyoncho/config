@@ -43,7 +43,7 @@
 (prelude-require-package 'helm-descbinds)
 (prelude-require-package 'flx-ido)
 (prelude-require-package 'ido-ubiquitous)
-
+(prelude-require-package 'evil)
 (prelude-require-package 'midje-mode)
 (prelude-require-package 'eclipse-theme)
 (prelude-require-package 'flycheck-pos-tip)
@@ -64,6 +64,12 @@
 (prelude-require-package 'sr-speedbar)
 (prelude-require-package 'omnisharp)
 (prelude-require-package 'dired+)
+(prelude-require-package 'meghanada)
+(prelude-require-package 'restclient)
+
+(require 'flycheck-pos-tip)
+(require 'ido)
+(require 'auto-complete-nxml)
 
 ;; modes
 (ido-mode t)
@@ -95,7 +101,6 @@
 (flycheck-pos-tip-mode t)
 
 (powerline-default-theme)
-
 (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
 
 ;;; ido configuration
@@ -107,7 +112,7 @@ NAME - the name of the buffer."
   (and (string-match "^\*" name)
        (not (and (string-match "repl" name)
                  (not (string-match "repl-messages" name))))
-       (not (string-match "shell\\|ansi-term\\|magit\\|Magit\\|cider" name))))
+       (not (string-match "shell\\|ansi-term\\|magit\\|Magit\\|cider\\|sql" name))))
 (require 'ido)
 
 (setq ido-ignore-buffers '("\\` " ido-ignore-non-user-except-ielm))
@@ -230,6 +235,7 @@ NAME - the name of the buffer."
         indent-tabs-mode nil)
   (c-set-offset 'inline-open '=))
 
+(require 'meghanada)
 (add-hook 'java-mode-hook #'paredit-mode)
 (add-hook 'java-mode-hook #'java-conf)
 (add-hook 'java-mode-hook #'meghanada-mode)
@@ -370,20 +376,6 @@ PREFIX - whether to switch to the other window."
   (interactive)
   (set-frame-parameter nil 'fullscreen
                        (if (frame-parameter nil 'fullscreen) nil 'fullboth)))
-
-;; god more configuration
-(require 'god-mode)
-(defun my-update-cursor ()
-  "Update my cursor."
-  (setq cursor-type (if (or god-local-mode buffer-read-only)
-                        'box
-                      'bar))
-  (set-cursor-color (if (or god-local-mode buffer-read-only)
-                        "yellow"
-                      "white")))
-
-(add-hook 'god-mode-enabled-hook 'my-update-cursor)
-(add-hook 'god-mode-disabled-hook 'my-update-cursor)
 
 (require 'god-mode)
 (define-key god-local-mode-map (kbd ".") 'repeat)
@@ -545,14 +537,13 @@ ARG - the amount for increasing the value."
           (replace-match (format (concat "%0" (int-to-string field-width) "d")
                                  answer)))))))
 
-(defun my/mvn-dependency-version-to-properties ()
-  "Move dependency version to properties section."
+(defun my/mvn-dependency-version-to-properties (&optional arg)
   (interactive "p")
   (save-excursion
     (search-forward "<version>")
     (kill-region (point) (progn
                            (search-forward "</version>"
-                                           nil nil nil)
+                                           nil nil arg)
                            (backward-char 10)
                            (point)))
     (let ((version (car kill-ring-yank-pointer)))
@@ -560,7 +551,7 @@ ARG - the amount for increasing the value."
       (search-forward "<artifactId>")
       (kill-ring-save (point) (progn
                                 (search-forward "</artifactId>"
-                                                nil nil nil)
+                                                nil nil arg)
                                 (backward-char 13)
                                 (point)))
       (let ((group-id (car kill-ring-yank-pointer)))
@@ -619,6 +610,8 @@ ARG - the amount for increasing the value."
       (kill-new filename)
       (message "Copied buffer file name '%s' to the clipboard." filename))))
 
+(require 'projectile)
+
 (defun my/projectile-open-pom ()
   "Open's pom file from the project."
   (interactive)
@@ -628,6 +621,22 @@ ARG - the amount for increasing the value."
   "Edit the `user-init-file', in another window."
   (interactive)
   (find-file user-init-file))
+
+(defun my/find-user-shell-init-file ()
+  "Edit the shell init file in another window."
+  (interactive)
+  (let* ((shell (car (reverse (split-string (getenv "SHELL") "/" t))))
+         (shell-init-file (cond
+                           ((string= "zsh" shell) crux-shell-zsh-init-files)
+                           ((string= "bash" shell) crux-shell-bash-init-files)
+                           ((string= "tcsh" shell) crux-shell-tcsh-init-files)
+                           ((string= "fish" shell) crux-shell-fish-init-files)
+                           ((string-prefix-p "ksh" shell) crux-shell-ksh-init-files)
+                           (t (error "Unknown shell"))))
+         (candidates (cl-remove-if-not 'file-exists-p (mapcar 'substitute-in-file-name shell-init-file))))
+    (if (> (length candidates) 1)
+        (find-file (completing-read "Choose shell init file:" candidates))
+      (find-file (car candidates)))))
 
 (require 'vc-dispatcher)
 (setq vc-suppress-confirm nil)
@@ -657,6 +666,7 @@ ARG - the amount for increasing the value."
                   (call-interactively 'self-insert-command))))))
 
 (defun my/toggle-window-split ()
+  "Toggle window split."
   (interactive)
   (if (= (count-windows) 2)
       (let* ((this-win-buffer (window-buffer))
@@ -682,29 +692,26 @@ ARG - the amount for increasing the value."
           (if this-win-2nd (other-window 1))))))
 
 (defun my/rotate-windows ()
-  "Rotate your windows"
+  "Rotate your windows."
   (interactive)
   (cond ((not (> (count-windows)1))
          (message "You can't rotate a single window!"))
         (t
-         (setq i 1)
-         (setq numWindows (count-windows))
-         (while  (< i numWindows)
-           (let* (
-                  (w1 (elt (window-list) i))
-                  (w2 (elt (window-list) (+ (% i numWindows) 1)))
-
-                  (b1 (window-buffer w1))
-                  (b2 (window-buffer w2))
-
-                  (s1 (window-start w1))
-                  (s2 (window-start w2))
-                  )
-             (set-window-buffer w1  b2)
-             (set-window-buffer w2 b1)
-             (set-window-start w1 s2)
-             (set-window-start w2 s1)
-             (setq i (1+ i)))))))
+         (let ((i 1)
+               (numWindows (count-windows)))
+           (while  (< i numWindows)
+             (let* (
+                    (w1 (elt (window-list) i))
+                    (w2 (elt (window-list) (+ (% i numWindows) 1)))
+                    (b1 (window-buffer w1))
+                    (b2 (window-buffer w2))
+                    (s1 (window-start w1))
+                    (s2 (window-start w2)))
+               (set-window-buffer w1  b2)
+               (set-window-buffer w2 b1)
+               (set-window-start w1 s2)
+               (set-window-start w2 s1)
+               (setq i (1+ i))))))))
 
 ;; Save point position between sessions
 (require 'saveplace)
@@ -720,12 +727,13 @@ ARG - the amount for increasing the value."
 
 ;; full screen magit-status
 (defadvice magit-status (around magit-fullscreen activate)
+  "Magit status wrap-up."
   (window-configuration-to-register :magit-fullscreen)
   ad-do-it
   (delete-other-windows))
 
 (defun my/magit-quit-session ()
-  "Restores the previous window configuration and kills the magit buffer."
+  "Restore the previous window configuration and kill the magit buffer."
   (interactive)
   (kill-buffer)
   (jump-to-register :magit-fullscreen))
@@ -739,16 +747,11 @@ ARG - the amount for increasing the value."
 (global-set-key (kbd "C-x C-0") 'delete-window)
 
 ;; redefine emacs state to intercept the escape key like insert-state does:
-(require 'evil)
-(evil-define-state emacs
-                   "Emacs state that can be exited with the escape key."
-                   :tag " <EE> "
-                   :message "-- EMACS WITH ESCAPE --"
-                   :input-method t
-                   ;; :intercept-esc nil)
-                   )
+
+
 
 (defadvice evil-insert-state (around emacs-state-instead-of-insert-state activate)
+  "Use emacs state for insert mode."
   (evil-emacs-state))
 
 ;; clipboard
@@ -756,9 +759,6 @@ ARG - the amount for increasing the value."
 ;; unset the suspend frame command
 (global-unset-key (kbd "C-z"))
 (global-unset-key (kbd "C-x C-z"))
-(global-unset-key (kbd "C-c I"))
-
-
 
 ;; global key configuration
 (bind-key "C-c C-<" 'mc/mark-all-like-this)
@@ -800,7 +800,6 @@ ARG - the amount for increasing the value."
 (bind-key "C-c C-c" 'eval-defun)
 (bind-key "C-c h" 'helm-google-suggest)
 (bind-key "C-x m" 'helm-M-x)
-(bind-key "C-c p x p" 'my/projectile-open-pom)
 (bind-key "C-x C-j" 'projectile-find-implementation-or-test-other-window)
 (bind-key "C->" 'mc/mark-next-like-this)
 (bind-key "C-<" 'mc/mark-previous-like-this)
@@ -812,11 +811,17 @@ ARG - the amount for increasing the value."
 (bind-key "C-x d" 'dired)
 (bind-key "C-v" 'change-inner)
 (bind-key "M-v" 'copy-inner)
-(bind-key "C-c I" 'my/find-user-init-file)
-(bind-key "C-x 2" 'my/vsplit-last-buffer)
-(bind-key "C-x 3" 'my/hsplit-last-buffer)
 (global-set-key [remap kill-ring-save] 'easy-kill)
 (global-set-key [remap other-window] 'my/other-window)
+(global-set-key [remap crux-find-user-init-file] 'my/find-user-init-file)
+(global-set-key [remap crux-find-shell-init-file] 'my/find-user-shell-init-file)
+(bind-key "C-x 2" 'my/vsplit-last-buffer)
+(bind-key "C-x 3" 'my/hsplit-last-buffer)
+(bind-key "C-c M-p" 'my/projectile-open-pom)
+
+(require 'nxml-mode)
+(bind-key "C-c M-e" 'my/mvn-dependency-version-to-properties nxml-mode-map)
+
 (require 'dired-x)
 
 
@@ -828,4 +833,26 @@ ARG - the amount for increasing the value."
 (require 'sr-speedbar)
 (setq sr-speedbar-right-side nil)
 
+;; evil configuration
+(require 'evil)
+(setq evil-default-state 'emacs)
+(evil-mode t)
+
+(evil-define-state emacs
+  "Emacs state that can be exited with the escape key."
+  :tag " <EE> "
+  :message "-- EMACS WITH ESCAPE --"
+  :input-method t)
+
+(lexical-let ((default-color (cons (face-background 'mode-line)
+                                   (face-foreground 'mode-line))))
+  (add-hook 'post-command-hook
+            (lambda ()
+              (let ((color (cond ((minibufferp) default-color)
+                                 ((or god-local-mode buffer-read-only) '("blue" . "#ffffff"))
+                                 ((evil-normal-state-p) '("purple" . "#ffffff"))
+                                 ((buffer-modified-p)   '("#006fa0" . "#ffffff"))
+                                 (t default-color))))
+                (set-face-background 'mode-line (car color))
+                (set-face-foreground 'mode-line (cdr color))))))
 ;;; .emacs ends here
