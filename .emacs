@@ -219,8 +219,6 @@ NAME - the name of the buffer."
 (setq midje-comments ";;.;.")
 
 (setq cider-auto-mode 't)
-(eval-after-load 'cider-mode
-  '(define-key cider-mode-map (kbd "C-x C-j") 'projectile-find-implementation-or-test-other-window))
 
 (eval-after-load 'cider-mode
   '(define-key cider-mode-map (kbd "C-c M-r") 'cider-restart))
@@ -238,7 +236,7 @@ NAME - the name of the buffer."
 (require 'meghanada)
 (add-hook 'java-mode-hook #'paredit-mode)
 (add-hook 'java-mode-hook #'java-conf)
-(add-hook 'java-mode-hook #'meghanada-mode)
+;;(remove-hook 'java-mode-hook #'meghanada-mode)
 (add-hook 'java-mode-hook #'aggressive-indent-mode)
 (add-hook 'java-mode-hook #'yas-minor-mode)
 
@@ -748,7 +746,10 @@ ARG - the amount for increasing the value."
 
 ;; redefine emacs state to intercept the escape key like insert-state does:
 
-
+(defun my/projectile-find-implementation ()
+  "Open matching implementation or test file in other window."
+  (interactive)
+  (find-file (projectile-find-implementation-or-test (buffer-file-name))))
 
 (defadvice evil-insert-state (around emacs-state-instead-of-insert-state activate)
   "Use emacs state for insert mode."
@@ -800,7 +801,7 @@ ARG - the amount for increasing the value."
 (bind-key "C-c C-c" 'eval-defun)
 (bind-key "C-c h" 'helm-google-suggest)
 (bind-key "C-x m" 'helm-M-x)
-(bind-key "C-x C-j" 'projectile-find-implementation-or-test-other-window)
+(bind-key "C-x C-j" 'my/projectile-find-implementation)
 (bind-key "C->" 'mc/mark-next-like-this)
 (bind-key "C-<" 'mc/mark-previous-like-this)
 (bind-key "M-<left>" 'back-button-global-backward)
@@ -818,6 +819,9 @@ ARG - the amount for increasing the value."
 (bind-key "C-x 2" 'my/vsplit-last-buffer)
 (bind-key "C-x 3" 'my/hsplit-last-buffer)
 (bind-key "C-c M-p" 'my/projectile-open-pom)
+
+(require 'ivy)
+(bind-key "C-c C-SPC" 'ivy-goto-word)
 
 (require 'nxml-mode)
 (bind-key "C-c M-e" 'my/mvn-dependency-version-to-properties nxml-mode-map)
