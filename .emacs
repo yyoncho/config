@@ -42,6 +42,10 @@
 (prelude-require-package 'highlight-symbol)
 (prelude-require-package 'helm-descbinds)
 (prelude-require-package 'flx-ido)
+(prelude-require-package 'elfeed)
+(prelude-require-package 'jabber)
+(prelude-require-package 'use-package)
+(prelude-require-package 'diminish)
 (prelude-require-package 'ido-ubiquitous)
 (prelude-require-package 'evil)
 (prelude-require-package 'midje-mode)
@@ -51,6 +55,7 @@
 (prelude-require-package 'auto-highlight-symbol)
 (prelude-require-package 'aggressive-indent)
 (prelude-require-package 'bm)
+
 (prelude-require-package 'helm-projectile)
 (prelude-require-package 'ujelly-theme)
 (prelude-require-package 'golden-ratio)
@@ -63,13 +68,18 @@
 (prelude-require-package 'auto-complete-nxml)
 (prelude-require-package 'sr-speedbar)
 (prelude-require-package 'omnisharp)
-(prelude-require-package 'dired+)
 (prelude-require-package 'meghanada)
 (prelude-require-package 'restclient)
+(prelude-require-package 'elpy)
+
+(prelude-require-package 'dired+)
+(prelude-require-package 'dired-explorer)
+(prelude-require-package 'dired-efap)
 
 (require 'flycheck-pos-tip)
 (require 'ido)
 (require 'auto-complete-nxml)
+(smartparens-mode -1)
 
 ;; modes
 (ido-mode t)
@@ -97,6 +107,7 @@
 (scroll-bar-mode -1)
 (global-auto-revert-mode 1)
 (helm-descbinds-mode 1)
+(smartparens-mode -1)
 (global-flycheck-mode t)
 (flycheck-pos-tip-mode t)
 
@@ -109,10 +120,7 @@
 (defun ido-ignore-non-user-except-ielm (name)
   "Ignore all non-user (a.k.a. *starred*) buffers except **.
 NAME - the name of the buffer."
-  (and (string-match "^\*" name)
-       (not (and (string-match "repl" name)
-                 (not (string-match "repl-messages" name))))
-       (not (string-match "shell\\|ansi-term\\|magit\\|Magit\\|cider\\|sql" name))))
+  nil)
 (require 'ido)
 
 (setq ido-ignore-buffers '("\\` " ido-ignore-non-user-except-ielm))
@@ -166,6 +174,12 @@ NAME - the name of the buffer."
 
 ;; dired files
 (require 'dired-x)
+(require 'dired+)
+(require 'dired-explorer)
+(require 'dired-efap)
+
+(define-key dired-mode-map [f2] 'dired-efap)
+(define-key dired-mode-map (kbd "I") 'dired-subtree-toggle)
 (setq-default dired-omit-files-p t) ; Buffer-local variable
 (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
 (setq delete-by-moving-to-trash t)
@@ -464,6 +478,7 @@ PREFIX - whether to switch to the other window."
 ;; configuration for multiple cursors
 
 (define-key global-map (kbd "C-c SPC") 'avy-goto-word-1)
+(define-key global-map (kbd "C-c C-SPC") 'avy-pop-mark)
 
 
 (setq exec-path (append exec-path '("/usr/bin")))
@@ -644,24 +659,13 @@ ARG - the amount for increasing the value."
 (require 'projectile)
 (require 'cider-eval-sexp-fu)
 
-(defun my/other-window ()
-  "Select other window or switch buffer if there is only one window."
-  (interactive)
+(defun my/other-window (arg)
+  "Select ARGth window or switch buffer if there is only one window."
+  (interactive "p")
   (let ((old-window  (selected-window)))
-    (other-window 1)
+    (other-window arg)
     (when (equal old-window (selected-window))
-      (switch-to-buffer (next-buffer)))))
-
-(add-hook 'ido-setup-hook
-          (lambda ()
-            ;; Go straight home
-            (define-key ido-file-completion-map
-              (kbd "~")
-              (lambda ()
-                (interactive)
-                (if (looking-back "/")
-                    (insert "~/")
-                  (call-interactively 'self-insert-command))))))
+      (other-frame arg))))
 
 (defun my/toggle-window-split ()
   "Toggle window split."
@@ -801,6 +805,7 @@ ARG - the amount for increasing the value."
 (bind-key "C-c C-c" 'eval-defun)
 (bind-key "C-c h" 'helm-google-suggest)
 (bind-key "C-x m" 'helm-M-x)
+(bind-key "C-x b" 'helm-buffers-list)
 (bind-key "C-x C-j" 'my/projectile-find-implementation)
 (bind-key "C->" 'mc/mark-next-like-this)
 (bind-key "C-<" 'mc/mark-previous-like-this)
@@ -812,6 +817,31 @@ ARG - the amount for increasing the value."
 (bind-key "C-x d" 'dired)
 (bind-key "C-v" 'change-inner)
 (bind-key "M-v" 'copy-inner)
+(bind-key "<f8>" 'emms)
+
+(defun fg-emms-track-description (track)
+  "Return a somewhat nice track description."
+  (let ((artist (emms-track-get track 'info-artist))
+        (year (emms-track-get track 'info-year))
+        (album (emms-track-get track 'info-album))
+        (tracknumber (emms-track-get track 'info-tracknumber))
+        (title (emms-track-get track 'info-title)))
+    (cond
+     ((or artist title)
+      (concat (if (> (length artist) 0) artist "Unknown artist") " - "
+              (if (> (length year) 0) year "XXXX") " - "
+              (if (> (length album) 0) album "Unknown album") " - "
+              (if (> (length tracknumber) 0)
+                  (format "%02d" (string-to-number tracknumber))
+                "XX") " - "
+                (if (> (length title) 0) title "Unknown title")))
+     (t
+      (emms-track-simple-description track)))))
+
+(setq emms-track-description-function 'fg-emms-track-description)
+(require 'emms)
+
+
 (global-set-key [remap kill-ring-save] 'easy-kill)
 (global-set-key [remap other-window] 'my/other-window)
 (global-set-key [remap crux-find-user-init-file] 'my/find-user-init-file)
@@ -837,6 +867,13 @@ ARG - the amount for increasing the value."
 (require 'sr-speedbar)
 (setq sr-speedbar-right-side nil)
 
+;; python configuration
+
+(add-hook 'python-mode-hook #'elpy-enable)
+(add-hook 'python-mode-hook #'eldoc-mode)
+
+(require 'better-defaults)
+
 ;; evil configuration
 (require 'evil)
 (setq evil-default-state 'emacs)
@@ -860,3 +897,203 @@ ARG - the amount for increasing the value."
                 (set-face-background 'mode-line (car color))
                 (set-face-foreground 'mode-line (cdr color))))))
 ;;; .emacs ends here
+
+(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
+(require 'mu4e)
+(require 'mu4e-speedbar)
+
+(bind-key "C-c m" 'mu4e)
+
+(setq mu4e-drafts-folder "/Drafts"
+      mu4e-sent-folder   "/Sent Items"
+      mu4e-trash-folder  "/Trash"
+      mu4e-msg2pdf "/usr/bin/msg2pdf"
+      mu4e-update-interval 200)
+
+;; don't save message to Sent Messages, Gmail/IMAP takes care of this
+(setq mu4e-sent-messages-behavior 'sent)
+
+(setq mu4e-maildir-shortcuts
+      '(("/INBOX" . ?j)
+        ("/Drafts" . ?d)
+        ("/Trash" . ?t)
+        ("/Sent Items" . ?s)
+        ("/bamboo" . ?b)))
+
+;; allow for updating mail using 'U' in the main view:
+(setq mu4e-get-mail-command "offlineimap")
+
+;; something about ourselves
+(setq
+ user-mail-address "ivan.yonchovski@tick42.com"
+ user-full-name  "Ivan Yonchovski"
+ mu4e-compose-signature nil)
+
+
+(require 'smtpmail)
+(setq message-send-mail-function 'smtpmail-send-it
+      starttls-use-gnutls t
+      smtpmail-starttls-credentials '(("smtp.office365.com" 587 nil nil))
+      smtpmail-auth-credentials
+      '(("smtp.office365.com" 587 "ivan.yonchovski@tick42.com" nil))
+      smtpmail-default-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-server "smtp.office365.com"
+      smtpmail-smtp-service 587)
+
+(setq message-kill-buffer-on-exit t)
+
+(use-package mu4e-alert
+  :ensure t
+  :config
+  (mu4e-alert-enable-notifications)
+  (mu4e-alert-set-default-style 'libnotify)
+  (setq mu4e-alert-interesting-mail-query
+        (concat "maildir:/INBOX and flag:unread"))
+
+  (alert-add-rule
+   :category "mu4e-alert"
+   :predicate (lambda (_) (string-match-p "^mu4e-" (symbol-name major-mode)))
+   :continue )
+
+  ;; display stuff on modeline as well as notify
+  (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
+  (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display))
+
+;; elfeed configuration
+(require 'elfeed)
+(setq elfeed-feeds
+      '("http://sachachua.com/blog/feed/"
+        "http://feeds.feedburner.com/cyclingnews/news?format=xml"))
+
+(require 'emms-setup)
+(emms-all)
+(emms-default-players)
+(emms-mode-line -1)
+
+(setq browse-url-browser-function 'eww-browse-url
+      browse-url-generic-program "chromium-browser")
+
+;; jabber configuration
+(require 'jabber)
+(setq starttls-use-gnutls t
+      starttls-gnutls-program "gnutls-cli"
+      jabber-connection-type  'ssl
+      jabber-history-enabled t
+      jabber-use-global-history nil
+      jabber-backlog-number 1000
+      jabber-backlog-days 300
+      starttls-extra-arguments '("--starttls"))
+
+(jabber-mode-line-mode t)
+
+(setq jabber-invalid-certificate-servers '("PIRINSOFT"))
+(setq jabber-account-list
+      '(("iyonchovski@PIRINSOFT/work"
+         (:network-server . "jabber.pirinsoft.bg")
+         (:port . 5222))
+        ("ivan.yonchovski@beta.chat.facebook.com"
+         (:network-server . "beta.chat.facebook.com")
+         (:connection-type . network)
+         (:port . 5222))))
+
+(require 'notify)
+
+(defun notify-jabber-notify (from buf text proposed-alert)
+  "(jabber.el hook) Notify of new Jabber chat messages via notify.el."
+  (when (or jabber-message-alert-same-buffer
+            (not (memq (selected-window) (get-buffer-window-list buf))))
+    (if (jabber-muc-sender-p from)
+        (notify (format "(PM) %s"
+                        (jabber-jid-displayname (jabber-jid-user from)))
+                (format "%s: %s" (jabber-jid-resource from) text)))
+    (notify (format "%s" (jabber-jid-displayname from))
+            text)))
+
+(add-hook 'jabber-alert-message-hooks 'notify-jabber-notify)
+
+;; diminish
+(diminish 'company-mode "cm")
+(diminish 'guru-mode)
+(diminish 'paredit-mode)
+(diminish 'prelude-mode)
+(diminish 'projectile-mode)
+(diminish 'auto-revert-mode)
+(diminish 'becon-mode)
+(diminish 'smartparens-mode)
+(diminish 'magit-mode "M")
+(diminish 'auto-highlight-symbol-mode)
+
+(defun my/find-symbol-at-point ()
+  "Find the function, face, or variable definition for the symbol at point
+in the other window."
+  (interactive)
+  (let ((symb (symbol-at-point)))
+    (cond
+     ((and (or (functionp symb)
+               (fboundp symb))
+           (find-definition-noselect symb nil))
+      (find-function symb))
+     ((and (facep symb) (find-definition-noselect symb 'defface))
+      (find-face-definition symb))
+     ((and (boundp symb) (find-definition-noselect symb 'defvar))
+      (find-variable-other-window symb))
+     (t (message "No symbol at point")))))
+
+(global-set-key [(control down-mouse-1)]
+                (lambda (click)
+                  (interactive "e")
+                  (mouse-minibuffer-check click)
+                  (let* ((window (posn-window (event-start click)))
+                         (buf (window-buffer window)))
+                    (with-current-buffer buf
+                      (save-excursion
+                        (goto-char (posn-point (event-start click)))
+                        (my/find-symbol-at-point))))))
+
+
+(define-key global-map "\C-c\C-j" jabber-global-keymap)
+
+(defun my/projectile-switch-project-dired (&optional arg)
+  "Switch to a project we have visited before.
+Invokes the command referenced by `projectile-switch-project-action' on switch.
+With a prefix ARG invokes `projectile-commander' instead of
+`projectile-switch-project-action.'"
+  (interactive "P")
+  (let (projects)
+    (if (setq projects (projectile-relevant-known-projects))
+        (projectile-completing-read
+         "[Dired]Switch to project: " projects
+         :action (lambda (project)
+                   (dired project)))
+      (error "There are no known projects"))))
+
+(defun my/projectile-switch-project-magit (&optional arg)
+  "Switch to a project we have visited before.
+Invokes the command referenced by `projectile-switch-project-action' on switch.
+With a prefix ARG invokes `projectile-commander' instead of
+`projectile-switch-project-action.'"
+  (interactive "P")
+  (let (projects)
+    (if (setq projects (projectile-relevant-known-projects))
+        (projectile-completing-read
+         "[Magit]Switch to project: " projects
+         :action (lambda (project)
+                   (magit-status project)))
+      (error "There are no known projects"))))
+
+(bind-key "C-c C-p g" 'my/projectile-switch-project-magit)
+(bind-key "C-c C-p d" 'my/projectile-switch-project-dired)
+
+(setq gc-cons-threshold 20000000)
+
+(setq helm-M-x-fuzzy-match                  t
+      helm-bookmark-show-location           t
+      helm-buffers-fuzzy-matching           t
+      helm-completion-in-region-fuzzy-match t
+      helm-file-cache-fuzzy-match           t
+      helm-imenu-fuzzy-match                t
+      helm-mode-fuzzy-match                 t
+      helm-locate-fuzzy-match               t
+      helm-quick-update                     t
+      helm-recentf-fuzzy-match              t
+      helm-semantic-fuzzy-match             t)
