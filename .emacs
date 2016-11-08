@@ -1,4 +1,4 @@
-;;; .emacs -- generh
+;;; .emacs -- 
 ;;; Commentary:
 ;;; my YY Emacs configuration
 ;;; Code:
@@ -411,6 +411,8 @@ PREFIX - whether to switch to the other window."
 
 (add-hook 'xml-mode-hook
           (lambda()
+            (paredit-mode t)
+            (web-mode t)
             (local-unset-key (kbd "C-M-u"))))
 
 (require 'browse-url)
