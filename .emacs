@@ -409,7 +409,7 @@ PREFIX - whether to switch to the other window."
 
 (setq sgml-basic-offset 4)
 
-(add-hook 'xml-mode-hook
+(add-hook 'nxml-mode-hook
           (lambda()
             (paredit-mode t)
             (web-mode t)
@@ -992,10 +992,6 @@ ARG - the amount for increasing the value."
 (setq jabber-account-list
       '(("iyonchovski@PIRINSOFT/work"
          (:network-server . "jabber.pirinsoft.bg")
-         (:port . 5222))
-        ("ivan.yonchovski@beta.chat.facebook.com"
-         (:network-server . "beta.chat.facebook.com")
-         (:connection-type . network)
          (:port . 5222))))
 
 (require 'notify)
@@ -1099,3 +1095,33 @@ With a prefix ARG invokes `projectile-commander' instead of
       helm-quick-update                     t
       helm-recentf-fuzzy-match              t
       helm-semantic-fuzzy-match             t)
+
+;; org-jira-mode 
+(setq jiralib-url "https://jira.tick42.com")
+
+;; truncate-lines enabled by default
+(set-default 'truncate-lines t)
+
+(defun my/kmacro-end-and-call-macro (arg &optional no-repeat)
+  "Call last keyboard macro, ending it first if currently being defined.
+With numeric prefix ARG, repeat macro that many times.
+Zero argument means repeat until there is an error.
+To give a macro a permanent name, so you can call it
+even after defining other macros, use \\[kmacro-name-last-macro]."
+  (interactive "P")
+  (if defining-kbd-macro
+      (kmacro-end-macro nil))
+  (progn
+    (font-lock-mode -1)
+    (kmacro-call-macro arg no-repeat)
+    (font-lock-mode)))
+
+(global-set-key [remap kill-ring-save] 'my/kmacro-end-and-call-macro)
+
+(fset 'my/send-to-jpm-mail [?\M-x ?c ?o ?p ?y ?- ?f ?i ?l ?e ?- ?n
+                                  ?a ?m ?e ?- ?t ?o ?- ?c ?l ?i ?e backspace ?p return ?\M-x
+                                  ?m ?u ?r ?3 backspace backspace ?4 ?3 backspace ?e ?- ?c ?o
+                                  ?m ?p ?o ?s ?e return ?i ?v ?a ?n ?. ?y ?o ?n ?c ?h ?o ?v
+                                  ?s ?k ?i ?@ ?j ?p tab ?\C-n ?\C-y ?\C-n ?\C-n ?\C-c ?\C-a
+                                  ?\C-f backspace backspace ?\C-y return return return return
+                                  ?\C-c ?\C-c])
