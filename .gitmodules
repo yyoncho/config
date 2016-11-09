@@ -4,3 +4,6 @@
 [submodule "zsh-syntax-highlighting"]
 	path = zsh-syntax-highlighting
 	url = ./zsh-syntax-highlighting
+[submodule "maven-pom-mode"]
+	path = maven-pom-mode
+	url = https://github.com/m0smith/maven-pom-mode.git
