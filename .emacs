@@ -905,7 +905,7 @@ the current buffer."
 ;; evil configuration
 (require 'evil)
 (setq evil-default-state 'emacs)
-(evil-mode t)
+(evil-mode nil)
 
 (evil-define-state emacs
   "Emacs state that can be exited with the escape key."
@@ -930,7 +930,14 @@ the current buffer."
 (require 'mu4e)
 (require 'mu4e-speedbar)
 
-(bind-key "C-c m" 'mu4e)
+(defun my/mu4e-go-to-inbox ()
+  "Go to inbox."
+  (interactive)
+  (mu4e-headers-search
+   (format "maildir:\"%s\"" "/INBOX")))
+
+(bind-key "C-c m h" 'mu4e)
+(bind-key "C-c m m" 'my/mu4e-go-to-inbox)
 
 (setq mu4e-drafts-folder "/Drafts"
       mu4e-sent-folder   "/Sent Items"
@@ -1033,7 +1040,13 @@ the current buffer."
     (notify (format "%s" (jabber-jid-displayname from))
             text)))
 
+(require 'mu4e-alert)
+(defun my/jabber-alert-set-window-urgency-maybe (from buf text proposed-alert)
+  "Jabber alert - make the window blinking."
+  (mu4e-alert-set-window-urgency-maybe))
+
 (add-hook 'jabber-alert-message-hooks 'notify-jabber-notify)
+(add-hook 'jabber-alert-message-hooks 'my/jabber-alert-set-window-urgency-maybe)
 
 ;; diminish
 (diminish 'company-mode "cm")
@@ -1181,5 +1194,4 @@ Remove expanded subdir of deleted dir, if any."
                                               (setq buf-list (cdr buf-list)))))))
                                ;; Anything else?
                                ))
-
 
