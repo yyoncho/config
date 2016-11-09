@@ -124,3 +124,5 @@ bindkey '^[s' _quote-previous-word-in-double
 
 alias fix-spaces="sed -i -e 's/[ \t]*$//' -e 's/\t/    /g'"
 export PATH=$PATH:~/.bin
+
+alias dired='emacsclient -e '"'"'(dired "'"'"'`pwd`'"'"'")'"'"''

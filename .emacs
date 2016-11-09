@@ -5,6 +5,8 @@
 
 (defconst emacs-start-time (current-time))
 
+
+
 (package-initialize)
 
 (require 'package)
@@ -37,6 +39,7 @@
 (prelude-require-package 'bind-key)
 (prelude-require-package 'java-snippets)
 (prelude-require-package 'elp)
+(prelude-require-package 'org-bullets)
 (prelude-require-package 'clj-refactor)
 (prelude-require-package 'helm-swoop)
 (prelude-require-package 'highlight-symbol)
@@ -850,6 +853,7 @@ ARG - the amount for increasing the value."
 (global-set-key [remap crux-find-shell-init-file] 'my/find-user-shell-init-file)
 (bind-key "C-x 2" 'my/vsplit-last-buffer)
 (bind-key "C-x 3" 'my/hsplit-last-buffer)
+(bind-key "C-c w w" 'eww)
 (bind-key "C-c M-p" 'my/projectile-open-pom)
 
 (require 'ivy)
@@ -1116,7 +1120,7 @@ even after defining other macros, use \\[kmacro-name-last-macro]."
     (kmacro-call-macro arg no-repeat)
     (font-lock-mode)))
 
-(global-set-key [remap kill-ring-save] 'my/kmacro-end-and-call-macro)
+(global-set-key [remap kbd-end-or-call-macro] 'my/kmacro-end-and-call-macro)
 
 (fset 'my/send-to-jpm-mail [?\M-x ?c ?o ?p ?y ?- ?f ?i ?l ?e ?- ?n
                                   ?a ?m ?e ?- ?t ?o ?- ?c ?l ?i ?e backspace ?p return ?\M-x
@@ -1125,3 +1129,10 @@ even after defining other macros, use \\[kmacro-name-last-macro]."
                                   ?s ?k ?i ?@ ?j ?p tab ?\C-n ?\C-y ?\C-n ?\C-n ?\C-c ?\C-a
                                   ?\C-f backspace backspace ?\C-y return return return return
                                   ?\C-c ?\C-c])
+(require 'org-bullets)
+
+(add-hook 'org-mode-hook #'org-bullets-mode)
+
+(emms-default-players)
+(emms)
+(emms-insert-playlist-directory-tree "~/Music")
