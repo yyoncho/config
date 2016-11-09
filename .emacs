@@ -843,14 +843,36 @@ ARG - the amount for increasing the value."
      (t
       (emms-track-simple-description track)))))
 
-(setq emms-track-description-function 'fg-emms-track-description)
 (require 'emms)
+(setq emms-track-description-function 'fg-emms-track-description)
+
+(require 'crux)
+
+(defun my/start-or-switch-to (function buffer-name)
+  "Invoke FUNCTION if there is no buffer with BUFFER-NAME.
+Otherwise switch to the buffer named BUFFER-NAME.  Don't clobber
+the current buffer."
+  (if (not (get-buffer buffer-name))
+      (progn
+        (split-window-sensibly (selected-window))
+        (other-window 1)
+        (funcall function))
+    (switch-to-buffer buffer-name)))
+
+(defun my/visit-term-buffer ()
+  "Create or visit a terminal buffer."
+  (interactive)
+  (my/start-or-switch-to (lambda ()
+                           (ansi-term crux-shell (concat crux-term-buffer-name "-term")))
+                         (format "*%s-term*" crux-term-buffer-name)))
 
 
 (global-set-key [remap kill-ring-save] 'easy-kill)
 (global-set-key [remap other-window] 'my/other-window)
 (global-set-key [remap crux-find-user-init-file] 'my/find-user-init-file)
 (global-set-key [remap crux-find-shell-init-file] 'my/find-user-shell-init-file)
+(global-set-key [remap crux-visit-term-buffer] 'my/visit-term-buffer)
+
 (bind-key "C-x 2" 'my/vsplit-last-buffer)
 (bind-key "C-x 3" 'my/hsplit-last-buffer)
 (bind-key "C-c w w" 'eww)
@@ -1136,3 +1158,28 @@ even after defining other macros, use \\[kmacro-name-last-macro]."
 (emms-default-players)
 (emms)
 (emms-insert-playlist-directory-tree "~/Music")
+
+(eval-after-load  "dired-x" '(defun dired-clean-up-after-deletion (fn)
+                               "My. Clean up after a deleted file or directory FN.
+Remove expanded subdir of deleted dir, if any."
+                               (save-excursion (and (cdr dired-subdir-alist)
+                                                    (dired-goto-subdir fn)
+                                                    (dired-kill-subdir)))
+
+                               ;; Offer to kill buffer of deleted file FN.
+                               (if dired-clean-up-buffers-too
+                                   (progn
+                                     (let ((buf (get-file-buffer fn)))
+                                       (and buf
+                                            (save-excursion ; you never know where kill-buffer leaves you
+                                              (kill-buffer buf))))
+                                     (let ((buf-list (dired-buffers-for-dir (expand-file-name fn)))
+                                           (buf nil))
+                                       (and buf-list
+                                            (while buf-list
+                                              (save-excursion (kill-buffer (car buf-list)))
+                                              (setq buf-list (cdr buf-list)))))))
+                               ;; Anything else?
+                               ))
+
+
