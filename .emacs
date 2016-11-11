@@ -36,6 +36,7 @@
 (toggle-truncate-lines t)
 (prelude-require-package 'ido-vertical-mode)
 (prelude-require-package 'ac-cider)
+(prelude-require-package 'ace-link)
 (prelude-require-package 'bind-key)
 (prelude-require-package 'java-snippets)
 (prelude-require-package 'elp)
@@ -216,8 +217,6 @@ NAME - the name of the buffer."
 
 ;; file -> mode configuration
 (add-to-list 'auto-mode-alist '("\\.raml\\'" . yaml-mode))
-(add-to-list 'auto-mode-alist '("\\.tpl\\'" . python-mode))
-(add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 
 ;; cider configuration
 (add-hook 'cider-mode-hook #'eldoc-mode)
@@ -875,7 +874,7 @@ the current buffer."
 
 (bind-key "C-x 2" 'my/vsplit-last-buffer)
 (bind-key "C-x 3" 'my/hsplit-last-buffer)
-(bind-key "C-c w w" 'eww)
+(bind-key "C-c w w" 'w3m)
 (bind-key "C-c M-p" 'my/projectile-open-pom)
 
 (require 'ivy)
@@ -936,8 +935,8 @@ the current buffer."
   (mu4e-headers-search
    (format "maildir:\"%s\"" "/INBOX")))
 
-(bind-key "C-c m h" 'mu4e)
-(bind-key "C-c m m" 'my/mu4e-go-to-inbox)
+(bind-key "C-c m" 'mu4e)
+
 
 (setq mu4e-drafts-folder "/Drafts"
       mu4e-sent-folder   "/Sent Items"
@@ -1090,6 +1089,8 @@ in the other window."
 
 (define-key global-map "\C-c\C-j" jabber-global-keymap)
 
+(define-key w3m-mode-map "f" 'ace-link-eww)
+
 (defun my/projectile-switch-project-dired (&optional arg)
   "Switch to a project we have visited before.
 Invokes the command referenced by `projectile-switch-project-action' on switch.
@@ -1118,8 +1119,8 @@ With a prefix ARG invokes `projectile-commander' instead of
                    (magit-status project)))
       (error "There are no known projects"))))
 
-(bind-key "C-c C-p g" 'my/projectile-switch-project-magit)
-(bind-key "C-c C-p d" 'my/projectile-switch-project-dired)
+(bind-key "C-c 2 g" 'my/projectile-switch-project-magit)
+(bind-key "C-c 2 d" 'my/projectile-switch-project-dired)
 
 (setq gc-cons-threshold 20000000)
 
@@ -1194,4 +1195,25 @@ Remove expanded subdir of deleted dir, if any."
                                               (setq buf-list (cdr buf-list)))))))
                                ;; Anything else?
                                ))
+;; ibuffer configuration
+(setq ibuffer-saved-filter-groups
+      (quote (("default"
+               ("dired" (mode . dired-mode))
+               ("java" (mode . java-mode))
+               ("w3m" (mode . w3m-mode))
+               ("magit" (name . "\*magit.*\*"))
+               ("temporary" (name . "\*.*\*"))))))
 
+(add-hook 'ibuffer-mode-hook
+          (lambda ()
+            (ibuffer-switch-to-saved-filter-groups "default")))
+
+;; python configuration
+(setq elpy-rpc-backend "jedi")
+(setq elpy-rpc-python-command "python")
+(elpy-use-ipython "ipython")
+(autoload 'jedi:setup "jedi" nil t)
+(add-hook 'python-mode-hook 'jedi:setup)
+(add-hook 'pyvenv-mode-hook 'jedi:setup)
+(setq jedi:setup-keys t)
+(setq jedi:complete-on-dot t)

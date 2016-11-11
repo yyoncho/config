@@ -126,3 +126,4 @@ alias fix-spaces="sed -i -e 's/[ \t]*$//' -e 's/\t/    /g'"
 export PATH=$PATH:~/.bin
 
 alias d='emacsclient -e '"'"'(dired "'"'"'`pwd`'"'"'")'"'"''
+alias m='emacsclient -e '"'"'(magit-status "'"'"'`git rev-parse --show-toplevel`'"'"'")'"'"''
