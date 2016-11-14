@@ -823,28 +823,6 @@ ARG - the amount for increasing the value."
 (bind-key "M-v" 'copy-inner)
 (bind-key "<f8>" 'emms)
 
-(defun fg-emms-track-description (track)
-  "Return a somewhat nice track description."
-  (let ((artist (emms-track-get track 'info-artist))
-        (year (emms-track-get track 'info-year))
-        (album (emms-track-get track 'info-album))
-        (tracknumber (emms-track-get track 'info-tracknumber))
-        (title (emms-track-get track 'info-title)))
-    (cond
-     ((or artist title)
-      (concat (if (> (length artist) 0) artist "Unknown artist") " - "
-              (if (> (length year) 0) year "XXXX") " - "
-              (if (> (length album) 0) album "Unknown album") " - "
-              (if (> (length tracknumber) 0)
-                  (format "%02d" (string-to-number tracknumber))
-                "XX") " - "
-                (if (> (length title) 0) title "Unknown title")))
-     (t
-      (emms-track-simple-description track)))))
-
-(require 'emms)
-(setq emms-track-description-function 'fg-emms-track-description)
-
 (require 'crux)
 
 (defun my/start-or-switch-to (function buffer-name)
@@ -1169,9 +1147,34 @@ even after defining other macros, use \\[kmacro-name-last-macro]."
 
 (add-hook 'org-mode-hook #'org-bullets-mode)
 
-(emms-default-players)
-(emms)
-(emms-insert-playlist-directory-tree "~/Music")
+(require 'emms)
+(defun my/emms-start ()
+  "Start emms."
+  (interactive)
+  (emms-default-players)
+  (emms-add-directory-tree "~/Music")
+  (emms))
+
+(defun fg-emms-track-description (track)
+  "Return a somewhat nice track description."
+  (let ((artist (emms-track-get track 'info-artist))
+        (year (emms-track-get track 'info-year))
+        (album (emms-track-get track 'info-album))
+        (tracknumber (emms-track-get track 'info-tracknumber))
+        (title (emms-track-get track 'info-title)))
+    (cond
+     ((or artist title)
+      (concat (if (> (length artist) 0) artist "Unknown artist") " - "
+              (if (> (length year) 0) year "XXXX") " - "
+              (if (> (length album) 0) album "Unknown album") " - "
+              (if (> (length tracknumber) 0)
+                  (format "%02d" (string-to-number tracknumber))
+                "XX") " - "
+                (if (> (length title) 0) title "Unknown title")))
+     (t
+      (emms-track-simple-description track)))))
+
+(setq emms-track-description-function 'fg-emms-track-description)
 
 (eval-after-load  "dired-x" '(defun dired-clean-up-after-deletion (fn)
                                "My. Clean up after a deleted file or directory FN.
@@ -1214,6 +1217,7 @@ Remove expanded subdir of deleted dir, if any."
 (elpy-use-ipython "ipython")
 (autoload 'jedi:setup "jedi" nil t)
 (add-hook 'python-mode-hook 'jedi:setup)
-(add-hook 'pyvenv-mode-hook 'jedi:setup)
+(add-hook 'python-mode-hook 'enable-paredit-mode)
+(add-hook 'python-mode-hook (lambda () (highlight-indentation-mode -1)))
 (setq jedi:setup-keys t)
 (setq jedi:complete-on-dot t)
