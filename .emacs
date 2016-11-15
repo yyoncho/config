@@ -3,147 +3,24 @@
 ;;; my YY Emacs configuration
 ;;; Code:
 
-(defconst emacs-start-time (current-time))
-
-
-
-(package-initialize)
-
-(require 'package)
-
-(setq package-archives '(("ELPA" . "http://tromey.com/elpa/")
-                         ("gnu" . "http://elpa.gnu.org/packages/")
-                         ("melpa" . "http://melpa.org/packages/")
-                         ("melpa-stable" . "http://stable.melpa.org/packages/")
-                         ("marmalade" . "http://marmalade-repo.org/packages/")))
-
 ;; Check if we're on Emacs 24.4 or newer, if so, use the pinned package feature
-(when (boundp 'package-pinned-packages)
-  (setq package-pinned-packages
-        '((bm                 . "marmalade")
-          (smex               . "melpa-stable")
-          (zenburn-theme      . "melpa-stable")
-          (anti-zenburn-theme . "melpa-stable")
-          (zen-and-art-theme  . "marmalade")
-          (cider              . "melpa-stable")
-          (htmlize            . "marmalade")
-          (rainbow-delimiters . "melpa-stable")
-          (icicles            . "melpa"))))
-
-
-(load "~/.emacs.d/init.el")
-
-(toggle-truncate-lines t)
-(prelude-require-package 'ido-vertical-mode)
-(prelude-require-package 'ac-cider)
-(prelude-require-package 'ace-link)
-(prelude-require-package 'bind-key)
-(prelude-require-package 'java-snippets)
-(prelude-require-package 'elp)
-(prelude-require-package 'org-bullets)
-(prelude-require-package 'clj-refactor)
-(prelude-require-package 'helm-swoop)
-(prelude-require-package 'highlight-symbol)
-(prelude-require-package 'helm-descbinds)
-(prelude-require-package 'flx-ido)
-(prelude-require-package 'elfeed)
-(prelude-require-package 'jabber)
-(prelude-require-package 'use-package)
-(prelude-require-package 'diminish)
-(prelude-require-package 'ido-ubiquitous)
-(prelude-require-package 'evil)
-(prelude-require-package 'midje-mode)
-(prelude-require-package 'eclipse-theme)
-(prelude-require-package 'flycheck-pos-tip)
-(prelude-require-package 'flycheck-clojure)
-(prelude-require-package 'auto-highlight-symbol)
-(prelude-require-package 'aggressive-indent)
-(prelude-require-package 'bm)
-
-(prelude-require-package 'helm-projectile)
-(prelude-require-package 'ujelly-theme)
-(prelude-require-package 'golden-ratio)
-(prelude-require-package 'back-button)
-(prelude-require-package 'cider-eval-sexp-fu)
-(prelude-require-package 'powerline)
-(prelude-require-package 'switch-window)
-(prelude-require-package 'recentf)
-(prelude-require-package 'cider-eval-sexp-fu)
-(prelude-require-package 'auto-complete-nxml)
-(prelude-require-package 'sr-speedbar)
-(prelude-require-package 'omnisharp)
-(prelude-require-package 'meghanada)
-(prelude-require-package 'restclient)
-(prelude-require-package 'elpy)
-
-(prelude-require-package 'dired+)
-(prelude-require-package 'dired-explorer)
-(prelude-require-package 'dired-efap)
-
 (require 'flycheck-pos-tip)
-(require 'ido)
 (require 'auto-complete-nxml)
 (smartparens-mode -1)
 
 ;; modes
-(ido-mode t)
-(ido-vertical-mode t)
-(winner-mode 1)
-(flx-ido-mode t)
-(transient-mark-mode t)
-(ido-everywhere t)
-(ido-ubiquitous-mode t)
 (show-paren-mode 1)
-(setq blink-matching-delay 0.1)
-(global-subword-mode t)
 (delete-selection-mode t)
 (setq indent-tabs-mode nil)
-(menu-bar-mode -1)
-(undo-tree-mode t)
-(global-whitespace-mode -1)
-(global-hl-line-mode -1)
 (global-auto-highlight-symbol-mode t)
-(blink-cursor-mode t)
-(recentf-mode 1)
 (line-number-mode 1)
-(column-number-mode 1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
-(global-auto-revert-mode 1)
-(helm-descbinds-mode 1)
-(smartparens-mode -1)
-(global-flycheck-mode t)
-(flycheck-pos-tip-mode t)
 
-(powerline-default-theme)
-(remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
-
-;;; ido configuration
-
-;; Do not list non user files
-(defun ido-ignore-non-user-except-ielm (name)
-  "Ignore all non-user (a.k.a. *starred*) buffers except **.
-NAME - the name of the buffer."
-  nil)
-(require 'ido)
-
-(setq ido-ignore-buffers '("\\` " ido-ignore-non-user-except-ielm))
-
-(require 'ido-vertical-mode)
-
-(setq ido-vertical-define-keys 'C-n-C-p-up-and-down)
 
 ;; magit configuration
 (require 'magit)
 (setq git-commit-summary-max-length 999)
 
 (setq kill-do-not-save-duplicates t)
-
-;; recent file configuration
-(require 'recentf)
-(setq recentf-max-menu-items 50)
-
-(set-face-attribute 'default nil :height 110)
 
 ;; disable backup files
 (setq make-backup-files nil)
@@ -155,28 +32,14 @@ NAME - the name of the buffer."
     (indent-region (point-min) (point-max) nil)))
 
 (custom-set-variables
- '(uniquify-buffer-name-style 'reverse)
- '(inhibit-startup-screen t)
  '(ediff-split-window-function (quote split-window-horizontally))
  '(send-mail-function (quote smtpmail-send-it))
  '(speedbar-show-unknown-files t)
  '(x-select-enable-clipboard t))
 
-(require 'sgml-mode)
-(setq sgml-basic-offset 4)
 
-;;(setq c-basic-indent 2)
-(setq tab-width 4)
-(setq-default tab-width 4)
 
-;; Descrnibe last command
-(defun my/describe-last-function()
-  (interactive)
-  (describe-function last-command))
-
-(set-face-attribute 'default nil :height 140)
-
-;; dired files
+;; dired configuration
 (require 'dired-x)
 (require 'dired+)
 (require 'dired-explorer)
@@ -190,7 +53,7 @@ NAME - the name of the buffer."
 (setq dired-recursive-deletes 'always)
 (setq dired-deletion-confirmer '(lambda (x) t))
 
-(defun toggle-window-dedicated ()
+(defun my/toggle-window-dedicated ()
   "Toggle whether the current active window is dedicated or not."
   (interactive)
   (message
@@ -202,7 +65,7 @@ NAME - the name of the buffer."
    (current-buffer)))
 
 ;; eval and replace
-(defun eval-and-replace ()
+(defun my/eval-and-replace ()
   "Replace the preceding sexp with its value."
   (interactive)
   (backward-kill-sexp)
