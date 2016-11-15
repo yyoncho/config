@@ -35,8 +35,11 @@
 
 (toggle-truncate-lines t)
 (prelude-require-package 'ido-vertical-mode)
+(prelude-require-package 'helm-flx)
 (prelude-require-package 'ac-cider)
+(prelude-require-package 'spacemacs-theme)
 (prelude-require-package 'ace-link)
+(prelude-require-package 'rainbow-delimiters)
 (prelude-require-package 'bind-key)
 (prelude-require-package 'java-snippets)
 (prelude-require-package 'elp)
@@ -50,7 +53,10 @@
 (prelude-require-package 'jabber)
 (prelude-require-package 'use-package)
 (prelude-require-package 'diminish)
+(prelude-require-package 'emms)
+(prelude-require-package 'notify)
 (prelude-require-package 'ido-ubiquitous)
+(prelude-require-package 'w3m)
 (prelude-require-package 'evil)
 (prelude-require-package 'midje-mode)
 (prelude-require-package 'eclipse-theme)
@@ -75,10 +81,12 @@
 (prelude-require-package 'meghanada)
 (prelude-require-package 'restclient)
 (prelude-require-package 'elpy)
+(prelude-require-package 'smooth-scrolling)
 
 (prelude-require-package 'dired+)
 (prelude-require-package 'dired-explorer)
 (prelude-require-package 'dired-efap)
+(prelude-require-package 'change-inner)
 
 (require 'flycheck-pos-tip)
 (require 'ido)
@@ -88,6 +96,8 @@
 ;; modes
 (ido-mode t)
 (ido-vertical-mode t)
+(smooth-scrolling-mode t)
+(ido-ubiquitous-mode t)
 (winner-mode 1)
 (flx-ido-mode t)
 (transient-mark-mode t)
@@ -97,13 +107,14 @@
 (setq blink-matching-delay 0.1)
 (global-subword-mode t)
 (delete-selection-mode t)
+(helm-flx-mode t)
 (setq indent-tabs-mode nil)
 (menu-bar-mode -1)
 (undo-tree-mode t)
 (global-whitespace-mode -1)
 (global-hl-line-mode -1)
 (global-auto-highlight-symbol-mode t)
-(blink-cursor-mode t)
+(blink-cursor-mode nil)
 (recentf-mode 1)
 (line-number-mode 1)
 (column-number-mode 1)
@@ -414,7 +425,7 @@ PREFIX - whether to switch to the other window."
 (add-hook 'nxml-mode-hook
           (lambda()
             (paredit-mode t)
-            (web-mode t)
+            (web-mode)
             (local-unset-key (kbd "C-M-u"))))
 
 (require 'browse-url)
@@ -772,6 +783,7 @@ ARG - the amount for increasing the value."
 ;; global key configuration
 (bind-key "C-c C-<" 'mc/mark-all-like-this)
 (bind-key "M-p" 'move-text-up)
+(bind-key "M-x" 'helm-M-x)
 (bind-key "M-n" 'move-text-down)
 (bind-key "<C-f8>" 'bm-toggle)
 (bind-key "<f8>"   'bm-next)
@@ -821,7 +833,17 @@ ARG - the amount for increasing the value."
 (bind-key "C-x d" 'dired)
 (bind-key "C-v" 'change-inner)
 (bind-key "M-v" 'copy-inner)
-(bind-key "<f8>" 'emms)
+
+(defvar ring-map (make-sparse-keymap))
+(define-prefix-command 'ring-map)
+(global-set-key (kbd "M-m") 'ring-map)
+
+(require 'emms)
+(bind-key "M-m e" 'emms)
+(bind-key "M-m w w" 'eww)
+(bind-key "M-m w s" 'helm-google-suggest)
+(bind-key "M-m m m" 'mu4e)
+(bind-key "M-m m m" 'mu4e)
 
 (require 'crux)
 
@@ -877,12 +899,9 @@ the current buffer."
 (add-hook 'python-mode-hook #'elpy-enable)
 (add-hook 'python-mode-hook #'eldoc-mode)
 
-(require 'better-defaults)
-
 ;; evil configuration
 (require 'evil)
 (setq evil-default-state 'emacs)
-(evil-mode nil)
 
 (evil-define-state emacs
   "Emacs state that can be exited with the escape key."
@@ -982,8 +1001,51 @@ the current buffer."
 (emms-default-players)
 (emms-mode-line -1)
 
+(require 'eww)
 (setq browse-url-browser-function 'eww-browse-url
       browse-url-generic-program "chromium-browser")
+
+(define-key eww-mode-map "f" 'ace-link-eww)
+(define-key eww-mode-map "g" 'eww)
+(define-key eww-mode-map "r" 'eww)
+(define-key eww-mode-map "p" 'eww-back-url)
+(define-key eww-mode-map "n" 'eww-forward-url)
+(define-key eww-mode-map "n" 'eww-form)
+(define-key eww-mode-map "G" 'eww-reload)
+
+(defvar-local endless/display-images t)  
+
+(defun endless/toggle-image-display ()  
+  "Toggle images display on current buffer."  
+  (interactive)  
+  (setq endless/display-images  
+        (null endless/display-images))  
+  (endless/backup-display-property endless/display-images))  
+
+(defun endless/backup-display-property (invert &optional object)
+  "Move the 'display property at POS to 'display-backup.
+Only applies if display property is an image.
+If INVERT is non-nil, move from 'display-backup to 'display
+instead . Optional OBJECT specifies the string or buffer . Nil means current
+buffer."
+  (let* ((inhibit-read-only t)
+         (from (if invert 'display-backup 'display))
+         (to (if invert 'display 'display-backup))
+         (pos (point-min))
+         left prop)
+    (while (and pos (/= pos (point-max)))
+      (if (get-text-property pos from object)
+          (setq left pos)
+        (setq left (next-single-property-change pos from object)))
+      (if (or (null left) (= left (point-max)))
+          (setq pos nil)
+        (setq prop (get-text-property left from object))
+        (setq pos (or (next-single-property-change left from object)
+                      (point-max)))
+        (when (eq (car prop) 'image)
+          (add-text-properties left pos (list from nil to prop) object))))))
+
+
 
 ;; jabber configuration
 (require 'jabber)
@@ -1067,6 +1129,7 @@ in the other window."
 
 (define-key global-map "\C-c\C-j" jabber-global-keymap)
 
+(require 'w3m)
 (define-key w3m-mode-map "f" 'ace-link-eww)
 
 (defun my/projectile-switch-project-dired (&optional arg)
@@ -1212,6 +1275,7 @@ Remove expanded subdir of deleted dir, if any."
             (ibuffer-switch-to-saved-filter-groups "default")))
 
 ;; python configuration
+(require 'elpy)
 (setq elpy-rpc-backend "jedi")
 (setq elpy-rpc-python-command "python")
 (elpy-use-ipython "ipython")
@@ -1221,3 +1285,25 @@ Remove expanded subdir of deleted dir, if any."
 (add-hook 'python-mode-hook (lambda () (highlight-indentation-mode -1)))
 (setq jedi:setup-keys t)
 (setq jedi:complete-on-dot t)
+
+
+(custom-set-variables
+ '(jabber-alert-muc-hooks nil)
+ '(jabber-alert-presence-hooks nil)
+ '(jabber-mode-line-compact t)
+ '(jabber-mode-line-mode nil)
+ '(mu4e-hide-index-messages t))
+
+(custom-set-variables
+ '(bmkp-last-as-first-bookmark-file "~/.emacs.d/savefile/bookmarks")
+ '(excorporate-configuration
+   (quote
+    ("ivan.yonchovski@tick42.com" . "https://pod51036.outlook.com/ews/Exchange.asmx")))
+ '(global-auto-highlight-symbol-mode t)
+ '(global-command-log-mode t)
+ '(projectile-globally-ignored-directories
+   (quote (".idea" ".ensime_cache" ".eunit" "target" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "target"))))
+
+(set-face-attribute 'region nil :background "#AAA" :foreground "#ffffff")
+
+
