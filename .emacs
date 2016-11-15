@@ -120,7 +120,7 @@
 (add-hook 'java-mode-hook #'yas-minor-mode)
 
 (require 'cc-mode)
-
+(require 'org)
 (define-key java-mode-map (kbd "C-x C-j")
   'projectile-find-implementation-or-test-other-window)
 
