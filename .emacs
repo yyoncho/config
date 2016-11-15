@@ -89,7 +89,7 @@
 (add-hook 'cider-mode-hook #'aggressive-indent-mode)
 (add-hook 'cider-mode-hook #'auto-highlight-symbol-mode)
 
-(require 'cider)
+(require 'cider )
 (setq cider-test-show-report-on-success nil)
 (setq cider-prompt-save-file-on-load 'always-save)
 (setq cider-use-fringe-indicators t)
@@ -134,11 +134,6 @@
   "Kill current buffer."
   (interactive)
   (kill-buffer (current-buffer)))
-
-(defun go-to-terminal-window ()
-  "Go to terminal window."
-  (interactive)
-  (switch-to-buffer "*ansi-term*"))
 
 ;; prevent creating backup files
 (setq make-backup-files nil)
@@ -762,99 +757,77 @@ the current buffer."
 (add-hook 'python-mode-hook #'elpy-enable)
 (add-hook 'python-mode-hook #'eldoc-mode)
 
-(require 'better-defaults)
 
-;; evil configuration
 (require 'evil)
 (setq evil-default-state 'emacs)
-(evil-mode nil)
 
-(evil-define-state emacs
-  "Emacs state that can be exited with the escape key."
-  :tag " <EE> "
-  :message "-- EMACS WITH ESCAPE --"
-  :input-method t)
+;; (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
+;; (require 'mu4e)
+;; (require 'mu4e-speedbar)
 
-(lexical-let ((default-color (cons (face-background 'mode-line)
-                                   (face-foreground 'mode-line))))
-  (add-hook 'post-command-hook
-            (lambda ()
-              (let ((color (cond ((minibufferp) default-color)
-                                 ((or god-local-mode buffer-read-only) '("blue" . "#ffffff"))
-                                 ((evil-normal-state-p) '("purple" . "#ffffff"))
-                                 ((buffer-modified-p)   '("#006fa0" . "#ffffff"))
-                                 (t default-color))))
-                (set-face-background 'mode-line (car color))
-                (set-face-foreground 'mode-line (cdr color))))))
-;;; .emacs ends here
+;; (defun my/mu4e-go-to-inbox ()
+;;   "Go to inbox."
+;;   (interactive)
+;;   (mu4e-headers-search
+;;    (format "maildir:\"%s\"" "/INBOX")))
 
-(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
-(require 'mu4e)
-(require 'mu4e-speedbar)
-
-(defun my/mu4e-go-to-inbox ()
-  "Go to inbox."
-  (interactive)
-  (mu4e-headers-search
-   (format "maildir:\"%s\"" "/INBOX")))
-
-(bind-key "C-c m" 'mu4e)
+;; (bind-key "C-c m" 'mu4e)
 
 
-(setq mu4e-drafts-folder "/Drafts"
-      mu4e-sent-folder   "/Sent Items"
-      mu4e-trash-folder  "/Trash"
-      mu4e-msg2pdf "/usr/bin/msg2pdf"
-      mu4e-update-interval 200)
+;; (setq mu4e-drafts-folder "/Drafts"
+;;       mu4e-sent-folder   "/Sent Items"
+;;       mu4e-trash-folder  "/Trash"
+;;       mu4e-msg2pdf "/usr/bin/msg2pdf"
+;;       mu4e-update-interval 200)
 
-;; don't save message to Sent Messages, Gmail/IMAP takes care of this
-(setq mu4e-sent-messages-behavior 'sent)
+;; ;; don't save message to Sent Messages, Gmail/IMAP takes care of this
+;; (setq mu4e-sent-messages-behavior 'sent)
 
-(setq mu4e-maildir-shortcuts
-      '(("/INBOX" . ?j)
-        ("/Drafts" . ?d)
-        ("/Trash" . ?t)
-        ("/Sent Items" . ?s)
-        ("/bamboo" . ?b)))
+;; (setq mu4e-maildir-shortcuts
+;;       '(("/INBOX" . ?j)
+;;         ("/Drafts" . ?d)
+;;         ("/Trash" . ?t)
+;;         ("/Sent Items" . ?s)
+;;         ("/bamboo" . ?b)))
 
-;; allow for updating mail using 'U' in the main view:
-(setq mu4e-get-mail-command "offlineimap")
+;; ;; allow for updating mail using 'U' in the main view:
+;; (setq mu4e-get-mail-command "offlineimap")
 
 ;; something about ourselves
-(setq
- user-mail-address "ivan.yonchovski@tick42.com"
- user-full-name  "Ivan Yonchovski"
- mu4e-compose-signature nil)
+;; (setq
+;;  user-mail-address "ivan.yonchovski@tick42.com"
+;;  user-full-name  "Ivan Yonchovski"
+;;  mu4e-compose-signature nil)
 
+;; (require 'smtpmail)
+;; (setq message-send-mail-function 'smtpmail-send-it
+;;       starttls-use-gnutls t
+;;       smtpmail-starttls-credentials '(("smtp.office365.com" 587 nil nil))
+;;       smtpmail-auth-credentials
+;;       '(("smtp.office365.com" 587 "ivan.yonchovski@tick42.com" nil))
+;;       smtpmail-default-smtp-server "smtp.gmail.com"
+;;       smtpmail-smtp-server "smtp.office365.com"
+;;       smtpmail-smtp-service 587)
 
-(require 'smtpmail)
-(setq message-send-mail-function 'smtpmail-send-it
-      starttls-use-gnutls t
-      smtpmail-starttls-credentials '(("smtp.office365.com" 587 nil nil))
-      smtpmail-auth-credentials
-      '(("smtp.office365.com" 587 "ivan.yonchovski@tick42.com" nil))
-      smtpmail-default-smtp-server "smtp.gmail.com"
-      smtpmail-smtp-server "smtp.office365.com"
-      smtpmail-smtp-service 587)
+;; (setq message-kill-buffer-on-exit t)
 
-(setq message-kill-buffer-on-exit t)
+;; (use-package mu4e-alert
+;;   :ensure t
+;;   :config
+;;   (mu4e-alert-enable-notifications)
+;;   (mu4e-alert-set-default-style 'libnotify)
+;;   (setq mu4e-alert-interesting-mail-query
+;;         (concat "maildir:/INBOX and flag:unread"))
 
-(use-package mu4e-alert
-  :ensure t
-  :config
-  (mu4e-alert-enable-notifications)
-  (mu4e-alert-set-default-style 'libnotify)
-  (setq mu4e-alert-interesting-mail-query
-        (concat "maildir:/INBOX and flag:unread"))
+;;   (alert-add-rule
+;;    :category "mu4e-alert"
+;;    :predicate (lambda (_) (string-match-p "^mu4e-" (symbol-name major-mode)))
+;;    :continue )
 
-  (alert-add-rule
-   :category "mu4e-alert"
-   :predicate (lambda (_) (string-match-p "^mu4e-" (symbol-name major-mode)))
-   :continue )
+;;   ;; display stuff on modeline as well as notify
+;;   (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
+;;   (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display))
 
-  ;; display stuff on modeline as well as notify
-  (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
-  (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display))
 
 ;; elfeed configuration
 (require 'elfeed)
@@ -889,38 +862,27 @@ the current buffer."
          (:network-server . "jabber.pirinsoft.bg")
          (:port . 5222))))
 
-(require 'notify)
+;; (require 'notify)
 
-(defun notify-jabber-notify (from buf text proposed-alert)
-  "(jabber.el hook) Notify of new Jabber chat messages via notify.el."
-  (when (or jabber-message-alert-same-buffer
-            (not (memq (selected-window) (get-buffer-window-list buf))))
-    (if (jabber-muc-sender-p from)
-        (notify (format "(PM) %s"
-                        (jabber-jid-displayname (jabber-jid-user from)))
-                (format "%s: %s" (jabber-jid-resource from) text)))
-    (notify (format "%s" (jabber-jid-displayname from))
-            text)))
+;; (defun notify-jabber-notify (from buf text proposed-alert)
+;;   "(jabber.el hook) Notify of new Jabber chat messages via notify.el."
+;;   (when (or jabber-message-alert-same-buffer
+;;             (not (memq (selected-window) (get-buffer-window-list buf))))
+;;     (if (jabber-muc-sender-p from)
+;;         (notify (format "(PM) %s"
+;;                         (jabber-jid-displayname (jabber-jid-user from)))
+;;                 (format "%s: %s" (jabber-jid-resource from) text)))
+;;     (notify (format "%s" (jabber-jid-displayname from))
+;;             text)))
 
-(require 'mu4e-alert)
-(defun my/jabber-alert-set-window-urgency-maybe (from buf text proposed-alert)
-  "Jabber alert - make the window blinking."
-  (mu4e-alert-set-window-urgency-maybe))
+;; (require 'mu4e-alert)
+;; (defun my/jabber-alert-set-window-urgency-maybe (from buf text proposed-alert)
+;;   "Jabber alert - make the window blinking."
+;;   (mu4e-alert-set-window-urgency-maybe))
 
-(add-hook 'jabber-alert-message-hooks 'notify-jabber-notify)
-(add-hook 'jabber-alert-message-hooks 'my/jabber-alert-set-window-urgency-maybe)
+;; (add-hook 'jabber-alert-message-hooks 'notify-jabber-notify)
+;; (add-hook 'jabber-alert-message-hooks 'my/jabber-alert-set-window-urgency-maybe)
 
-;; diminish
-(diminish 'company-mode "cm")
-(diminish 'guru-mode)
-(diminish 'paredit-mode)
-(diminish 'prelude-mode)
-(diminish 'projectile-mode)
-(diminish 'auto-revert-mode)
-(diminish 'becon-mode)
-(diminish 'smartparens-mode)
-(diminish 'magit-mode "M")
-(diminish 'auto-highlight-symbol-mode)
 
 (defun my/find-symbol-at-point ()
   "Find the function, face, or variable definition for the symbol at point
@@ -951,8 +913,6 @@ in the other window."
 
 
 (define-key global-map "\C-c\C-j" jabber-global-keymap)
-
-(define-key w3m-mode-map "f" 'ace-link-eww)
 
 (defun my/projectile-switch-project-dired (&optional arg)
   "Switch to a project we have visited before.
@@ -1032,10 +992,6 @@ even after defining other macros, use \\[kmacro-name-last-macro]."
 
 (add-hook 'org-mode-hook #'org-bullets-mode)
 
-(emms-default-players)
-(emms)
-(emms-insert-playlist-directory-tree "~/Music")
-
 (eval-after-load  "dired-x" '(defun dired-clean-up-after-deletion (fn)
                                "My. Clean up after a deleted file or directory FN.
 Remove expanded subdir of deleted dir, if any."
@@ -1064,7 +1020,6 @@ Remove expanded subdir of deleted dir, if any."
                ("dired" (mode . dired-mode))
                ("java" (mode . java-mode))
                ("w3m" (mode . w3m-mode))
-               ("magit" (name . "\*magit.*\*"))
                ("temporary" (name . "\*.*\*"))))))
 
 (add-hook 'ibuffer-mode-hook
@@ -1072,6 +1027,7 @@ Remove expanded subdir of deleted dir, if any."
             (ibuffer-switch-to-saved-filter-groups "default")))
 
 ;; python configuration
+(require 'elpy)
 (setq elpy-rpc-backend "jedi")
 (setq elpy-rpc-python-command "python")
 (elpy-use-ipython "ipython")
