@@ -93,7 +93,7 @@ zstyle ":completion:*:commands" rehash 1
 
 setopt rmstarsilent
 
-source ~/.zsh-syntax/zsh-syntax-highlighting.zsh
+source ~/.zsh-libs/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 #make the cursor faster
 xset r rate 200 60
@@ -101,7 +101,7 @@ xset r rate 200 60
 export EDITOR="emacsclient -t -a emacs -nw"
 
 # Path to your oh-my-zsh installation.
-export ZSH=~/.oh-my-zsh
+export ZSH=~/.zsh-libs/oh-my-zsh/
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
