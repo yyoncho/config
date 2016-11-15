@@ -82,6 +82,7 @@
 (prelude-require-package 'restclient)
 (prelude-require-package 'elpy)
 (prelude-require-package 'smooth-scrolling)
+(prelude-require-package 'ethan-wspace)
 
 (prelude-require-package 'dired+)
 (prelude-require-package 'dired-explorer)
@@ -102,6 +103,7 @@
 (flx-ido-mode t)
 (transient-mark-mode t)
 (ido-everywhere t)
+(global-ethan-wspace-mode t)
 (ido-ubiquitous-mode t)
 (show-paren-mode 1)
 (setq blink-matching-delay 0.1)
