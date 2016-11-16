@@ -35,6 +35,7 @@
 
 (toggle-truncate-lines t)
 (prelude-require-package 'ido-vertical-mode)
+(prelude-require-package 'sx)
 (prelude-require-package 'helm-flx)
 (prelude-require-package 'ac-cider)
 (prelude-require-package 'spacemacs-theme)
@@ -116,7 +117,7 @@
 (global-whitespace-mode -1)
 (global-hl-line-mode -1)
 (global-auto-highlight-symbol-mode t)
-(blink-cursor-mode nil)
+(blink-cursor-mode -1)
 (recentf-mode 1)
 (line-number-mode 1)
 (column-number-mode 1)
@@ -844,8 +845,15 @@ ARG - the amount for increasing the value."
 (bind-key "M-m e" 'emms)
 (bind-key "M-m w w" 'eww)
 (bind-key "M-m w s" 'helm-google-suggest)
+(bind-key "M-m w b" 'eww-list-bookmarks)
 (bind-key "M-m m m" 'mu4e)
-(bind-key "M-m m m" 'mu4e)
+
+
+;; contrast configuration
+(require 'shr-color)
+(setq shr-color-visible-distance-min 60)
+(setq shr-color-visible-luminance-min 80)
+
 
 (require 'crux)
 
@@ -1012,17 +1020,16 @@ the current buffer."
 (define-key eww-mode-map "r" 'eww)
 (define-key eww-mode-map "p" 'eww-back-url)
 (define-key eww-mode-map "n" 'eww-forward-url)
-(define-key eww-mode-map "n" 'eww-form)
 (define-key eww-mode-map "G" 'eww-reload)
 
-(defvar-local endless/display-images t)  
+(defvar-local endless/display-images t)
 
-(defun endless/toggle-image-display ()  
-  "Toggle images display on current buffer."  
-  (interactive)  
-  (setq endless/display-images  
-        (null endless/display-images))  
-  (endless/backup-display-property endless/display-images))  
+(defun endless/toggle-image-display ()
+  "Toggle images display on current buffer."
+  (interactive)
+  (setq endless/display-images
+        (null endless/display-images))
+  (endless/backup-display-property endless/display-images))
 
 (defun endless/backup-display-property (invert &optional object)
   "Move the 'display property at POS to 'display-backup.
@@ -1213,12 +1220,14 @@ even after defining other macros, use \\[kmacro-name-last-macro]."
 (add-hook 'org-mode-hook #'org-bullets-mode)
 
 (require 'emms)
+(setq emms-player-next-function 'emms-random)
+
 (defun my/emms-start ()
   "Start emms."
   (interactive)
   (emms-default-players)
   (emms-add-directory-tree "~/Music")
-  (emms))
+  (emms-random))
 
 (defun fg-emms-track-description (track)
   "Return a somewhat nice track description."
@@ -1307,5 +1316,3 @@ Remove expanded subdir of deleted dir, if any."
    (quote (".idea" ".ensime_cache" ".eunit" "target" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "target"))))
 
 (set-face-attribute 'region nil :background "#AAA" :foreground "#ffffff")
-
-
