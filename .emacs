@@ -11,6 +11,87 @@
 ;; You may delete these explanatory comments.
 (package-initialize)
 
+(require 'package)
+
+(setq package-archives '(("ELPA" . "http://tromey.com/elpa/")
+                         ("gnu" . "http://elpa.gnu.org/packages/")
+                         ("melpa" . "http://melpa.org/packages/")
+                         ("melpa-stable" . "http://stable.melpa.org/packages/")
+                         ("marmalade" . "http://marmalade-repo.org/packages/")))
+
+;; Check if we're on Emacs 24.4 or newer, if so, use the pinned package feature
+(when (boundp 'package-pinned-packages)
+  (setq package-pinned-packages
+        '((bm                 . "marmalade")
+          (smex               . "melpa-stable")
+          (zenburn-theme      . "melpa-stable")
+          (anti-zenburn-theme . "melpa-stable")
+          (zen-and-art-theme  . "marmalade")
+          (cider              . "melpa-stable")
+          (htmlize            . "marmalade")
+          (rainbow-delimiters . "melpa-stable")
+          (icicles            . "melpa"))))
+
+
+(load "~/.emacs.d/init.el")
+
+(toggle-truncate-lines t)
+(prelude-require-package 'ido-vertical-mode)
+(prelude-require-package 'sx)
+(prelude-require-package 'helm-flx)
+(prelude-require-package 'ac-cider)
+(prelude-require-package 'spacemacs-theme)
+(prelude-require-package 'ace-link)
+(prelude-require-package 'rainbow-delimiters)
+(prelude-require-package 'bind-key)
+(prelude-require-package 'java-snippets)
+(prelude-require-package 'elp)
+(prelude-require-package 'org-bullets)
+(prelude-require-package 'clj-refactor)
+(prelude-require-package 'helm-swoop)
+(prelude-require-package 'highlight-symbol)
+(prelude-require-package 'helm-descbinds)
+(prelude-require-package 'flx-ido)
+(prelude-require-package 'elfeed)
+(prelude-require-package 'jabber)
+(prelude-require-package 'use-package)
+(prelude-require-package 'diminish)
+(prelude-require-package 'emms)
+(prelude-require-package 'notify)
+(prelude-require-package 'ido-ubiquitous)
+(prelude-require-package 'w3m)
+(prelude-require-package 'evil)
+(prelude-require-package 'midje-mode)
+(prelude-require-package 'eclipse-theme)
+(prelude-require-package 'flycheck-pos-tip)
+(prelude-require-package 'flycheck-clojure)
+(prelude-require-package 'auto-highlight-symbol)
+(prelude-require-package 'aggressive-indent)
+(prelude-require-package 'bm)
+
+(prelude-require-package 'helm-projectile)
+(prelude-require-package 'ujelly-theme)
+(prelude-require-package 'golden-ratio)
+(prelude-require-package 'back-button)
+(prelude-require-package 'cider-eval-sexp-fu)
+(prelude-require-package 'powerline)
+(prelude-require-package 'switch-window)
+(prelude-require-package 'recentf)
+(prelude-require-package 'cider-eval-sexp-fu)
+(prelude-require-package 'auto-complete-nxml)
+(prelude-require-package 'sr-speedbar)
+(prelude-require-package 'omnisharp)
+(prelude-require-package 'meghanada)
+(prelude-require-package 'restclient)
+(prelude-require-package 'elpy)
+(prelude-require-package 'smooth-scrolling)
+(prelude-require-package 'ethan-wspace)
+
+(prelude-require-package 'dired+)
+(prelude-require-package 'dired-explorer)
+(prelude-require-package 'dired-efap)
+(prelude-require-package 'change-inner)
+
 (require 'flycheck-pos-tip)
 (require 'auto-complete-nxml)
 (smartparens-mode -1)
@@ -18,6 +99,7 @@
 ;; modes
 (show-paren-mode 1)
 (delete-selection-mode t)
+(helm-flx-mode t)
 (setq indent-tabs-mode nil)
 (global-auto-highlight-symbol-mode t)
 (line-number-mode 1)
@@ -280,7 +362,7 @@ PREFIX - whether to switch to the other window."
 (add-hook 'nxml-mode-hook
           (lambda()
             (paredit-mode t)
-            (web-mode t)
+            (web-mode)
             (local-unset-key (kbd "C-M-u"))))
 
 (require 'browse-url)
@@ -638,6 +720,7 @@ ARG - the amount for increasing the value."
 ;; global key configuration
 (bind-key "C-c C-<" 'mc/mark-all-like-this)
 (bind-key "M-p" 'move-text-up)
+(bind-key "M-x" 'helm-M-x)
 (bind-key "M-n" 'move-text-down)
 (bind-key "<C-f8>" 'bm-toggle)
 (bind-key "<f8>"   'bm-next)
@@ -687,29 +770,24 @@ ARG - the amount for increasing the value."
 (bind-key "C-x d" 'dired)
 (bind-key "C-v" 'change-inner)
 (bind-key "M-v" 'copy-inner)
-(bind-key "<f8>" 'emms)
 
-(defun fg-emms-track-description (track)
-  "Return a somewhat nice track description."
-  (let ((artist (emms-track-get track 'info-artist))
-        (year (emms-track-get track 'info-year))
-        (album (emms-track-get track 'info-album))
-        (tracknumber (emms-track-get track 'info-tracknumber))
-        (title (emms-track-get track 'info-title)))
-    (cond
-     ((or artist title)
-      (concat (if (> (length artist) 0) artist "Unknown artist") " - "
-              (if (> (length year) 0) year "XXXX") " - "
-              (if (> (length album) 0) album "Unknown album") " - "
-              (if (> (length tracknumber) 0)
-                  (format "%02d" (string-to-number tracknumber))
-                "XX") " - "
-                (if (> (length title) 0) title "Unknown title")))
-     (t
-      (emms-track-simple-description track)))))
+(defvar ring-map (make-sparse-keymap))
+(define-prefix-command 'ring-map)
+(global-set-key (kbd "M-m") 'ring-map)
 
 (require 'emms)
-(setq emms-track-description-function 'fg-emms-track-description)
+(bind-key "M-m e" 'emms)
+(bind-key "M-m w w" 'eww)
+(bind-key "M-m w s" 'helm-google-suggest)
+(bind-key "M-m w b" 'eww-list-bookmarks)
+(bind-key "M-m m m" 'mu4e)
+
+
+;; contrast configuration
+(require 'shr-color)
+(setq shr-color-visible-distance-min 60)
+(setq shr-color-visible-luminance-min 80)
+
 
 (require 'crux)
 
@@ -765,7 +843,11 @@ the current buffer."
 (add-hook 'python-mode-hook #'elpy-enable)
 (add-hook 'python-mode-hook #'eldoc-mode)
 
+<<<<<<< variant A
 
+>>>>>>> variant B
+;; evil configuration
+======= end
 (require 'evil)
 (setq evil-default-state 'emacs)
 
@@ -848,8 +930,50 @@ the current buffer."
 (emms-default-players)
 (emms-mode-line -1)
 
+(require 'eww)
 (setq browse-url-browser-function 'eww-browse-url
       browse-url-generic-program "chromium-browser")
+
+(define-key eww-mode-map "f" 'ace-link-eww)
+(define-key eww-mode-map "g" 'eww)
+(define-key eww-mode-map "r" 'eww)
+(define-key eww-mode-map "p" 'eww-back-url)
+(define-key eww-mode-map "n" 'eww-forward-url)
+(define-key eww-mode-map "G" 'eww-reload)
+
+(defvar-local endless/display-images t)
+
+(defun endless/toggle-image-display ()
+  "Toggle images display on current buffer."
+  (interactive)
+  (setq endless/display-images
+        (null endless/display-images))
+  (endless/backup-display-property endless/display-images))
+
+(defun endless/backup-display-property (invert &optional object)
+  "Move the 'display property at POS to 'display-backup.
+Only applies if display property is an image.
+If INVERT is non-nil, move from 'display-backup to 'display
+instead . Optional OBJECT specifies the string or buffer . Nil means current
+buffer."
+  (let* ((inhibit-read-only t)
+         (from (if invert 'display-backup 'display))
+         (to (if invert 'display 'display-backup))
+         (pos (point-min))
+         left prop)
+    (while (and pos (/= pos (point-max)))
+      (if (get-text-property pos from object)
+          (setq left pos)
+        (setq left (next-single-property-change pos from object)))
+      (if (or (null left) (= left (point-max)))
+          (setq pos nil)
+        (setq prop (get-text-property left from object))
+        (setq pos (or (next-single-property-change left from object)
+                      (point-max)))
+        (when (eq (car prop) 'image)
+          (add-text-properties left pos (list from nil to prop) object))))))
+
+
 
 ;; jabber configuration
 (require 'jabber)
@@ -1041,6 +1165,27 @@ Remove expanded subdir of deleted dir, if any."
 (elpy-use-ipython "ipython")
 (autoload 'jedi:setup "jedi" nil t)
 (add-hook 'python-mode-hook 'jedi:setup)
-(add-hook 'pyvenv-mode-hook 'jedi:setup)
+(add-hook 'python-mode-hook 'enable-paredit-mode)
+(add-hook 'python-mode-hook (lambda () (highlight-indentation-mode -1)))
 (setq jedi:setup-keys t)
 (setq jedi:complete-on-dot t)
+
+
+(custom-set-variables
+ '(jabber-alert-muc-hooks nil)
+ '(jabber-alert-presence-hooks nil)
+ '(jabber-mode-line-compact t)
+ '(jabber-mode-line-mode nil)
+ '(mu4e-hide-index-messages t))
+
+(custom-set-variables
+ '(bmkp-last-as-first-bookmark-file "~/.emacs.d/savefile/bookmarks")
+ '(excorporate-configuration
+   (quote
+    ("ivan.yonchovski@tick42.com" . "https://pod51036.outlook.com/ews/Exchange.asmx")))
+ '(global-auto-highlight-symbol-mode t)
+ '(global-command-log-mode t)
+ '(projectile-globally-ignored-directories
+   (quote (".idea" ".ensime_cache" ".eunit" "target" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "target"))))
+
+(set-face-attribute 'region nil :background "#AAA" :foreground "#ffffff")
