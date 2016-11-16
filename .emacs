@@ -1,9 +1,16 @@
-;;; .emacs -- 
+;;; .emacs --
 ;;; Commentary:
 ;;; my YY Emacs configuration
 ;;; Code:
 
 ;; Check if we're on Emacs 24.4 or newer, if so, use the pinned package feature
+
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+(package-initialize)
+
 (require 'flycheck-pos-tip)
 (require 'auto-complete-nxml)
 (smartparens-mode -1)
@@ -63,7 +70,7 @@
        "Window '%s' is dedicated"
      "Window '%s' is normal")
    (current-buffer)))
-
+(require 'org)
 ;; eval and replace
 (defun my/eval-and-replace ()
   "Replace the preceding sexp with its value."
@@ -120,6 +127,7 @@
 (add-hook 'java-mode-hook #'yas-minor-mode)
 
 (require 'cc-mode)
+
 (require 'org)
 (define-key java-mode-map (kbd "C-x C-j")
   'projectile-find-implementation-or-test-other-window)
@@ -959,7 +967,7 @@ With a prefix ARG invokes `projectile-commander' instead of
       helm-recentf-fuzzy-match              t
       helm-semantic-fuzzy-match             t)
 
-;; org-jira-mode 
+;; org-jira-mode
 (setq jiralib-url "https://jira.tick42.com")
 
 ;; truncate-lines enabled by default
