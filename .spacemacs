@@ -26,6 +26,7 @@ values."
      org
      spell-checking
      syntax-checking
+     my/layer
      )
    dotspacemacs-additional-packages
    '(
