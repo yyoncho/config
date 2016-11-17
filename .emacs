@@ -71,6 +71,7 @@
      "Window '%s' is normal")
    (current-buffer)))
 (require 'org)
+(require 'org)
 ;; eval and replace
 (defun my/eval-and-replace ()
   "Replace the preceding sexp with its value."
@@ -996,7 +997,6 @@ even after defining other macros, use \\[kmacro-name-last-macro]."
                                   ?s ?k ?i ?@ ?j ?p tab ?\C-n ?\C-y ?\C-n ?\C-n ?\C-c ?\C-a
                                   ?\C-f backspace backspace ?\C-y return return return return
                                   ?\C-c ?\C-c])
-(require 'org-bullets)
 
 (add-hook 'org-mode-hook #'org-bullets-mode)
 
