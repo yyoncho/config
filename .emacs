@@ -1191,4 +1191,7 @@ Remove expanded subdir of deleted dir, if any."
    (quote (".idea" ".ensime_cache" ".eunit" "target" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "target"))))
 
 (set-face-attribute 'region nil :background "#AAA" :foreground "#ffffff")
+<<<<<<< HEAD
+>>>>>>> c1fa34db0b21dde39e411f4d2b6785fa542e0fcb
+=======
 >>>>>>> c1fa34db0b21dde39e411f4d2b6785fa542e0fcb
