@@ -7,15 +7,9 @@
 [submodule "https://github.com/zsh-users/zsh-syntax-highlighting.git"]
 	path = .zsh-syntax
 	url = ./.zsh-syntax
-[submodule ".zsh-syntax-highlighting"]
-	path = .zsh-syntax-highlighting
-	url = https://github.com/zsh-users/zsh-syntax-highlighting.git
 [submodule ".emacs.d"]
 	path = .emacs.d
 	url = https://github.com/syl20bnr/spacemacs
 [submodule ".my-zsh"]
 	path = .my-zsh
-	url = https://github.com/robbyrussell/oh-my-zsh.git
-[submodule "oh"]
-	path = oh-my-zsh
 	url = https://github.com/robbyrussell/oh-my-zsh.git
