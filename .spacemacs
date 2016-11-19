@@ -18,18 +18,31 @@ values."
      ;; <M-m f e R> (Emacs style) to install them.
      ;;
      helm auto-completion better-defaults emacs-lisp git markdown
-          org spell-checking syntax-checking ibuffer clojure
+          org spell-checking syntax-checking ibuffer clojure eww
           command-log my-layer elfeed)
    dotspacemacs-additional-packages
    '(ace-link java-snippets
               ac-cider
               evil
+              jabber
+              persistent-scratch
               crux
               elfeed
-              midje-mode flycheck-pos-tip
-              auto-complete-nxml sr-speedbar meghanada
-              elpy dired+ dired-explorer dired-efap dired+
-              emms god-mode zenburn-theme easy-kill )
+              midje-mode
+              flycheck-pos-tip
+              flycheck-clojure
+              auto-complete-nxml
+              sx
+              sr-speedbar
+              meghanada
+              elpy
+              dired+
+              dired-explorer
+              dired-efap
+              emms
+              god-mode
+              zenburn-theme
+              easy-kill )
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -45,7 +58,7 @@ values."
    dotspacemacs-elpa-timeout 5
    dotspacemacs-check-for-update nil
    dotspacemacs-elpa-subdirectory nil
-   dotspacemacs-editing-style 'hybrid
+   dotspacemacs-editing-style 'emacs
    dotspacemacs-verbose-loading nil
    dotspacemacs-startup-banner 'official
    dotspacemacs-startup-lists '((recents . 5)
@@ -184,13 +197,14 @@ you should place your code here."
     ("fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" default)))
  '(ediff-split-window-function (quote split-window-horizontally))
  '(evil-want-Y-yank-to-eol nil)
- '(fci-rule-color "#383838")
+ '(eww-search-prefix "https://www.google.com/search?q=")
+ '(fci-rule-color "#383838" t)
  '(nrepl-message-colors
    (quote
     ("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3")))
  '(package-selected-packages
    (quote
-    (sx elfeed-web simple-httpd elfeed-org elfeed-goodies ace-jump-mode noflet command-log-mode clojure-snippets ibuffer-projectile evil-smartparens easy-kill dired-subtree enotify mu4e-alert crux emms god-mode smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mwim mmm-mode markdown-toc markdown-mode magit-gitflow htmlize helm-gitignore helm-company helm-c-yasnippet gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md flyspell-correct-helm flyspell-correct evil-magit magit magit-popup git-commit with-editor diff-hl company-statistics auto-yasnippet auto-dictionary ac-ispell ujelly-theme switch-window sr-speedbar restclient omnisharp csharp-mode midje-mode meghanada java-snippets jabber fsm ido-ubiquitous ido-completing-read+ highlight-symbol flycheck-pos-tip pos-tip flycheck-clojure flycheck elpy pyvenv find-file-in-project company ivy elfeed eclipse-theme dired-explorer dired-efap dired+ clj-refactor inflections edn multiple-cursors paredit yasnippet peg cider-eval-sexp-fu bm back-button ucs-utils smartrep nav-flash persistent-soft list-utils pcache auto-complete-nxml ac-cider auto-complete cider seq queue clojure-mode ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
+    (eww-lnum sx elfeed-web simple-httpd elfeed-org elfeed-goodies ace-jump-mode noflet command-log-mode clojure-snippets ibuffer-projectile evil-smartparens easy-kill dired-subtree enotify mu4e-alert crux emms god-mode smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mwim mmm-mode markdown-toc markdown-mode magit-gitflow htmlize helm-gitignore helm-company helm-c-yasnippet gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md flyspell-correct-helm flyspell-correct evil-magit magit magit-popup git-commit with-editor diff-hl company-statistics auto-yasnippet auto-dictionary ac-ispell ujelly-theme switch-window sr-speedbar restclient omnisharp csharp-mode midje-mode meghanada java-snippets jabber fsm ido-ubiquitous ido-completing-read+ highlight-symbol flycheck-pos-tip pos-tip flycheck-clojure flycheck elpy pyvenv find-file-in-project company ivy elfeed eclipse-theme dired-explorer dired-efap dired+ clj-refactor inflections edn multiple-cursors yasnippet peg cider-eval-sexp-fu bm back-button ucs-utils smartrep nav-flash persistent-soft list-utils pcache auto-complete-nxml ac-cider auto-complete cider seq queue clojure-mode ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
  '(pdf-view-midnight-colors (quote ("#DCDCCC" . "#383838")))
  '(select-enable-clipboard t)
  '(send-mail-function (quote smtpmail-send-it))

@@ -162,7 +162,6 @@ Each entry is either:
 
 ;; cider configuration
 (add-hook 'cider-mode-hook #'eldoc-mode)
-(add-hook 'cider-mode-hook #'paredit-mode)
 (add-hook 'cider-mode-hook #'auto-complete-mode)
 (add-hook 'cider-mode-hook #'rainbow-delimiters-mode)
 (add-hook 'cider-mode-hook #'aggressive-indent-mode)
@@ -192,7 +191,6 @@ Each entry is either:
   (c-set-offset 'inline-open '=))
 
 (require 'meghanada)
-(add-hook 'java-mode-hook #'paredit-mode)
 (add-hook 'java-mode-hook #'java-conf)
 ;;(remove-hook 'java-mode-hook #'meghanada-mode)
 (add-hook 'java-mode-hook #'aggressive-indent-mode)
@@ -204,8 +202,6 @@ Each entry is either:
 (define-key java-mode-map (kbd "C-x C-j")
   'projectile-find-implementation-or-test-other-window)
 
-(require 'paredit)
-(define-key paredit-mode-map (kbd "C-M-u") 'er/expand-region)
 (define-key java-mode-map (kbd "C-<f11>") 'meghanada-run-junit-recent)
 
 (add-to-list 'auto-mode-alist '("\\.clj\\'" . clojure-mode))
@@ -250,8 +246,6 @@ downcased, no preceding underscore"
 (setq cider-lein-command "~/.bin/lein")
 (add-hook 'cider-mode-hook 'ac-flyspell-workaround)
 (add-hook 'cider-mode-hook 'ac-cider-setup)
-(add-hook 'cider-mode-hook 'paredit-mode)
-(add-hook 'cider-repl-mode-hook #'paredit-mode)
 (add-hook 'cider-repl-mode-hook 'ac-cider-setup)
 
 (eval-after-load "auto-complete"
@@ -351,7 +345,6 @@ PREFIX - whether to switch to the other window."
 
 (add-hook 'nxml-mode-hook
           (lambda()
-            (paredit-mode t)
             (web-mode t)
             (local-unset-key (kbd "C-M-u"))))
 
@@ -369,15 +362,8 @@ PREFIX - whether to switch to the other window."
 (eval-after-load 'flycheck
   '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
 
-(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
-(add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
 (add-hook 'emacs-lisp-mode-hook       #'aggressive-indent-mode)
-(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
-(add-hook 'ielm-mode-hook             #'enable-paredit-mode)
-(add-hook 'lisp-mode-hook             #'enable-paredit-mode)
 (add-hook 'lisp-mode-hook             #'aggressive-indent-mode)
-(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
-(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
 
 (dolist (mode '(clojure-mode clojurescript-mode cider-mode))
   (eval-after-load mode
@@ -435,7 +421,6 @@ PREFIX - whether to switch to the other window."
 (define-key ac-complete-mode-map "\C-n" 'ac-previous)
 (define-key ac-complete-mode-map "\C-p" 'ac-next)
 
-(define-key ac-complete-mode-map "C-М-)" 'paredit-forward-slurp-sexp)
 
 (setq prelude-whitespace nil)
 
