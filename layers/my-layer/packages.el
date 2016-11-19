@@ -33,6 +33,7 @@
   '(java-snippets
     ac-cider
     evil
+    sx
     crux
     elfeed
     jabber
@@ -1116,3 +1117,58 @@ Remove expanded subdir of deleted dir, if any."
 (setq jedi:complete-on-dot t)
 
 ;;; packages.el ends here
+(global-set-key [remap eww-follow-link] 'my/eww-follow-link)
+
+(require 'sx)
+
+(defun my/browse-url (url new-window)
+  "Browse url in the associated app.
+URL - the url to browse.
+new-window - whether to open in new window."
+  (let ((host (elt (url-generic-parse-url url) 4)))
+    (if (or (string-equal "stackoverflow.com" host)
+            (s-index-of "stackexchange.com" host))
+        (sx-open-link url)
+      (eww-follow-link))))
+
+(defun my/eww-follow-link (&optional external mouse-event)
+  "Browse the URL under point.
+If EXTERNAL is single prefix, browse the URL using `shr-external-browser'.
+If EXTERNAL is double prefix, browse in new buffer."
+  (interactive (list current-prefix-arg last-nonmenu-event))
+  (mouse-set-point mouse-event)
+  (let ((url (get-text-property (point) 'shr-url)))
+    (cond
+     ((not url)
+      (message "No link under point"))
+     ((string-match "^mailto:" url)
+      (browse-url-mail url))
+     ((and (consp external) (<= (car external) 4))
+      (funcall shr-external-browser url))
+     ;; This is a #target url in the same page as the current one.
+     ((and (url-target (url-generic-parse-url url))
+           (eww-same-page-p url (plist-get eww-data :url)))
+      (let ((dom (plist-get eww-data :dom)))
+        (eww-save-history)
+        (eww-display-html 'utf-8 url dom nil (current-buffer))))
+     ((string-prefix-p "http://www.google.bg/url?q=" url)
+      (message "The url is url redirect.")
+      (let* ((url-stripped-1 (s-replace "http://www.google.bg/url?q=" "" url))
+             (url-stripped (s-left (s-index-of "&" url-stripped-1) url-stripped-1)))
+        (message "Stripped google url: loading %s" url-stripped)
+        (my/browse-url url-stripped external)))
+     (t
+      (my/browse-url url external)))))
+(setq sx-question-mode-display-buffer-function #'pop-to-buffer-same-window)
+
+;; use mobile interface
+(setq url-user-agent (concat
+                      "User-Agent: Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) "
+                      "AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7\n"))
+
+;; persistent-scratch
+(persistent-scratch-setup-default)
+(add-hook 'java-mode-hook #'meghanada-mode)
+;; jira
+(fset 'my/copy-worklog
+      [?\C-c ?\C-x ?\C-w ?\C-y ?\C-y ?\C-p tab ?\C-n tab ?\C-n ?\C-k ?\C-k ?\C-n ?\M-f ?\M-f ?\M-f ?\M-f ?\C-f ?\M-x ?m ?y ?- backspace ?/ ?i ?n tab return])
