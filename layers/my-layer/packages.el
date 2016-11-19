@@ -30,7 +30,16 @@
 ;;; Code:
 
 (defconst my-layer-packages
-  '()
+  '(java-snippets
+    ac-cider
+    evil
+    crux
+    elfeed
+    jabber
+    midje-mode flycheck-pos-tip
+    auto-complete-nxml sr-speedbar meghanada
+    elpy dired+ dired-explorer dired-efap dired+
+    emms god-mode zenburn-theme easy-kill)
   "The list of Lisp packages required by the my-layer layer.
 
 Each entry is either:

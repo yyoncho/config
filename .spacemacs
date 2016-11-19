@@ -11,22 +11,25 @@ values."
    dotspacemacs-enable-lazy-installation 'unused
    dotspacemacs-ask-for-lazy-installation t
    ;; Paths must have a trailing slash (i.e. `~/.mycontribs/')
-   dotspacemacs-configuration-layer-path '("~/.remote-config/config/layers")
+   dotspacemacs-configuration-layer-path '("~/.remote-config/config/layers/")
    dotspacemacs-configuration-layers
    '(
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;;
-     ----------------------------------------------------------------
      helm auto-completion better-defaults emacs-lisp git markdown
-     org spell-checking syntax-checking ibuffer clojure
-     command-log my-layer elfeed)
+          org spell-checking syntax-checking ibuffer clojure
+          command-log my-layer elfeed)
    dotspacemacs-additional-packages
    '(ace-link java-snippets
+              ac-cider
+              evil
+              crux
+              elfeed
               midje-mode flycheck-pos-tip
               auto-complete-nxml sr-speedbar meghanada
               elpy dired+ dired-explorer dired-efap dired+
-              emms god-mode zenburn-theme )
+              emms god-mode zenburn-theme easy-kill )
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -140,12 +143,12 @@ values."
    ;; specified with an installed package.
    ;; Not used for now. (default nil)
    dotspacemacs-default-package-repository) nil
-  ;; Delete whitespace while saving buffer. Possible values are `all'
-  ;; to aggressively delete empty line and long sequences of whitespace,
-  ;; `trailing' to delete only the whitespace at end of lines, `changed'to
-  ;; delete only whitespace for changed lines or `nil' to disable cleanup.
-  ;; (default nil)
-  dotspacemacs-whitespace-cleanup `all
+   ;; Delete whitespace while saving buffer. Possible values are `all'
+   ;; to aggressively delete empty line and long sequences of whitespace,
+   ;; `trailing' to delete only the whitespace at end of lines, `changed'to
+   ;; delete only whitespace for changed lines or `nil' to disable cleanup.
+   ;; (default nil)
+   dotspacemacs-whitespace-cleanup `all
    )
 
 (defun dotspacemacs/user-init ()
@@ -187,7 +190,7 @@ you should place your code here."
     ("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3")))
  '(package-selected-packages
    (quote
-    (command-log-mode clojure-snippets ibuffer-projectile evil-smartparens easy-kill dired-subtree enotify mu4e-alert crux emms god-mode smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mwim mmm-mode markdown-toc markdown-mode magit-gitflow htmlize helm-gitignore helm-company helm-c-yasnippet gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md flyspell-correct-helm flyspell-correct evil-magit magit magit-popup git-commit with-editor diff-hl company-statistics auto-yasnippet auto-dictionary ac-ispell ujelly-theme switch-window sr-speedbar restclient omnisharp csharp-mode midje-mode meghanada java-snippets jabber fsm ido-ubiquitous ido-completing-read+ highlight-symbol flycheck-pos-tip pos-tip flycheck-clojure flycheck elpy pyvenv find-file-in-project company ivy elfeed eclipse-theme dired-explorer dired-efap dired+ clj-refactor inflections edn multiple-cursors paredit yasnippet peg cider-eval-sexp-fu bm back-button ucs-utils smartrep nav-flash persistent-soft list-utils pcache auto-complete-nxml ac-cider auto-complete cider seq queue clojure-mode ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
+    (elfeed-web simple-httpd elfeed-org elfeed-goodies ace-jump-mode noflet command-log-mode clojure-snippets ibuffer-projectile evil-smartparens easy-kill dired-subtree enotify mu4e-alert crux emms god-mode smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mwim mmm-mode markdown-toc markdown-mode magit-gitflow htmlize helm-gitignore helm-company helm-c-yasnippet gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md flyspell-correct-helm flyspell-correct evil-magit magit magit-popup git-commit with-editor diff-hl company-statistics auto-yasnippet auto-dictionary ac-ispell ujelly-theme switch-window sr-speedbar restclient omnisharp csharp-mode midje-mode meghanada java-snippets jabber fsm ido-ubiquitous ido-completing-read+ highlight-symbol flycheck-pos-tip pos-tip flycheck-clojure flycheck elpy pyvenv find-file-in-project company ivy elfeed eclipse-theme dired-explorer dired-efap dired+ clj-refactor inflections edn multiple-cursors paredit yasnippet peg cider-eval-sexp-fu bm back-button ucs-utils smartrep nav-flash persistent-soft list-utils pcache auto-complete-nxml ac-cider auto-complete cider seq queue clojure-mode ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
  '(pdf-view-midnight-colors (quote ("#DCDCCC" . "#383838")))
  '(select-enable-clipboard t)
  '(send-mail-function (quote smtpmail-send-it))
