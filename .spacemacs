@@ -14,12 +14,13 @@ values."
    dotspacemacs-configuration-layer-path '("~/.remote-config/config/layers/")
    dotspacemacs-configuration-layers
    '(
+     python
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;;
      helm auto-completion better-defaults emacs-lisp git markdown
-          org spell-checking syntax-checking ibuffer clojure eww
-          command-log my-layer elfeed)
+     org spell-checking syntax-checking ibuffer clojure eww
+     command-log my-layer elfeed)
    dotspacemacs-additional-packages
    '(ace-link java-snippets
               ac-cider
@@ -39,6 +40,7 @@ values."
               dired+
               dired-explorer
               dired-efap
+              dired-subtree
               emms
               god-mode
               zenburn-theme
@@ -169,6 +171,74 @@ values."
   )
 
 (defun dotspacemacs/user-config ()
-  (smartparens-strict-mode t)
-  (sp-use-paredit-bindings))
+  (define-key eww-mode-map "f" 'ace-link-eww)
+  (define-key eww-mode-map "g" 'eww)
+  (define-key eww-mode-map "r" 'eww)
+  (define-key eww-mode-map "p" 'eww-back-url)
+  (define-key eww-mode-map "n" 'eww-forward-url)
+  (define-key eww-mode-map "G" 'eww-reload)
+  (define-key eww-mode-map "h" 'helm-eww-history)
+  (define-key eww-mode-map "l" 'helm-eww-links)
 
+  ;; contrast configuration
+  (require 'shr-color)
+  (setq shr-color-visible-distance-min 60)
+  (setq shr-color-visible-luminance-min 80)
+
+  (smartparens-global-strict-mode t)
+  (sp-use-paredit-bindings)
+                                        ;(sp-) 
+  )
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ansi-color-names-vector
+   ["#3F3F3F" "#CC9393" "#7F9F7F" "#F0DFAF" "#8CD0D3" "#DC8CC3" "#93E0E3" "#DCDCCC"])
+ '(custom-safe-themes
+   (quote
+    ("fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" default)))
+ '(ediff-split-window-function (quote split-window-horizontally))
+ '(evil-want-Y-yank-to-eol nil)
+ '(eww-search-prefix "https://www.google.com/search?q=")
+ '(fci-rule-color "#383838" t)
+ '(nrepl-message-colors
+   (quote
+    ("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3")))
+ '(package-selected-packages
+   (quote
+    (yapfify pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode helm-pydoc cython-mode company-anaconda anaconda-mode pythonic 2048-game eww-lnum sx elfeed-web simple-httpd elfeed-org elfeed-goodies ace-jump-mode noflet command-log-mode clojure-snippets ibuffer-projectile evil-smartparens easy-kill dired-subtree enotify mu4e-alert crux emms god-mode smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mwim mmm-mode markdown-toc markdown-mode magit-gitflow htmlize helm-gitignore helm-company helm-c-yasnippet gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md flyspell-correct-helm flyspell-correct evil-magit magit magit-popup git-commit with-editor diff-hl company-statistics auto-yasnippet auto-dictionary ac-ispell ujelly-theme switch-window sr-speedbar restclient omnisharp csharp-mode midje-mode meghanada java-snippets jabber fsm ido-ubiquitous ido-completing-read+ highlight-symbol flycheck-pos-tip pos-tip flycheck-clojure flycheck elpy pyvenv find-file-in-project company ivy elfeed eclipse-theme dired-explorer dired-efap dired+ clj-refactor inflections edn multiple-cursors yasnippet peg cider-eval-sexp-fu bm back-button ucs-utils smartrep nav-flash persistent-soft list-utils pcache auto-complete-nxml ac-cider auto-complete cider seq queue clojure-mode ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
+ '(pdf-view-midnight-colors (quote ("#DCDCCC" . "#383838")))
+ '(select-enable-clipboard t)
+ '(send-mail-function (quote smtpmail-send-it))
+ '(speedbar-show-unknown-files t)
+ '(vc-annotate-background "#2B2B2B")
+ '(vc-annotate-color-map
+   (quote
+    ((20 . "#BC8383")
+     (40 . "#CC9393")
+     (60 . "#DFAF8F")
+     (80 . "#D0BF8F")
+     (100 . "#E0CF9F")
+     (120 . "#F0DFAF")
+     (140 . "#5F7F5F")
+     (160 . "#7F9F7F")
+     (180 . "#8FB28F")
+     (200 . "#9FC59F")
+     (220 . "#AFD8AF")
+     (240 . "#BFEBBF")
+     (260 . "#93E0E3")
+     (280 . "#6CA0A3")
+     (300 . "#7CB8BB")
+     (320 . "#8CD0D3")
+     (340 . "#94BFF3")
+     (360 . "#DC8CC3"))))
+ '(vc-annotate-very-old-color "#DC8CC3"))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

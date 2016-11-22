@@ -898,7 +898,8 @@ the current buffer."
 (require 'elfeed)
 (setq elfeed-feeds
       '("http://sachachua.com/blog/feed/"
-        "http://feeds.feedburner.com/cyclingnews/news?format=xml"))
+        "http://feeds.feedburner.com/cyclingnews/news?format=xml"
+        "http://endlessparentheses.com/atom.xml"))
 
 (require 'emms-setup)
 (emms-all)
