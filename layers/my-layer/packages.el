@@ -418,9 +418,6 @@ PREFIX - whether to switch to the other window."
 
 (define-key java-mode-map "\M-j" 'join-next-line)
 
-(define-key ac-complete-mode-map "\C-n" 'ac-previous)
-(define-key ac-complete-mode-map "\C-p" 'ac-next)
-
 
 (setq prelude-whitespace nil)
 
@@ -1009,6 +1006,7 @@ With a prefix ARG invokes `projectile-commander' instead of
       (error "There are no known projects"))))
 
 (bind-key "C-c 2 g" 'my/projectile-switch-project-magit)
+(bind-key "C-=" 'er/expand-region)
 (bind-key "C-c 2 d" 'my/projectile-switch-project-dired)
 
 (setq gc-cons-threshold 20000000)
@@ -1158,3 +1156,4 @@ If EXTERNAL is double prefix, browse in new buffer."
 ;; jira
 (fset 'my/copy-worklog
       [?\C-c ?\C-x ?\C-w ?\C-y ?\C-y ?\C-p tab ?\C-n tab ?\C-n ?\C-k ?\C-k ?\C-n ?\M-f ?\M-f ?\M-f ?\M-f ?\C-f ?\M-x ?m ?y ?- backspace ?/ ?i ?n tab return])
+

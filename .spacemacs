@@ -14,6 +14,8 @@ values."
    dotspacemacs-configuration-layer-path '("~/.remote-config/config/layers/")
    dotspacemacs-configuration-layers
    '(
+     typescript
+     javascript
      python
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
@@ -37,6 +39,7 @@ values."
               sr-speedbar
               meghanada
               elpy
+              helm-dash
               dired+
               dired-explorer
               dired-efap
@@ -169,7 +172,6 @@ values."
 (defun dotspacemacs/user-init ()
   
   )
-
 (defun dotspacemacs/user-config ()
   (define-key eww-mode-map "f" 'ace-link-eww)
   (define-key eww-mode-map "g" 'eww)
@@ -180,6 +182,8 @@ values."
   (define-key eww-mode-map "h" 'helm-eww-history)
   (define-key eww-mode-map "l" 'helm-eww-links)
 
+  (setq helm-ff-guess-ffap-filenames t)
+
   ;; contrast configuration
   (require 'shr-color)
   (setq shr-color-visible-distance-min 60)
@@ -189,6 +193,7 @@ values."
   (sp-use-paredit-bindings)
                                         ;(sp-) 
   )
+(dotspacemacs/user-config)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -209,7 +214,7 @@ values."
     ("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3")))
  '(package-selected-packages
    (quote
-    (yapfify pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode helm-pydoc cython-mode company-anaconda anaconda-mode pythonic 2048-game eww-lnum sx elfeed-web simple-httpd elfeed-org elfeed-goodies ace-jump-mode noflet command-log-mode clojure-snippets ibuffer-projectile evil-smartparens easy-kill dired-subtree enotify mu4e-alert crux emms god-mode smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mwim mmm-mode markdown-toc markdown-mode magit-gitflow htmlize helm-gitignore helm-company helm-c-yasnippet gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md flyspell-correct-helm flyspell-correct evil-magit magit magit-popup git-commit with-editor diff-hl company-statistics auto-yasnippet auto-dictionary ac-ispell ujelly-theme switch-window sr-speedbar restclient omnisharp csharp-mode midje-mode meghanada java-snippets jabber fsm ido-ubiquitous ido-completing-read+ highlight-symbol flycheck-pos-tip pos-tip flycheck-clojure flycheck elpy pyvenv find-file-in-project company ivy elfeed eclipse-theme dired-explorer dired-efap dired+ clj-refactor inflections edn multiple-cursors yasnippet peg cider-eval-sexp-fu bm back-button ucs-utils smartrep nav-flash persistent-soft list-utils pcache auto-complete-nxml ac-cider auto-complete cider seq queue clojure-mode ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
+    (tide typescript-mode web-beautify livid-mode skewer-mode json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc company-tern dash-functional tern coffee-mode clojure-cheatsheet helm-cider jedi helm-dash yapfify pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode helm-pydoc cython-mode company-anaconda anaconda-mode pythonic 2048-game eww-lnum sx elfeed-web simple-httpd elfeed-org elfeed-goodies ace-jump-mode noflet command-log-mode clojure-snippets ibuffer-projectile evil-smartparens easy-kill dired-subtree enotify mu4e-alert crux emms god-mode smeargle orgit org-projectile org-present org org-pomodoro alert log4e gntp org-download mwim mmm-mode markdown-toc markdown-mode magit-gitflow htmlize helm-gitignore helm-company helm-c-yasnippet gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md flyspell-correct-helm flyspell-correct evil-magit magit magit-popup git-commit with-editor diff-hl company-statistics auto-yasnippet auto-dictionary ac-ispell ujelly-theme switch-window sr-speedbar restclient omnisharp csharp-mode midje-mode meghanada java-snippets jabber fsm ido-ubiquitous ido-completing-read+ highlight-symbol flycheck-pos-tip pos-tip flycheck-clojure flycheck elpy pyvenv find-file-in-project company ivy elfeed eclipse-theme dired-explorer dired-efap dired+ clj-refactor inflections edn multiple-cursors yasnippet peg cider-eval-sexp-fu bm back-button ucs-utils smartrep nav-flash persistent-soft list-utils pcache auto-complete-nxml ac-cider auto-complete cider seq queue clojure-mode ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spacemacs-theme spaceline restart-emacs request rainbow-delimiters quelpa popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide ido-vertical-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
  '(pdf-view-midnight-colors (quote ("#DCDCCC" . "#383838")))
  '(select-enable-clipboard t)
  '(send-mail-function (quote smtpmail-send-it))
