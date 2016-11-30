@@ -40,7 +40,42 @@
     midje-mode flycheck-pos-tip
     auto-complete-nxml sr-speedbar meghanada
     elpy dired+ dired-explorer dired-efap dired+
-    emms god-mode zenburn-theme easy-kill)
+    emms god-mode zenburn-theme easy-kill
+    ace-link java-snippets
+    ac-cider
+    evil
+    sx
+    crux
+    elfeed
+    jabber
+    midje-mode flycheck-pos-tip
+    auto-complete-nxml sr-speedbar meghanada
+    elpy dired+ dired-explorer dired-efap dired+
+    emms god-mode zenburn-theme easy-kill
+    ac-cider
+    eww
+    flycheck-pos-tip
+    jabber
+    persistent-scratch
+    crux
+    elfeed
+    midje-mode
+    flycheck-clojure
+    auto-complete-nxml
+    sx
+    sr-speedbar
+    meghanada
+    elpy
+    helm-dash
+    dired+
+    dired-explorer
+    dired-efap
+    magit
+    dired-subtree
+    emms
+    god-mode
+    zenburn-theme
+    easy-kill)
   "The list of Lisp packages required by the my-layer layer.
 
 Each entry is either:
@@ -80,24 +115,11 @@ Each entry is either:
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
-(package-initialize)
-
-(require 'flycheck-pos-tip)
-(require 'auto-complete-nxml)
-(smartparens-mode -1)
 
 ;; modes
-(show-paren-mode 1)
-(delete-selection-mode t)
-(setq indent-tabs-mode nil)
-(global-auto-highlight-symbol-mode t)
-(line-number-mode 1)
-
-
-;; magit configuration
+(defun my/init ()
 (require 'magit)
 (setq git-commit-summary-max-length 999)
-
 (setq kill-do-not-save-duplicates t)
 
 ;; disable backup files
@@ -259,7 +281,6 @@ downcased, no preceding underscore"
 
 (put 'set-goal-column 'disabled nil)
 
-(require 'magit)
 (require 'ediff-diff)
 
 (setq ediff-diff-options "-w")
@@ -823,72 +844,72 @@ the current buffer."
 (require 'evil)
 (setq evil-default-state 'emacs)
 
-;; (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
-;; (require 'mu4e)
-;; (require 'mu4e-speedbar)
+ (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
+ (require 'mu4e)
+ (require 'mu4e-speedbar)
 
-;; (defun my/mu4e-go-to-inbox ()
-;;   "Go to inbox."
-;;   (interactive)
-;;   (mu4e-headers-search
-;;    (format "maildir:\"%s\"" "/INBOX")))
+ (defun my/mu4e-go-to-inbox ()
+   "Go to inbox."
+   (interactive)
+   (mu4e-headers-search
+    (format "maildir:\"%s\"" "/INBOX")))
 
-;; (bind-key "C-c m" 'mu4e)
+ (bind-key "C-c m" 'mu4e)
 
 
-;; (setq mu4e-drafts-folder "/Drafts"
-;;       mu4e-sent-folder   "/Sent Items"
-;;       mu4e-trash-folder  "/Trash"
-;;       mu4e-msg2pdf "/usr/bin/msg2pdf"
-;;       mu4e-update-interval 200)
+ (setq mu4e-drafts-folder "/Drafts"
+       mu4e-sent-folder   "/Sent Items"
+       mu4e-trash-folder  "/Trash"
+       mu4e-msg2pdf "/usr/bin/msg2pdf"
+       mu4e-update-interval 200)
 
-;; ;; don't save message to Sent Messages, Gmail/IMAP takes care of this
-;; (setq mu4e-sent-messages-behavior 'sent)
+ ;; don't save message to Sent Messages, Gmail/IMAP takes care of this
+ (setq mu4e-sent-messages-behavior 'sent)
 
-;; (setq mu4e-maildir-shortcuts
-;;       '(("/INBOX" . ?j)
-;;         ("/Drafts" . ?d)
-;;         ("/Trash" . ?t)
-;;         ("/Sent Items" . ?s)
-;;         ("/bamboo" . ?b)))
+ (setq mu4e-maildir-shortcuts
+       '(("/INBOX" . ?j)
+         ("/Drafts" . ?d)
+         ("/Trash" . ?t)
+         ("/Sent Items" . ?s)
+         ("/bamboo" . ?b)))
 
-;; ;; allow for updating mail using 'U' in the main view:
-;; (setq mu4e-get-mail-command "offlineimap")
+ ;; allow for updating mail using 'U' in the main view:
+ (setq mu4e-get-mail-command "offlineimap")
 
-;; something about ourselves
-;; (setq
-;;  user-mail-address "ivan.yonchovski@tick42.com"
-;;  user-full-name  "Ivan Yonchovski"
-;;  mu4e-compose-signature nil)
+ ;; something about ourselves
+ (setq
+  user-mail-address "ivan.yonchovski@tick42.com"
+  user-full-name  "Ivan Yonchovski"
+  mu4e-compose-signature nil)
 
-;; (require 'smtpmail)
-;; (setq message-send-mail-function 'smtpmail-send-it
-;;       starttls-use-gnutls t
-;;       smtpmail-starttls-credentials '(("smtp.office365.com" 587 nil nil))
-;;       smtpmail-auth-credentials
-;;       '(("smtp.office365.com" 587 "ivan.yonchovski@tick42.com" nil))
-;;       smtpmail-default-smtp-server "smtp.gmail.com"
-;;       smtpmail-smtp-server "smtp.office365.com"
-;;       smtpmail-smtp-service 587)
+ (require 'smtpmail)
+ (setq message-send-mail-function 'smtpmail-send-it
+       starttls-use-gnutls t
+       smtpmail-starttls-credentials '(("smtp.office365.com" 587 nil nil))
+       smtpmail-auth-credentials
+       '(("smtp.office365.com" 587 "ivan.yonchovski@tick42.com" nil))
+       smtpmail-default-smtp-server "smtp.gmail.com"
+       smtpmail-smtp-server "smtp.office365.com"
+       smtpmail-smtp-service 587)
 
-;; (setq message-kill-buffer-on-exit t)
+ (setq message-kill-buffer-on-exit t)
 
-;; (use-package mu4e-alert
-;;   :ensure t
-;;   :config
-;;   (mu4e-alert-enable-notifications)
-;;   (mu4e-alert-set-default-style 'libnotify)
-;;   (setq mu4e-alert-interesting-mail-query
-;;         (concat "maildir:/INBOX and flag:unread"))
+ (use-package mu4e-alert
+   :ensure t
+   :config
+   (mu4e-alert-enable-notifications)
+   (mu4e-alert-set-default-style 'libnotify)
+   (setq mu4e-alert-interesting-mail-query
+         (concat "maildir:/INBOX and flag:unread"))
 
-;;   (alert-add-rule
-;;    :category "mu4e-alert"
-;;    :predicate (lambda (_) (string-match-p "^mu4e-" (symbol-name major-mode)))
-;;    :continue )
+   (alert-add-rule
+    :category "mu4e-alert"
+    :predicate (lambda (_) (string-match-p "^mu4e-" (symbol-name major-mode)))
+    :continue )
 
-;;   ;; display stuff on modeline as well as notify
-;;   (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
-;;   (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display))
+   ;; display stuff on modeline as well as notify
+   (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
+   (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display))
 
 
 ;; elfeed configuration
@@ -1018,7 +1039,7 @@ With a prefix ARG invokes `projectile-commander' instead of
       helm-file-cache-fuzzy-match           t
       helm-imenu-fuzzy-match                t
       helm-mode-fuzzy-match                 t
-      helm-locate-fuzzy-match               t
+      helm-locate-fuzzy-match               nil
       helm-quick-update                     t
       helm-recentf-fuzzy-match              t
       helm-semantic-fuzzy-match             t)
@@ -1156,4 +1177,17 @@ If EXTERNAL is double prefix, browse in new buffer."
 ;; jira
 (fset 'my/copy-worklog
       [?\C-c ?\C-x ?\C-w ?\C-y ?\C-y ?\C-p tab ?\C-n tab ?\C-n ?\C-k ?\C-k ?\C-n ?\M-f ?\M-f ?\M-f ?\M-f ?\C-f ?\M-x ?m ?y ?- backspace ?/ ?i ?n tab return])
+(custom-set-variables
+ '(jabber-alert-muc-hooks nil)
+ '(jabber-alert-presence-hooks nil)
+ '(jabber-mode-line-compact t)
+ '(jabber-mode-line-mode nil)
+ '(mu4e-hide-index-messages t))
 
+(defun my/emms-start ()
+  "Start emms."
+  (interactive)
+  (emms-default-players)
+  (emms-add-directory-tree "~/Music")
+  (emms-random))
+)
