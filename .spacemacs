@@ -13,6 +13,7 @@ values."
    dotspacemacs-configuration-layer-path '("~/.remote-config/config/layers/")
    dotspacemacs-configuration-layers
    '(
+     html
      typescript
      mu4e
      javascript
@@ -21,22 +22,25 @@ values."
      org spell-checking syntax-checking ibuffer clojure
      jabber
                                         ;no-dots command-log
-     my-layer elfeed) dotspacemacs-additional-packages 
-     '(java-snippets ac-cider evil sx crux elfeed jabber midje-mode
-                     flycheck-pos-tip auto-complete-nxml sr-speedbar meghanada
-                     elpy dired+ dired-explorer dired-efap dired+ emms god-mode
-                     zenburn-theme easy-kill ace-link java-snippets ac-cider evil
-                     sx crux elfeed jabber midje-mode flycheck-pos-tip
-                     auto-complete-nxml sr-speedbar meghanada elpy dired+
-                     dired-explorer dired-efap dired+ emms god-mode zenburn-theme
-                     easy-kill ac-cider eww flycheck-pos-tip jabber
-                     persistent-scratch crux elfeed midje-mode flycheck-clojure
-                     auto-complete-nxml sx sr-speedbar meghanada elpy helm-dash
-                     dired+ dired-explorer dired-efap magit dired-subtree emms
-                     god-mode zenburn-theme easy-kill)
-     dotspacemacs-frozen-packages '()
-     dotspacemacs-excluded-packages '()
-     dotspacemacs-install-packages 'used-only))
+     my-layer elfeed)
+
+   dotspacemacs-additional-packages
+   '(java-snippets ac-cider evil
+                   sx crux elfeed jabber midje-mode flycheck-pos-tip
+                   auto-complete-nxml sr-speedbar meghanada elpy dired+
+                   dired-explorer dired-efap dired+ emms god-mode zenburn-theme
+                   easy-kill ace-link java-snippets ac-cider evil notify sx crux
+                   elfeed jabber midje-mode flycheck-pos-tip auto-complete-nxml
+                   sr-speedbar meghanada elpy dired+ dired-explorer dired-efap
+                   dired+ emms god-mode zenburn-theme easy-kill ac-cider eww
+                   flycheck-pos-tip jabber persistent-scratch crux elfeed
+                   midje-mode auto-complete-nxml sx sr-speedbar meghanada elpy
+                   helm-dash dired+ dired-explorer dired-efap magit dired-subtree
+                   emms org-jira-mode god-mode zenburn-theme easy-kill)
+
+   dotspacemacs-frozen-packages '()
+   dotspacemacs-excluded-packages '()
+   dotspacemacs-install-packages 'used-only))
 
 (defun dotspacemacs/init ()
   "Initialization function.
@@ -152,11 +156,16 @@ values."
    ;; `trailing' to delete only the whitespace at end of lines, `changed'to
    ;; delete only whitespace for changed lines or `nil' to disable cleanup.
    ;; (default nil)
-   dotspacemacs-whitespace-cleanup `all
+   dotspacemacs-whitespace-cleanup `trailing
    )
 
+
 (defun dotspacemacs/user-init ()
-  
+  (setq package-archives '(("ELPA" . "http://tromey.com/elpa/")
+                           ("gnu" . "http://elpa.gnu.org/packages/")
+                           ("melpa" . "http://melpa.org/packages/")
+                           ("melpa-stable" . "http://stable.melpa.org/packages/")
+                           ("marmalade" . "http://marmalade-repo.org/packages/")))
   )
 (defun dotspacemacs/user-config ()
   (require 'eww)
@@ -183,7 +192,13 @@ values."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(bmkp-last-as-first-bookmark-file "~/.emacs.d/savefile/bookmarks")
  '(ediff-split-window-function (quote split-window-horizontally))
+ '(excorporate-configuration
+   (quote
+    ("ivan.yonchovski@tick42.com" . "https://pod51036.outlook.com/ews/Exchange.asmx")))
+ '(global-auto-highlight-symbol-mode t)
+ '(global-command-log-mode t)
  '(jabber-alert-muc-hooks nil)
  '(jabber-alert-presence-hooks nil)
  '(jabber-mode-line-compact t)
@@ -191,7 +206,10 @@ values."
  '(mu4e-hide-index-messages t)
  '(package-selected-packages
    (quote
-    (web-mode-edit-element multi-web-mode mu4e-maildirs-extension mu4e-alert ht sx sr-speedbar persistent-scratch midje-mode meghanada java-snippets jabber fsm helm-dash god-mode flycheck-clojure emms elpy find-file-in-project ivy easy-kill dired-subtree dired-hacks-utils dired-explorer dired-efap dired+ crux auto-complete-nxml ac-cider zenburn-theme yapfify ws-butler window-numbering which-key web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package toc-org tide spacemacs-theme spaceline smeargle restart-emacs rainbow-delimiters quelpa pyvenv pytest pyenv-mode py-isort pip-requirements persp-mode pcre2el paradox orgit org-projectile org-present org-pomodoro org-plus-contrib org-download org-bullets open-junk-file neotree mwim move-text mmm-mode markdown-toc magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode linum-relative link-hint json-mode js2-refactor js-doc info+ indent-guide ido-vertical-mode ibuffer-projectile hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-gitignore helm-flx helm-descbinds helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flyspell-correct-helm flycheck-pos-tip flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu elisp-slime-nav elfeed-web elfeed-org elfeed-goodies dumb-jump define-word cython-mode company-tern company-statistics company-anaconda command-log-mode column-enforce-mode coffee-mode clojure-snippets clj-refactor clean-aindent-mode cider-eval-sexp-fu auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell)))
+    (notify enotify excorporate cypher-mode org-jira web-mode tagedit slim-mode scss-mode sass-mode pug-mode less-css-mode helm-css-scss haml-mode emmet-mode company-web web-completion-data web-mode-edit-element multi-web-mode mu4e-maildirs-extension mu4e-alert ht sx sr-speedbar persistent-scratch midje-mode meghanada java-snippets jabber fsm helm-dash god-mode flycheck-clojure emms elpy find-file-in-project ivy easy-kill dired-subtree dired-hacks-utils dired-explorer dired-efap dired+ crux auto-complete-nxml ac-cider zenburn-theme yapfify ws-butler window-numbering which-key web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package toc-org tide spacemacs-theme spaceline smeargle restart-emacs rainbow-delimiters quelpa pyvenv pytest pyenv-mode py-isort pip-requirements persp-mode pcre2el paradox orgit org-projectile org-present org-pomodoro org-plus-contrib org-download org-bullets open-junk-file neotree mwim move-text mmm-mode markdown-toc magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode linum-relative link-hint json-mode js2-refactor js-doc info+ indent-guide ido-vertical-mode ibuffer-projectile hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-gitignore helm-flx helm-descbinds helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flyspell-correct-helm flycheck-pos-tip flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu elisp-slime-nav elfeed-web elfeed-org elfeed-goodies dumb-jump define-word cython-mode company-tern company-statistics company-anaconda command-log-mode column-enforce-mode coffee-mode clojure-snippets clj-refactor clean-aindent-mode cider-eval-sexp-fu auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell)))
+ '(projectile-globally-ignored-directories
+   (quote
+    (".idea" ".ensime_cache" ".eunit" "target" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "target")))
  '(select-enable-clipboard t)
  '(send-mail-function (quote smtpmail-send-it))
  '(speedbar-show-unknown-files t)

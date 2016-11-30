@@ -224,6 +224,9 @@ Each entry is either:
 (define-key java-mode-map (kbd "C-x C-j")
   'projectile-find-implementation-or-test-other-window)
 
+(define-key clojure-mode-map (kbd "C-x C-j")
+  'projectile-find-implementation-or-test-other-window)
+
 (define-key java-mode-map (kbd "C-<f11>") 'meghanada-run-junit-recent)
 
 (add-to-list 'auto-mode-alist '("\\.clj\\'" . clojure-mode))
@@ -946,26 +949,27 @@ the current buffer."
          (:network-server . "jabber.pirinsoft.bg")
          (:port . 5222))))
 
-;; (require 'notify)
+(require 'alert)
+(alert "Test" :severity 'high)
 
-;; (defun notify-jabber-notify (from buf text proposed-alert)
-;;   "(jabber.el hook) Notify of new Jabber chat messages via notify.el."
-;;   (when (or jabber-message-alert-same-buffer
-;;             (not (memq (selected-window) (get-buffer-window-list buf))))
-;;     (if (jabber-muc-sender-p from)
-;;         (notify (format "(PM) %s"
-;;                         (jabber-jid-displayname (jabber-jid-user from)))
-;;                 (format "%s: %s" (jabber-jid-resource from) text)))
-;;     (notify (format "%s" (jabber-jid-displayname from))
-;;             text)))
+ (defun notify-jabber-notify (from buf text proposed-alert)
+   "(jabber.el hook) Notify of new Jabber chat messages via notify.el."
+   (when (or jabber-message-alert-same-buffer
+             (not (memq (selected-window) (get-buffer-window-list buf))))
+     (if (jabber-muc-sender-p from)
+         (inotify (format "(PM) %s"
+                         (jabber-jid-displayname (jabber-jid-user from)))
+                 (format "%s: %s" (jabber-jid-resource from) text)))
+     (notify (format "%s" (jabber-jid-displayname from))
+             text)))
 
-;; (require 'mu4e-alert)
-;; (defun my/jabber-alert-set-window-urgency-maybe (from buf text proposed-alert)
-;;   "Jabber alert - make the window blinking."
-;;   (mu4e-alert-set-window-urgency-maybe))
+ (require 'mu4e-alert)
+ (defun my/jabber-alert-set-window-urgency-maybe (from buf text proposed-alert)
+   "Jabber alert - make the window blinking."
+   (mu4e-alert-set-window-urgency-maybe))
 
-;; (add-hook 'jabber-alert-message-hooks 'notify-jabber-notify)
-;; (add-hook 'jabber-alert-message-hooks 'my/jabber-alert-set-window-urgency-maybe)
+ (add-hook 'jabber-alert-message-hooks 'notify-jabber-notify)
+ (add-hook 'jabber-alert-message-hooks 'my/jabber-alert-set-window-urgency-maybe)
 
 
 (defun my/find-symbol-at-point ()
@@ -1177,17 +1181,29 @@ If EXTERNAL is double prefix, browse in new buffer."
 ;; jira
 (fset 'my/copy-worklog
       [?\C-c ?\C-x ?\C-w ?\C-y ?\C-y ?\C-p tab ?\C-n tab ?\C-n ?\C-k ?\C-k ?\C-n ?\M-f ?\M-f ?\M-f ?\M-f ?\C-f ?\M-x ?m ?y ?- backspace ?/ ?i ?n tab return])
+
 (custom-set-variables
  '(jabber-alert-muc-hooks nil)
  '(jabber-alert-presence-hooks nil)
  '(jabber-mode-line-compact t)
  '(jabber-mode-line-mode nil)
- '(mu4e-hide-index-messages t))
+ '(mu4e-hide-index-messages t)
+ '(bmkp-last-as-first-bookmark-file "~/.emacs.d/savefile/bookmarks")
+ '(excorporate-configuration
+   (quote
+    ("ivan.yonchovski@tick42.com" . "https://pod51036.outlook.com/ews/Exchange.asmx")))
+ '(global-auto-highlight-symbol-mode t)
+ '(global-command-log-mode t)
+ '(projectile-globally-ignored-directories
+   (quote (".idea" ".ensime_cache" ".eunit" "target" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "target"))))
+
+(define-key calendar-mode-map (kbd  "<f2>") #'exco-calendar-show-day)
+
+(load "soap-client.el")
 
 (defun my/emms-start ()
   "Start emms."
   (interactive)
   (emms-default-players)
   (emms-add-directory-tree "~/Music")
-  (emms-random))
-)
+  (emms-random)))
