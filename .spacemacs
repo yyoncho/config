@@ -53,7 +53,7 @@ values."
    dotspacemacs-elpa-timeout 5
    dotspacemacs-check-for-update nil
    dotspacemacs-elpa-subdirectory nil
-   dotspacemacs-editing-style 'hybrid-mode
+   dotspacemacs-editing-style 'hybrid
    dotspacemacs-verbose-loading nil
    dotspacemacs-startup-banner 'official
    dotspacemacs-startup-lists '((recents . 5)
@@ -62,7 +62,7 @@ values."
    dotspacemacs-scratch-mode 'text-mode
    dotspacemacs-themes '(zenburn)
    dotspacemacs-colorize-cursor-according-to-state t
-   dotspacemacs-default-font '("Monospace"
+   dotspacemacs-default-font '("Source Code Pro"
                                :size 18
                                :weight normal
                                :width normal
@@ -153,6 +153,7 @@ values."
                            ("melpa-stable" . "http://stable.melpa.org/packages/")
                            ("marmalade" . "http://marmalade-repo.org/packages/"))))
 (defun dotspacemacs/user-config ()
+  (setq clojure-enable-fancify-symbols t)
   (require 'eww)
   (define-key eww-mode-map "f" 'ace-link-eww)
   (define-key eww-mode-map "g" 'eww)
