@@ -87,28 +87,12 @@
   (add-hook 'cider-mode-hook 'ac-cider-setup)
   (add-hook 'cider-repl-mode-hook 'ac-cider-setup)
 
-  (eval-after-load "auto-complete"
-    '(progn
-       (add-to-list 'ac-modes 'cider-mode)
-       (add-to-list 'ac-modes 'cider-repl-mode)))
-  (eval-after-load 'cider-mode
-    '(define-key cider-mode-map (kbd "C-S-f") 'cider-format-buffer))
-
   (setenv "PATH" (concat (getenv "PATH") ":~/.bin"))
-
   (put 'set-goal-column 'disabled nil)
 
   (require 'ediff-diff)
 
   (setq ediff-diff-options "-w")
-
-  (defun my/clojure-mode-hook ()
-    "Clojure mode hook."
-    (clj-refactor-mode 1)
-    (yas-minor-mode 1) ; for adding require/use/import
-    (cljr-add-keybindings-with-prefix "C-c m"))
-
-  (add-hook 'clojure-mode-hook #'my/clojure-mode-hook)
 
   ;; better window splitting
   (defun my/vsplit-last-buffer (prefix)
@@ -128,38 +112,14 @@ PREFIX - whether to switch to the other window."
     (other-window 1 nil)
     (if (= prefix 1) (switch-to-next-buffer)))
 
-  (fset 'yes-or-no-p 'y-or-n-p)
-
   ;; prevent prompt for killing emcacsclient buffer
   (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
   (setq inhibit-splash-screen t)
 
-  ;; Use the clipboard, pretty please, so that copy/paste "works"
-  (setq x-select-enable-clipboard t)
-
-  ;; M-x shell is a nice shell interface to use, let's make it colorful.  If
-  ;; you need a terminal emulator rather than just a shell, consider M-x term
-  ;; instead.
-  (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
-  (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
-
-  ;; If you do use M-x term, you will notice there's line mode that acts like
-  ;; emacs buffers, and there's the default char mode that will send your
-  ;; input char-by-char, so that curses application see each of your key
-  ;; strokes.
-  ;;
-  ;; The default way to toggle between them is C-c C-j and C-c C-k, let's
-  ;; better use just one key to do the same.
   (require 'term)
   (define-key term-raw-map  (kbd "C-'") 'term-line-mode)
   (define-key term-mode-map (kbd "C-'") 'term-char-mode)
   (define-key term-raw-map  (kbd "C-y") 'term-paste)
-
-  (defun fullscreen ()
-    "Switch to full screen."
-    (interactive)
-    (set-frame-parameter nil 'fullscreen
-                         (if (frame-parameter nil 'fullscreen) nil 'fullboth)))
 
   (require 'god-mode)
   (define-key god-local-mode-map (kbd ".") 'repeat)
@@ -190,10 +150,7 @@ PREFIX - whether to switch to the other window."
   (setq browse-url-browser-function 'browse-url-generic
         browse-url-generic-program "chromium-browser")
 
-
   (set-face-attribute 'default nil :height 130)
-
-                                        ;(eval-after-load 'flycheck '(flycheck-clojure-setup))
 
   (require 'flycheck)
   (eval-after-load 'flycheck
@@ -234,20 +191,6 @@ PREFIX - whether to switch to the other window."
                                          (match-end 1) "∈")
                          nil)))))))
 
-
-  ;; shortcuts configuration
-
-
-
-
-  ;; configuration for multiple cursors
-
-  (define-key global-map (kbd "C-c SPC") 'avy-goto-word-1)
-  (define-key global-map (kbd "C-c C-SPC") 'avy-pop-mark)
-
-
-  (setq exec-path (append exec-path '("/usr/bin")))
-
   (require 'company)
   (define-key company-active-map "\C-p" 'company-select-previous)
   (define-key company-active-map "\C-n" 'company-select-next)
@@ -255,44 +198,15 @@ PREFIX - whether to switch to the other window."
 
   (define-key java-mode-map "\M-j" 'join-next-line)
 
-
-  (setq prelude-whitespace nil)
-
-  (global-unset-key (vector (list 'shift 'left)))
-  (global-unset-key (vector (list 'shift 'right)))
-  (global-unset-key (vector (list 'shift 'up)))
-  (global-unset-key (vector (list 'shift 'down)))
-
   (add-hook 'midje-mode-hook
             (lambda ()
-              (message "passed ")
-              (define-key midje-mode-map (kbd "C-c p") nil)))
-
-  (provide '.emacs)
-;;; .emacs ends here
-  ;; org-mode configuration
-  (setq org-hide-leading-stars t)
-
-
-  (setq-default ibuffer-saved-filter-groups
-                `(("Default"
-                   ;; I create a group call Dired, which contains all buffer in dired-mode
-                   ("Dired" (mode . dired-mode))
-                   ("Temporary" (name . "\*.*\*")))))
-
-  (setq browse-url-generic-program (executable-find "conkeror"))
-  (setq browse-url-browser-function 'browse-url-generic)
+              (define-key midje-mode-map (kbd "C-c b") nil)))
 
   ;; always follow symlinks
   (setq vc-follow-symlinks t)
 
   ;; use windows-1251
   (modify-coding-system-alist 'file "\\.txt\\'" 'windows-1251)
-
-  (set-face-attribute 'region nil :background "#666")
-
-  (setq-default cursor-type '(bar . 2))
-  (setq default-frame-alist '((cursor-color . "white")))
 
   (defun my/increment-number-decimal (&optional arg)
     "Increment the number forward from point by 'ARG'.
