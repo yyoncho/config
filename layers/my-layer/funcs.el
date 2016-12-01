@@ -667,19 +667,7 @@ With a prefix ARG invokes `projectile-commander' instead of
   ;; truncate-lines enabled by default
   (set-default 'truncate-lines t)
 
-  (defun my/kmacro-end-and-call-macro (arg &optional no-repeat)
-    "Call last keyboard macro, ending it first if currently being defined.
-With numeric prefix ARG, repeat macro that many times.
-Zero argument means repeat until there is an error.
-To give a macro a permanent name, so you can call it
-even after defining other macros, use \\[kmacro-name-last-macro]."
-    (interactive "P")
-    (if defining-kbd-macro
-        (kmacro-end-macro nil))
-    (progn
-      (font-lock-mode -1)
-      (kmacro-call-macro arg no-repeat)
-      (font-lock-mode)))
+
 
   (global-set-key [remap kbd-end-or-call-macro] 'my/kmacro-end-and-call-macro)
 
@@ -693,39 +681,29 @@ even after defining other macros, use \\[kmacro-name-last-macro]."
 
   (add-hook 'org-mode-hook #'org-bullets-mode)
 
-  (eval-after-load  "dired-x" '(defun dired-clean-up-after-deletion (fn)
-                                 "My. Clean up after a deleted file or directory FN.
+  (eval-after-load  "dired-x"
+    '(defun dired-clean-up-after-deletion (fn)
+       "My. Clean up after a deleted file or directory FN.
 Remove expanded subdir of deleted dir, if any."
-                                 (save-excursion (and (cdr dired-subdir-alist)
-                                                      (dired-goto-subdir fn)
-                                                      (dired-kill-subdir)))
+       (save-excursion (and (cdr dired-subdir-alist)
+                            (dired-goto-subdir fn)
+                            (dired-kill-subdir)))
 
-                                 ;; Offer to kill buffer of deleted file FN.
-                                 (if dired-clean-up-buffers-too
-                                     (progn
-                                       (let ((buf (get-file-buffer fn)))
-                                         (and buf
-                                              (save-excursion ; you never know where kill-buffer leaves you
-                                                (kill-buffer buf))))
-                                       (let ((buf-list (dired-buffers-for-dir (expand-file-name fn)))
-                                             (buf nil))
-                                         (and buf-list
-                                              (while buf-list
-                                                (save-excursion (kill-buffer (car buf-list)))
-                                                (setq buf-list (cdr buf-list)))))))
-                                 ;; Anything else?
-                                 ))
-  ;; ibuffer configuration
-  (setq ibuffer-saved-filter-groups
-        (quote (("default"
-                 ("dired" (mode . dired-mode))
-                 ("java" (mode . java-mode))
-                 ("w3m" (mode . w3m-mode))
-                 ("temporary" (name . "\*.*\*"))))))
-
-  (add-hook 'ibuffer-mode-hook
-            (lambda ()
-              (ibuffer-switch-to-saved-filter-groups "default")))
+       ;; Offer to kill buffer of deleted file FN.
+       (if dired-clean-up-buffers-too
+           (progn
+             (let ((buf (get-file-buffer fn)))
+               (and buf
+                    (save-excursion ; you never know where kill-buffer leaves you
+                      (kill-buffer buf))))
+             (let ((buf-list (dired-buffers-for-dir (expand-file-name fn)))
+                   (buf nil))
+               (and buf-list
+                    (while buf-list
+                      (save-excursion (kill-buffer (car buf-list)))
+                      (setq buf-list (cdr buf-list)))))))
+       ;; Anything else?
+       ))
 
   ;; python configuration
   (require 'elpy)
@@ -740,8 +718,6 @@ Remove expanded subdir of deleted dir, if any."
 
 ;;; packages.el ends here
   (global-set-key [remap eww-follow-link] 'my/eww-follow-link)
-
-  (require 'sx)
 
   (defun my/browse-url (url new-window)
     "Browse url in the associated app.
@@ -815,7 +791,6 @@ If EXTERNAL is double prefix, browse in new buffer."
   (define-key calendar-mode-map (kbd  "<f2>") #'exco-calendar-show-day)
 
 
-
   (bind-key "C-x C-j" 'my/projectile-find-implementation)
   (jabber-mode-line-mode t)
   (helm-flx-mode t)
@@ -835,5 +810,4 @@ If EXTERNAL is double prefix, browse in new buffer."
     (interactive)
     (emms-default-players)
     (emms-add-directory-tree "~/Music")
-    (emms-random))
-  )
+    (emms-random)))
