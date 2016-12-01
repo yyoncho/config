@@ -118,6 +118,7 @@ Each entry is either:
 
 ;; modes
 (defun my/init ()
+(interactive)
 (require 'magit)
 (setq git-commit-summary-max-length 999)
 (setq kill-do-not-save-duplicates t)
@@ -379,8 +380,7 @@ PREFIX - whether to switch to the other window."
 
 (set-face-attribute 'default nil :height 130)
 
-(eval-after-load 'flycheck '(flycheck-clojure-setup))
-(add-hook 'after-init-hook #'global-flycheck-mode)
+;(eval-after-load 'flycheck '(flycheck-clojure-setup))
 
 (require 'flycheck)
 (eval-after-load 'flycheck
@@ -1176,9 +1176,9 @@ If EXTERNAL is double prefix, browse in new buffer."
                       "AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7\n"))
 
 ;; persistent-scratch
+
 (persistent-scratch-setup-default)
 (add-hook 'java-mode-hook #'meghanada-mode)
-;; jira
 (fset 'my/copy-worklog
       [?\C-c ?\C-x ?\C-w ?\C-y ?\C-y ?\C-p tab ?\C-n tab ?\C-n ?\C-k ?\C-k ?\C-n ?\M-f ?\M-f ?\M-f ?\M-f ?\C-f ?\M-x ?m ?y ?- backspace ?/ ?i ?n tab return])
 
@@ -1194,10 +1194,18 @@ If EXTERNAL is double prefix, browse in new buffer."
     ("ivan.yonchovski@tick42.com" . "https://pod51036.outlook.com/ews/Exchange.asmx")))
  '(global-auto-highlight-symbol-mode t)
  '(global-command-log-mode t)
+ '(projectile-globally-ignored-files
+   (quote ("TAGS" ".lein-repl-history")))
  '(projectile-globally-ignored-directories
-   (quote (".idea" ".ensime_cache" ".eunit" "target" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "target"))))
+   (quote (".idea" ".ensime_cache" ".eunit" "target" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "target" ))))
 
 (define-key calendar-mode-map (kbd  "<f2>") #'exco-calendar-show-day)
+(bind-key "C-x C-j" 'my/projectile-find-implementation)
+
+(defun my/projectile-find-implementation ()
+  "Open matching implementation or test file in other window."
+  (interactive)
+  (find-file (projectile-find-implementation-or-test (buffer-file-name))))
 
 (load "soap-client.el")
 
