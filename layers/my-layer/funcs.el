@@ -288,7 +288,7 @@ ARG - the amount for increasing the value."
                                         ;(flush-lines "^\\s-*$"  (region-beginning) (region-end))
       (sort-lines nil (region-beginning) (region-end))))
 
-  (defun prelude-copy-file-name-to-clipboard ()
+  (defun my/copy-file-name-to-clipboard ()
     "Copy the current buffer file name to the clipboard."
     (interactive)
     (let ((filename (if (equal major-mode 'dired-mode)
@@ -305,34 +305,10 @@ ARG - the amount for increasing the value."
     (interactive)
     (find-file (concat (projectile-project-root) "pom.xml")))
 
-  (defun my/find-user-init-file ()
-    "Edit the `user-init-file', in another window."
-    (interactive)
-    (find-file user-init-file))
 
-  (defun my/find-user-shell-init-file ()
-    "Edit the shell init file in another window."
-    (interactive)
-    (let* ((shell (car (reverse (split-string (getenv "SHELL") "/" t))))
-           (shell-init-file (cond
-                             ((string= "zsh" shell) crux-shell-zsh-init-files)
-                             ((string= "bash" shell) crux-shell-bash-init-files)
-                             ((string= "tcsh" shell) crux-shell-tcsh-init-files)
-                             ((string= "fish" shell) crux-shell-fish-init-files)
-                             ((string-prefix-p "ksh" shell) crux-shell-ksh-init-files)
-                             (t (error "Unknown shell"))))
-           (candidates (cl-remove-if-not 'file-exists-p (mapcar 'substitute-in-file-name shell-init-file))))
-      (if (> (length candidates) 1)
-          (find-file (completing-read "Choose shell init file:" candidates))
-        (find-file (car candidates)))))
 
   (require 'vc-dispatcher)
   (setq vc-suppress-confirm nil)
-
-  ;; helm configuration
-  (require 'helm)
-  (require 'projectile)
-  (require 'cider-eval-sexp-fu)
 
   (defun my/other-window (arg)
     "Select ARGth window or switch buffer if there is only one window."
@@ -341,54 +317,6 @@ ARG - the amount for increasing the value."
       (other-window arg)
       (when (equal old-window (selected-window))
         (other-frame arg))))
-
-  (defun my/toggle-window-split ()
-    "Toggle window split."
-    (interactive)
-    (if (= (count-windows) 2)
-        (let* ((this-win-buffer (window-buffer))
-               (next-win-buffer (window-buffer (next-window)))
-               (this-win-edges (window-edges (selected-window)))
-               (next-win-edges (window-edges (next-window)))
-               (this-win-2nd (not (and (<= (car this-win-edges)
-                                           (car next-win-edges))
-                                       (<= (cadr this-win-edges)
-                                           (cadr next-win-edges)))))
-               (splitter
-                (if (= (car this-win-edges)
-                       (car (window-edges (next-window))))
-                    'split-window-horizontally
-                  'split-window-vertically)))
-          (delete-other-windows)
-          (let ((first-win (selected-window)))
-            (funcall splitter)
-            (if this-win-2nd (other-window 1))
-            (set-window-buffer (selected-window) this-win-buffer)
-            (set-window-buffer (next-window) next-win-buffer)
-            (select-window first-win)
-            (if this-win-2nd (other-window 1))))))
-
-  (defun my/rotate-windows ()
-    "Rotate your windows."
-    (interactive)
-    (cond ((not (> (count-windows)1))
-           (message "You can't rotate a single window!"))
-          (t
-           (let ((i 1)
-                 (numWindows (count-windows)))
-             (while  (< i numWindows)
-               (let* (
-                      (w1 (elt (window-list) i))
-                      (w2 (elt (window-list) (+ (% i numWindows) 1)))
-                      (b1 (window-buffer w1))
-                      (b2 (window-buffer w2))
-                      (s1 (window-start w1))
-                      (s2 (window-start w2)))
-                 (set-window-buffer w1  b2)
-                 (set-window-buffer w2 b1)
-                 (set-window-start w1 s2)
-                 (set-window-start w2 s1)
-                 (setq i (1+ i))))))))
 
   ;; Save point position between sessions
   (require 'saveplace)
@@ -417,7 +345,6 @@ ARG - the amount for increasing the value."
 
   (define-key magit-status-mode-map (kbd "q") 'my/magit-quit-session)
 
-
   (global-set-key (kbd "C-x C-1") 'delete-other-windows)
   (global-set-key (kbd "C-x C-2") 'split-window-below)
   (global-set-key (kbd "C-x C-3") 'split-window-right)
@@ -434,8 +361,6 @@ ARG - the amount for increasing the value."
     "Use emacs state for insert mode."
     (evil-emacs-state))
 
-  ;; clipboard
-
   ;; unset the suspend frame command
   (global-unset-key (kbd "C-z"))
   (global-unset-key (kbd "C-x C-z"))
@@ -449,49 +374,28 @@ ARG - the amount for increasing the value."
   (bind-key "<M-f8>" 'bm-previous)
   (bind-key "M-i" 'helm-swoop)
   (bind-key "M-I" 'helm-swoop-back-to-last-point)
-  (bind-key "C-c M-i" 'helm-multi-swoop)
-  (bind-key "C-x M-i" 'helm-multi-swoop-all)
   (bind-key "C-x k" 'kill-current-buffer)
-  (bind-key "<f7>" 'go-to-terminal-window)
-  (bind-key "<f11>" 'fullscreen)
   (bind-key "M-j" 'join-next-line)
-  (bind-key "C-x B" 'ibuffer)
   (bind-key "C-x C-r" 'helm-recentf)
   (bind-key "M-/" 'hippie-expand)
-  (bind-key "C-l" 'other-window)
   (bind-key "C-M-u" 'er/expand-region)
   (bind-key "C->" 'mc/mark-next-like-this)
   (bind-key "C-<" 'mc/mark-previous-like-this)
   (bind-key "C-c C-<" 'mc/mark-all-like-this)
-  (bind-key "C-M-s" 'helm-swoop)
   (bind-key "C-h" 'backward-delete-char)
   (bind-key "C-M-h" 'backward-kill-word)
   (bind-key "C-M-y" 'helm-show-kill-ring)
   (bind-key "C-S-l" 'helm-projectile-ack)
   (bind-key "C-S-c" 'comment-region)
-  (bind-key "C-v" 'ace-window)
-  (bind-key "C-c 9" 'buffer-menu)
-  (bind-key "C-x p" 'previous-buffer)
-  (bind-key "C-x n" 'next-buffer)
   (bind-key "C-M-u" 'er/expand-region)
-  (bind-key "C-x 9" 'helm-locate)
   (bind-key "C-<backspace>" 'subword-backward-kill)
-  (bind-key "C-x v" 'eval-buffer)
   (bind-key "C-c C-c" 'eval-defun)
   (bind-key "C-c h" 'helm-google-suggest)
-  (bind-key "C-x m" 'helm-M-x)
-  (bind-key "C-x b" 'helm-buffers-list)
   (bind-key "C-x C-j" 'my/projectile-find-implementation)
   (bind-key "C->" 'mc/mark-next-like-this)
   (bind-key "C-<" 'mc/mark-previous-like-this)
-  (bind-key "M-<left>" 'back-button-global-backward)
-  (bind-key "M-<right>" 'back-button-global-forward)
-  (bind-key "C-c 1" 'switch-window)
   (bind-key "<f6>" 'god-mode)
   (bind-key "<f7>" 'sr-speedbar-toggle)
-  (bind-key "C-x d" 'dired)
-  (bind-key "C-v" 'change-inner)
-  (bind-key "M-v" 'copy-inner)
   (bind-key "<f8>" 'emms)
 
   (defun fg-emms-track-description (track)
@@ -545,17 +449,10 @@ the current buffer."
 
   (bind-key "C-x 2" 'my/vsplit-last-buffer)
   (bind-key "C-x 3" 'my/hsplit-last-buffer)
-  (bind-key "C-c w w" 'w3m)
   (bind-key "C-c M-p" 'my/projectile-open-pom)
-
-  (require 'ivy)
-  (bind-key "C-c C-SPC" 'ivy-goto-word)
 
   (require 'nxml-mode)
   (bind-key "C-c M-e" 'my/mvn-dependency-version-to-properties nxml-mode-map)
-
-  (require 'dired-x)
-
 
   (require 'auto-complete-nxml)
   ;; Keystroke to popup help about something at point.
@@ -570,12 +467,7 @@ the current buffer."
   (add-hook 'python-mode-hook #'elpy-enable)
   (add-hook 'python-mode-hook #'eldoc-mode)
 
-
-  (require 'evil)
-  (setq evil-default-state 'normal)
   (setq magit-save-repository-buffers 'dontask)
-
-
 
   (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
   (require 'mu4e)
@@ -588,7 +480,6 @@ the current buffer."
      (format "maildir:\"%s\"" "/INBOX")))
 
   (bind-key "C-c m" 'mu4e)
-
 
   (setq mu4e-drafts-folder "/Drafts"
         mu4e-sent-folder   "/Sent Items"
@@ -644,7 +535,6 @@ the current buffer."
     (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
     (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display))
 
-
   ;; elfeed configuration
   (require 'elfeed)
   (setq elfeed-feeds
@@ -656,9 +546,6 @@ the current buffer."
   (emms-all)
   (emms-default-players)
   (emms-mode-line -1)
-
-  (setq browse-url-browser-function 'eww-browse-url
-        browse-url-generic-program "chromium-browser")
 
   ;; jabber configuration
   (require 'jabber)
@@ -679,9 +566,6 @@ the current buffer."
            (:network-server . "jabber.pirinsoft.bg")
            (:port . 5222))))
 
-  (require 'alert)
-  (alert "Test" :severity 'high)
-
   (defun notify-jabber-notify (from buf text proposed-alert)
     "(jabber.el hook) Notify of new Jabber chat messages via notify.el."
     (when (or jabber-message-alert-same-buffer
@@ -700,7 +584,6 @@ the current buffer."
 
   (add-hook 'jabber-alert-message-hooks 'notify-jabber-notify)
   (add-hook 'jabber-alert-message-hooks 'my/jabber-alert-set-window-urgency-maybe)
-
 
   (defun my/find-symbol-at-point ()
     "Find the function, face, or variable definition for the symbol at point
