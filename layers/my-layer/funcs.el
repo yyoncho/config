@@ -129,13 +129,14 @@ PREFIX - whether to switch to the other window."
 
   (setq shift-selection-mode t)
 
-  (defun remove-dos-eol ()
+  (defun my/remove-dos-eol ()
     "Do not show ^M in files containing mixed UNIX and DOS line endings."
     (interactive)
     (setq buffer-display-table (make-display-table))
     (aset buffer-display-table ?\^M []))
 
   ;; auto complete settings
+  (require 'auto-complete)
   (define-key ac-complete-mode-map "\C-n" 'ac-next)
   (define-key ac-complete-mode-map "\C-p" 'ac-previous)
 
@@ -148,7 +149,7 @@ PREFIX - whether to switch to the other window."
 
   (require 'browse-url)
   (setq browse-url-browser-function 'browse-url-generic
-        browse-url-generic-program "chromium-browser")
+        browse-url-generic-program "eww")
 
   (set-face-attribute 'default nil :height 130)
 
@@ -196,6 +197,7 @@ PREFIX - whether to switch to the other window."
   (define-key company-active-map "\C-n" 'company-select-next)
   (define-key company-active-map "\C-j" 'company-complete-selection)
 
+  (require 'cc-mode)
   (define-key java-mode-map "\M-j" 'join-next-line)
 
   (add-hook 'midje-mode-hook
