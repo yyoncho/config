@@ -173,4 +173,9 @@ values."
   (setq shr-color-visible-luminance-min 80)
 
   (smartparens-global-strict-mode t)
+  (setq custom-file "~/.remote-config/config/.custom.el")
+  (load custom-file)
+
+  (spacemacs/set-leader-keys
+    "jj" 'my/avy-goto-char-3)
   (sp-use-paredit-bindings))
