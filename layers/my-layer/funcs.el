@@ -1,6 +1,7 @@
 ;(require 'sx)
 
 (defun my/init ()
+  (interactive)
   (require 'magit)
   (setq git-commit-summary-max-length 999)
   (setq kill-do-not-save-duplicates t)
@@ -148,7 +149,7 @@ PREFIX - whether to switch to the other window."
               (local-unset-key (kbd "C-M-u"))))
 
   (require 'browse-url)
-  (setq browse-url-browser-function 'browse-url-generic
+  (setq browse-url-browser-function 'browse-url
         browse-url-generic-program "eww")
 
   (set-face-attribute 'default nil :height 130)
@@ -359,10 +360,6 @@ ARG - the amount for increasing the value."
     (interactive)
     (find-file (projectile-find-implementation-or-test (buffer-file-name))))
 
-  (defadvice evil-insert-state (around emacs-state-instead-of-insert-state activate)
-    "Use emacs state for insert mode."
-    (evil-emacs-state))
-
   ;; unset the suspend frame command
   (global-unset-key (kbd "C-z"))
   (global-unset-key (kbd "C-x C-z"))
@@ -480,8 +477,6 @@ the current buffer."
     (interactive)
     (mu4e-headers-search
      (format "maildir:\"%s\"" "/INBOX")))
-
-  (bind-key "C-c m" 'mu4e)
 
   (setq mu4e-drafts-folder "/Drafts"
         mu4e-sent-folder   "/Sent Items"
@@ -769,6 +764,7 @@ If EXTERNAL is double prefix, browse in new buffer."
   ;; persistent-scratch
 
   (persistent-scratch-setup-default)
+  (require 'cc-mode)
   (add-hook 'java-mode-hook #'meghanada-mode)
   (fset 'my/copy-worklog
         [?\C-c ?\C-x ?\C-w ?\C-y ?\C-y ?\C-p tab ?\C-n tab ?\C-n ?\C-k ?\C-k ?\C-n ?\M-f ?\M-f ?\M-f ?\M-f ?\C-f ?\M-x ?m ?y ?- backspace ?/ ?i ?n tab return])
@@ -812,4 +808,25 @@ If EXTERNAL is double prefix, browse in new buffer."
     (interactive)
     (emms-default-players)
     (emms-add-directory-tree "~/Music")
-    (emms-random)))
+    (emms-random))
+
+  (defun my/avy-goto-char-3 (char1 char2 char3 &optional arg beg end)
+    "Jump to the currently visible CHAR1 followed by CHAR2 and char3.
+The window scope is determined by `avy-all-windows' (ARG negates it)."
+    (interactive (list (read-char "char 1: " t)
+                       (read-char "char 2: " t)
+                       (read-char "char 3: " t)
+                       current-prefix-arg
+                       nil nil))
+    (when (eq char1 ?)
+      (setq char1 ?\n))
+    (when (eq char2 ?)
+      (setq char2 ?\n))
+    (when (eq char1 ?)
+      (setq char1 ?\n))
+    (avy-with avy-goto-char-2
+      (avy--generic-jump
+       (regexp-quote (string char1 char2 char3))
+       arg
+       avy-style
+       beg end))))

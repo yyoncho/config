@@ -13,6 +13,7 @@ values."
    dotspacemacs-configuration-layer-path '("~/.remote-config/config/layers/")
    dotspacemacs-configuration-layers
    '(
+     sql
      html
      typescript
      mu4e
