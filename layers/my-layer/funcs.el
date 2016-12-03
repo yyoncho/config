@@ -54,6 +54,7 @@
     '(define-key cider-mode-map (kbd "C-c M-r") 'cider-restart))
 
   (require 'meghanada)
+  (require 'cc-mode)
   (add-hook 'java-mode-hook #'java-conf)
   (add-hook 'java-mode-hook #'aggressive-indent-mode)
   (add-hook 'java-mode-hook #'yas-minor-mode)

@@ -184,3 +184,4 @@ values."
   (sp-pair "(" ")" :wrap "M-(")
   (sp-pair "{" "}" :wrap "M-{")
   (sp-pair "[" "]" :wrap "M-["))
+;;  (sp-use-paredit-bindings)
