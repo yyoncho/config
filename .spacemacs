@@ -179,3 +179,17 @@ values."
   (spacemacs/set-leader-keys
     "jj" 'my/avy-goto-char-3)
   (sp-use-paredit-bindings))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (web-mode tagedit sql-indent slim-mode scss-mode sass-mode pug-mode origami mu4e-maildirs-extension mu4e-alert ht less-css-mode helm-css-scss haml-mode emmet-mode diff-hl company-web web-completion-data zenburn-theme yapfify ws-butler window-numbering which-key web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package toc-org tide sx sr-speedbar spacemacs-theme spaceline smeargle restart-emacs rainbow-delimiters quelpa pytest pyenv-mode py-isort pip-requirements persp-mode persistent-scratch pcre2el paradox orgit org-projectile org-present org-pomodoro org-plus-contrib org-download org-bullets open-junk-file neotree mwim move-text mmm-mode midje-mode meghanada markdown-toc magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode linum-relative link-hint json-mode js2-refactor js-doc java-snippets jabber info+ indent-guide ido-vertical-mode ibuffer-projectile hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers hide-comnt help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-gitignore helm-flx helm-descbinds helm-dash helm-company helm-c-yasnippet helm-ag google-translate golden-ratio god-mode gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flyspell-correct-helm flycheck-pos-tip flycheck-clojure flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu emms elpy elisp-slime-nav elfeed-web elfeed-org elfeed-goodies easy-kill dumb-jump dired-subtree dired-explorer dired-efap dired+ define-word cython-mode crux company-tern company-statistics company-anaconda command-log-mode column-enforce-mode coffee-mode clojure-snippets clj-refactor clean-aindent-mode cider-eval-sexp-fu auto-yasnippet auto-highlight-symbol auto-dictionary auto-complete-nxml auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell ac-cider))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
