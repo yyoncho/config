@@ -17,6 +17,7 @@ values."
      html
      typescript
      mu4e
+     eww
      javascript
      python
      helm auto-completion better-defaults emacs-lisp git markdown
