@@ -178,4 +178,9 @@ values."
 
   (spacemacs/set-leader-keys
     "jj" 'my/avy-goto-char-3)
-  (sp-use-paredit-bindings))
+  (sp-use-paredit-bindings)
+  (window-numbering-mode -1)
+  (add-hook 'smartparens-mode-hook 'evil-smartparens-mode)
+  (sp-pair "(" ")" :wrap "M-(")
+  (sp-pair "{" "}" :wrap "M-{")
+  (sp-pair "[" "]" :wrap "M-["))
