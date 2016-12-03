@@ -58,11 +58,12 @@
   (add-hook 'java-mode-hook #'aggressive-indent-mode)
   (add-hook 'java-mode-hook #'yas-minor-mode)
 
+  (require 'cc-mode)
   (define-key java-mode-map (kbd "C-x C-j")
-    'projectile-find-implementation-or-test-other-window)
+    'projectile-toggle-between-implementation-and-test)
 
   (define-key clojure-mode-map (kbd "C-x C-j")
-    'projectile-find-implementation-or-test-other-window)
+    'projectile-toggle-between-implementation-and-test)
 
   (define-key java-mode-map (kbd "C-<f11>") 'meghanada-run-junit-recent)
 
@@ -390,7 +391,6 @@ ARG - the amount for increasing the value."
   (bind-key "C-<backspace>" 'subword-backward-kill)
   (bind-key "C-c C-c" 'eval-defun)
   (bind-key "C-c h" 'helm-google-suggest)
-  (bind-key "C-x C-j" 'my/projectile-find-implementation)
   (bind-key "C->" 'mc/mark-next-like-this)
   (bind-key "C-<" 'mc/mark-previous-like-this)
   (bind-key "<f6>" 'god-mode)
@@ -640,9 +640,9 @@ With a prefix ARG invokes `projectile-commander' instead of
                      (magit-status project)))
         (error "There are no known projects"))))
 
-  (bind-key "C-c 2 g" 'my/projectile-switch-project-magit)
   (bind-key "C-=" 'er/expand-region)
   (bind-key "C-c 2 d" 'my/projectile-switch-project-dired)
+  (bind-key "C-c 2 g" 'my/projectile-switch-project-magit)
 
   (setq gc-cons-threshold 20000000)
 
@@ -663,8 +663,6 @@ With a prefix ARG invokes `projectile-commander' instead of
 
   ;; truncate-lines enabled by default
   (set-default 'truncate-lines t)
-
-
 
   (global-set-key [remap kbd-end-or-call-macro] 'my/kmacro-end-and-call-macro)
 
@@ -790,6 +788,8 @@ If EXTERNAL is double prefix, browse in new buffer."
 
 
   (bind-key "C-x C-j" 'my/projectile-find-implementation)
+  (bind-key "C-j" 'newline-and-indent)
+  (cljr-add-keybindings-with-prefix "C-c m")
   (jabber-mode-line-mode t)
   (helm-flx-mode t)
   (setq evil-move-beyond-eol t)
@@ -809,7 +809,9 @@ If EXTERNAL is double prefix, browse in new buffer."
     (emms-default-players)
     (emms-add-directory-tree "~/Music")
     (emms-random))
+  (setq-default evil-cross-lines t)
 
+  (require 'avy)
   (defun my/avy-goto-char-3 (char1 char2 char3 &optional arg beg end)
     "Jump to the currently visible CHAR1 followed by CHAR2 and char3.
 The window scope is determined by `avy-all-windows' (ARG negates it)."

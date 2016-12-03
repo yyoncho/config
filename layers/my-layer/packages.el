@@ -20,6 +20,7 @@
     persistent-scratch
     sr-speedbar
     sx
+    evil-smartparens
     zenburn-theme))
 
 (defun my-layer/init-sx ()
