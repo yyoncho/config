@@ -12,8 +12,7 @@ values."
    dotspacemacs-ask-for-lazy-installation t
    dotspacemacs-configuration-layer-path '("~/.remote-config/config/layers/")
    dotspacemacs-configuration-layers
-   '(
-     sql
+   '(sql
      html
      typescript
      mu4e
@@ -25,20 +24,20 @@ values."
      jabber
                                         ;no-dots command-log
      my-layer elfeed)
-
    dotspacemacs-additional-packages
-   '(java-snippets ac-cider evil
+   '(java-snippets ac-cider evil
                    sx crux elfeed jabber midje-mode flycheck-pos-tip
                    auto-complete-nxml sr-speedbar meghanada elpy dired+
+                   evil-smartparens sr-speedbar meghanada elpy dired+
                    dired-explorer dired-efap dired+ emms god-mode zenburn-theme
                    easy-kill ace-link java-snippets ac-cider evil notify sx crux
                    elfeed jabber midje-mode flycheck-pos-tip auto-complete-nxml
-                   sr-speedbar meghanada elpy dired+ dired-explorer dired-efap
-                   dired+ emms god-mode zenburn-theme easy-kill ac-cider eww
-                   flycheck-pos-tip jabber persistent-scratch crux elfeed
-                   midje-mode auto-complete-nxml sx sr-speedbar meghanada elpy
-                   diff-hl helm-dash dired+ dired-explorer dired-efap magit dired-subtree
-                   emms org-jira-mode god-mode zenburn-theme easy-kill)
+                   dired-explorer dired-efap dired+ emms god-mode zenburn-theme
+                   easy-kill ac-cider eww flycheck-pos-tip jabber
+                   persistent-scratch crux elfeed midje-mode auto-complete-nxml
+                   sx sr-speedbar meghanada elpy diff-hl helm-dash dired+
+                   dired-explorer dired-efap magit dired-subtree emms
+                   org-jira-mode god-mode zenburn-theme easy-kill)
 
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
@@ -181,8 +180,23 @@ values."
     "jj" 'my/avy-goto-char-3)
   (sp-use-paredit-bindings)
   (window-numbering-mode -1)
+  (setq evil-cross-lines t)
   (add-hook 'smartparens-mode-hook 'evil-smartparens-mode)
   (sp-pair "(" ")" :wrap "M-(")
   (sp-pair "{" "}" :wrap "M-{")
   (sp-pair "[" "]" :wrap "M-["))
-;;  (sp-use-paredit-bindings)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(eww-search-prefix "https://www.google.com/search?q=")
+ '(package-selected-packages
+   (quote
+    (evil-smartparens zenburn-theme yapfify ws-butler window-numbering which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package toc-org tide tagedit sx sr-speedbar sql-indent spacemacs-theme spaceline smeargle slim-mode scss-mode sass-mode restart-emacs rainbow-delimiters quelpa pytest pyenv-mode py-isort pug-mode pip-requirements persp-mode persistent-scratch pcre2el paradox origami orgit org-projectile org-present org-pomodoro org-plus-contrib org-download org-bullets open-junk-file neotree mwim mu4e-maildirs-extension mu4e-alert move-text mmm-mode midje-mode meghanada markdown-toc magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc java-snippets jabber info+ indent-guide ido-vertical-mode ibuffer-projectile hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers hide-comnt help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-gitignore helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-ag google-translate golden-ratio god-mode gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flyspell-correct-helm flycheck-pos-tip flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu emms emmet-mode elpy elisp-slime-nav elfeed-web elfeed-org elfeed-goodies easy-kill dumb-jump dired-subtree dired-explorer dired-efap dired+ diff-hl define-word cython-mode crux company-web company-tern company-statistics company-anaconda column-enforce-mode coffee-mode clojure-snippets clj-refactor clean-aindent-mode cider-eval-sexp-fu auto-yasnippet auto-highlight-symbol auto-dictionary auto-complete-nxml auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell ac-cider))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
