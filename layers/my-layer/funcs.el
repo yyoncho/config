@@ -150,8 +150,8 @@ PREFIX - whether to switch to the other window."
               (local-unset-key (kbd "C-M-u"))))
 
   (require 'browse-url)
-  (setq browse-url-browser-function 'browse-url
-        browse-url-generic-program "eww")
+  (setq browse-url-browser-function 'eww-browse-url
+        browse-url-generic-program "conkeror")
 
   (set-face-attribute 'default nil :height 130)
 
@@ -463,75 +463,79 @@ the current buffer."
   (setq sr-speedbar-right-side nil)
 
   ;; python configuration
-
   (add-hook 'python-mode-hook #'elpy-enable)
   (add-hook 'python-mode-hook #'eldoc-mode)
 
   (setq magit-save-repository-buffers 'dontask)
 
-  (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
-  (require 'mu4e)
-  (require 'mu4e-speedbar)
+  (when (file-exists-p "/usr/local/share/emacs/site-lisp/mu4e")
+    (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
+    (require 'mu4e)
+    (require 'mu4e-speedbar)
 
-  (defun my/mu4e-go-to-inbox ()
-    "Go to inbox."
-    (interactive)
-    (mu4e-headers-search
-     (format "maildir:\"%s\"" "/INBOX")))
+    (defun my/mu4e-go-to-inbox ()
+      "Go to inbox."
+      (interactive)
+      (mu4e-headers-search
+       (format "maildir:\"%s\"" "/INBOX")))
 
-  (setq mu4e-drafts-folder "/Drafts"
-        mu4e-sent-folder   "/Sent Items"
-        mu4e-trash-folder  "/Trash"
-        mu4e-msg2pdf "/usr/bin/msg2pdf"
-        mu4e-update-interval 200)
+    (setq mu4e-drafts-folder "/Drafts"
+          mu4e-sent-folder   "/Sent Items"
+          mu4e-trash-folder  "/Trash"
+          mu4e-msg2pdf "/usr/bin/msg2pdf"
+          mu4e-update-interval 200)
 
-  ;; don't save message to Sent Messages, Gmail/IMAP takes care of this
-  (setq mu4e-sent-messages-behavior 'sent)
+    ;; don't save message to Sent Messages, Gmail/IMAP takes care of this
+    (setq mu4e-sent-messages-behavior 'sent)
 
-  (setq mu4e-maildir-shortcuts
-        '(("/INBOX" . ?j)
-          ("/Drafts" . ?d)
-          ("/Trash" . ?t)
-          ("/Sent Items" . ?s)
-          ("/bamboo" . ?b)))
+    (setq mu4e-maildir-shortcuts
+          '(("/INBOX" . ?j)
+            ("/Drafts" . ?d)
+            ("/Trash" . ?t)
+            ("/Sent Items" . ?s)
+            ("/bamboo" . ?b)))
 
-  ;; allow for updating mail using 'U' in the main view:
-  (setq mu4e-get-mail-command "offlineimap")
+    ;; allow for updating mail using 'U' in the main view:
+    (setq mu4e-get-mail-command "offlineimap")
 
-  ;; something about ourselves
-  (setq
-   user-mail-address "ivan.yonchovski@tick42.com"
-   user-full-name  "Ivan Yonchovski"
-   mu4e-compose-signature nil)
+    ;; something about ourselves
+    (setq
+     user-mail-address "ivan.yonchovski@tick42.com"
+     user-full-name  "Ivan Yonchovski"
+     mu4e-compose-signature nil)
 
-  (require 'smtpmail)
-  (setq message-send-mail-function 'smtpmail-send-it
-        starttls-use-gnutls t
-        smtpmail-starttls-credentials '(("smtp.office365.com" 587 nil nil))
-        smtpmail-auth-credentials
-        '(("smtp.office365.com" 587 "ivan.yonchovski@tick42.com" nil))
-        smtpmail-default-smtp-server "smtp.gmail.com"
-        smtpmail-smtp-server "smtp.office365.com"
-        smtpmail-smtp-service 587)
+    (require 'smtpmail)
+    (setq message-send-mail-function 'smtpmail-send-it
+          starttls-use-gnutls t
+          smtpmail-starttls-credentials '(("smtp.office365.com" 587 nil nil))
+          smtpmail-auth-credentials
+          '(("smtp.office365.com" 587 "ivan.yonchovski@tick42.com" nil))
+          smtpmail-default-smtp-server "smtp.gmail.com"
+          smtpmail-smtp-server "smtp.office365.com"
+          smtpmail-smtp-service 587)
 
-  (setq message-kill-buffer-on-exit t)
+    (setq message-kill-buffer-on-exit t)
 
-  (use-package mu4e-alert
-    :ensure t
-    :config
-    (mu4e-alert-enable-notifications)
-    (mu4e-alert-set-default-style 'libnotify)
-    (setq mu4e-alert-interesting-mail-query
-          (concat "maildir:/INBOX and flag:unread"))
+    (use-package mu4e-alert
+      :ensure t
+      :config
+      (mu4e-alert-enable-notifications)
+      (mu4e-alert-set-default-style 'libnotify)
+      (setq mu4e-alert-interesting-mail-query
+            (concat "maildir:/INBOX and flag:unread"))
 
-    (alert-add-rule
-     :category "mu4e-alert"
-     :predicate (lambda (_) (string-match-p "^mu4e-" (symbol-name major-mode)))
-     :continue )
+      (alert-add-rule
+       :category "mu4e-alert"
+       :predicate (lambda (_) (string-match-p "^mu4e-" (symbol-name major-mode)))
+       :continue )
 
-    ;; display stuff on modeline as well as notify
-    (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
-    (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display))
+      ;; display stuff on modeline as well as notify
+      (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
+      (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
+      (require 'mu4e-alert)
+      (defun my/jabber-alert-set-window-urgency-maybe (from buf text proposed-alert)
+        "Jabber alert - make the window blinking."
+        (mu4e-alert-set-window-urgency-maybe))))
 
   ;; elfeed configuration
   (require 'elfeed)
@@ -574,11 +578,6 @@ the current buffer."
                    (format "%s: %s" (jabber-jid-resource from) text)))
       (notify (format "%s" (jabber-jid-displayname from))
               text)))
-
-  (require 'mu4e-alert)
-  (defun my/jabber-alert-set-window-urgency-maybe (from buf text proposed-alert)
-    "Jabber alert - make the window blinking."
-    (mu4e-alert-set-window-urgency-maybe))
 
   (add-hook 'jabber-alert-message-hooks 'notify-jabber-notify)
   (add-hook 'jabber-alert-message-hooks 'my/jabber-alert-set-window-urgency-maybe)
