@@ -779,6 +779,8 @@ If EXTERNAL is double prefix, browse in new buffer."
       ("ivan.yonchovski@tick42.com" . "https://pod51036.outlook.com/ews/Exchange.asmx")))
    '(global-auto-highlight-symbol-mode t)
    '(global-command-log-mode t)
+   '(evil-cross-lines t)
+   '(evil-move-beyond-eol t)
    '(projectile-globally-ignored-files
      (quote ("TAGS" ".lein-repl-history")))
    '(projectile-globally-ignored-directories
@@ -786,18 +788,11 @@ If EXTERNAL is double prefix, browse in new buffer."
 
   (define-key calendar-mode-map (kbd  "<f2>") #'exco-calendar-show-day)
 
-
   (bind-key "C-x C-j" 'my/projectile-find-implementation)
   (bind-key "C-j" 'newline-and-indent)
   (cljr-add-keybindings-with-prefix "C-c m")
   (jabber-mode-line-mode t)
   (helm-flx-mode t)
-  (setq evil-move-beyond-eol t)
-
-  (defun my/projectile-find-implementation ()
-    "Open matching implementation or test file in other window."
-    (interactive)
-    (find-file (projectile-find-implementation-or-test (buffer-file-name))))
 
   (load "soap-client.el")
 
@@ -809,10 +804,10 @@ If EXTERNAL is double prefix, browse in new buffer."
     (emms-default-players)
     (emms-add-directory-tree "~/Music")
     (emms-random))
-  (setq-default evil-cross-lines t)
 
   (require 'avy)
-  (defun my/avy-goto-char-3 (char1 char2 char3 &optional arg beg end)
+
+  (defun my/goto-char-3 (char1 char2 char3 &optional arg beg end)
     "Jump to the currently visible CHAR1 followed by CHAR2 and char3.
 The window scope is determined by `avy-all-windows' (ARG negates it)."
     (interactive (list (read-char "char 1: " t)
