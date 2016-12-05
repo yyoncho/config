@@ -37,7 +37,7 @@ values."
                    persistent-scratch crux elfeed midje-mode auto-complete-nxml
                    sx sr-speedbar meghanada elpy diff-hl helm-dash dired+
                    dired-explorer dired-efap magit dired-subtree emms
-                   org-jira-mode god-mode zenburn-theme easy-kill)
+                   org-jira god-mode zenburn-theme easy-kill)
 
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
