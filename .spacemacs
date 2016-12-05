@@ -12,8 +12,7 @@ values."
    dotspacemacs-ask-for-lazy-installation t
    dotspacemacs-configuration-layer-path '("~/.remote-config/config/layers/")
    dotspacemacs-configuration-layers
-   '(
-     sql
+   '(sql
      html
      typescript
      mu4e
@@ -25,20 +24,20 @@ values."
      jabber
                                         ;no-dots command-log
      my-layer elfeed)
-
    dotspacemacs-additional-packages
-   '(java-snippets ac-cider evil
+   '(java-snippets ac-cider evil
                    sx crux elfeed jabber midje-mode flycheck-pos-tip
                    auto-complete-nxml sr-speedbar meghanada elpy dired+
+                   evil-smartparens sr-speedbar meghanada elpy dired+
                    dired-explorer dired-efap dired+ emms god-mode zenburn-theme
                    easy-kill ace-link java-snippets ac-cider evil notify sx crux
                    elfeed jabber midje-mode flycheck-pos-tip auto-complete-nxml
-                   sr-speedbar meghanada elpy dired+ dired-explorer dired-efap
-                   dired+ emms god-mode zenburn-theme easy-kill ac-cider eww
-                   flycheck-pos-tip jabber persistent-scratch crux elfeed
-                   midje-mode auto-complete-nxml sx sr-speedbar meghanada elpy
-                   diff-hl helm-dash dired+ dired-explorer dired-efap magit dired-subtree
-                   emms org-jira-mode god-mode zenburn-theme easy-kill)
+                   dired-explorer dired-efap dired+ emms god-mode zenburn-theme
+                   easy-kill ac-cider eww flycheck-pos-tip jabber
+                   persistent-scratch crux elfeed midje-mode auto-complete-nxml
+                   sx sr-speedbar meghanada elpy diff-hl helm-dash dired+
+                   dired-explorer dired-efap magit dired-subtree emms
+                   org-jira-mode god-mode zenburn-theme easy-kill)
 
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
@@ -181,6 +180,7 @@ values."
     "jj" 'my/avy-goto-char-3)
   (sp-use-paredit-bindings)
   (window-numbering-mode -1)
+  (setq evil-cross-lines t)
   (require 'evil-smartparens)
   (add-hook 'smartparens-mode-hook 'evil-smartparens-mode)
   (sp-pair "(" ")" :wrap "M-(")
