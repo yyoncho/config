@@ -185,4 +185,5 @@ values."
   (add-hook 'smartparens-mode-hook 'evil-smartparens-mode)
   (sp-pair "(" ")" :wrap "M-(")
   (sp-pair "{" "}" :wrap "M-{")
-  (sp-pair "[" "]" :wrap "M-["))
+  (sp-pair "[" "]" :wrap "M-[")
+  (my/init))

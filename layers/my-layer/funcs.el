@@ -473,36 +473,27 @@ the current buffer."
     (require 'mu4e)
     (require 'mu4e-speedbar)
 
-    (defun my/mu4e-go-to-inbox ()
-      "Go to inbox."
-      (interactive)
-      (mu4e-headers-search
-       (format "maildir:\"%s\"" "/INBOX")))
-
-    (setq mu4e-drafts-folder "/Drafts"
-          mu4e-sent-folder   "/Sent Items"
-          mu4e-trash-folder  "/Trash"
-          mu4e-msg2pdf "/usr/bin/msg2pdf"
-          mu4e-update-interval 200)
-
-    ;; don't save message to Sent Messages, Gmail/IMAP takes care of this
-    (setq mu4e-sent-messages-behavior 'sent)
-
-    (setq mu4e-maildir-shortcuts
-          '(("/INBOX" . ?j)
-            ("/Drafts" . ?d)
-            ("/Trash" . ?t)
-            ("/Sent Items" . ?s)
-            ("/bamboo" . ?b)))
-
-    ;; allow for updating mail using 'U' in the main view:
-    (setq mu4e-get-mail-command "offlineimap")
-
-    ;; something about ourselves
     (setq
+     ;; something about ourselves
      user-mail-address "ivan.yonchovski@tick42.com"
      user-full-name  "Ivan Yonchovski"
-     mu4e-compose-signature nil)
+     mu4e-compose-signature nil
+     mu4e-get-mail-command "offlineimap"
+
+     mu4e-drafts-folder "/Drafts"
+     mu4e-sent-folder   "/Sent Items"
+     mu4e-trash-folder  "/Trash"
+     mu4e-msg2pdf "/usr/bin/msg2pdf"
+     mu4e-update-interval 200
+
+     ;; don't save message to Sent Messages, Gmail/IMAP takes care of this
+     mu4e-sent-messages-behavior 'sent
+
+     mu4e-maildir-shortcuts '(("/INBOX" . ?j)
+                              ("/Drafts" . ?d)
+                              ("/Trash" . ?t)
+                              ("/Sent Items" . ?s)
+                              ("/bamboo" . ?b)))
 
     (require 'smtpmail)
     (setq message-send-mail-function 'smtpmail-send-it
@@ -666,13 +657,14 @@ With a prefix ARG invokes `projectile-commander' instead of
 
   (global-set-key [remap kbd-end-or-call-macro] 'my/kmacro-end-and-call-macro)
 
-  (fset 'my/send-to-jpm-mail [?\M-x ?c ?o ?p ?y ?- ?f ?i ?l ?e ?- ?n
-                                    ?a ?m ?e ?- ?t ?o ?- ?c ?l ?i ?e backspace ?p return ?\M-x
-                                    ?m ?u ?r ?3 backspace backspace ?4 ?3 backspace ?e ?- ?c ?o
-                                    ?m ?p ?o ?s ?e return ?i ?v ?a ?n ?. ?y ?o ?n ?c ?h ?o ?v
-                                    ?s ?k ?i ?@ ?j ?p tab ?\C-n ?\C-y ?\C-n ?\C-n ?\C-c ?\C-a
-                                    ?\C-f backspace backspace ?\C-y return return return return
-                                    ?\C-c ?\C-c])
+  (fset 'my/send-to-jpm-mail
+        [?\M-x ?c ?o ?p ?y ?- ?f ?i ?l ?e ?- ?n
+               ?a ?m ?e ?- ?t ?o ?- ?c ?l ?i ?e backspace ?p return ?\M-x
+               ?m ?u ?r ?3 backspace backspace ?4 ?3 backspace ?e ?- ?c ?o
+               ?m ?p ?o ?s ?e return ?i ?v ?a ?n ?. ?y ?o ?n ?c ?h ?o ?v
+               ?s ?k ?i ?@ ?j ?p tab ?\C-n ?\C-y ?\C-n ?\C-n ?\C-c ?\C-a
+               ?\C-f backspace backspace ?\C-y return return return return
+               ?\C-c ?\C-c])
 
   (add-hook 'org-mode-hook #'org-bullets-mode)
 
@@ -697,7 +689,6 @@ Remove expanded subdir of deleted dir, if any."
                     (while buf-list
                       (save-excursion (kill-buffer (car buf-list)))
                       (setq buf-list (cdr buf-list)))))))
-       ;; Anything else?
        ))
 
   ;; python configuration
@@ -711,10 +702,9 @@ Remove expanded subdir of deleted dir, if any."
   (setq jedi:setup-keys t)
   (setq jedi:complete-on-dot t)
 
-;;; packages.el ends here
   (global-set-key [remap eww-follow-link] 'my/eww-follow-link)
 
-  (defun my/browse-url (url new-window)
+  (defun my/browse-url (url)
     "Browse url in the associated app.
 URL - the url to browse.
 new-window - whether to open in new window."
@@ -759,8 +749,6 @@ If EXTERNAL is double prefix, browse in new buffer."
                         "User-Agent: Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) "
                         "AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7\n"))
 
-  ;; persistent-scratch
-
   (persistent-scratch-setup-default)
   (require 'cc-mode)
   (add-hook 'java-mode-hook #'meghanada-mode)
@@ -790,6 +778,7 @@ If EXTERNAL is double prefix, browse in new buffer."
 
   (bind-key "C-x C-j" 'my/projectile-find-implementation)
   (bind-key "C-j" 'newline-and-indent)
+
   (cljr-add-keybindings-with-prefix "C-c m")
   (jabber-mode-line-mode t)
   (helm-flx-mode t)
