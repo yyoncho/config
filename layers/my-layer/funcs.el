@@ -486,21 +486,15 @@ the current buffer."
           mu4e-trash-folder  "/Trash"
           mu4e-sent-messages-behavior 'sent
           mu4e-msg2pdf "/usr/bin/msg2pdf"
-    (setq mu4e-maildir-shortcuts
-          '(("/INBOX" . ?j)
-            ("/Drafts" . ?d)
-            ("/Trash" . ?t)
-            ("/Sent Items" . ?s)
-            ("/bamboo" . ?b)))
-
-    ;; allow for updating mail using 'U' in the main view:
-    (setq mu4e-get-mail-command "offlineimap")
-
-    ;; something about ourselves
-    (setq
-     user-mail-address "ivan.yonchovski@tick42.com"
-     user-full-name  "Ivan Yonchovski"
-     mu4e-compose-signature nil)
+          mu4e-maildir-shortcuts '(("/INBOX" . ?j)
+                                   ("/Drafts" . ?d)
+                                   ("/Trash" . ?t)
+                                   ("/Sent Items" . ?s)
+                                   ("/bamboo" . ?b))
+          mu4e-get-mail-command "offlineimap"
+          user-mail-address "ivan.yonchovski@tick42.com"
+          user-full-name  "Ivan Yonchovski"
+          mu4e-compose-signature nil)
 
     (require 'smtpmail)
     (setq message-send-mail-function 'smtpmail-send-it
@@ -510,9 +504,8 @@ the current buffer."
           '(("smtp.office365.com" 587 "ivan.yonchovski@tick42.com" nil))
           smtpmail-default-smtp-server "smtp.gmail.com"
           smtpmail-smtp-server "smtp.office365.com"
-          smtpmail-smtp-service 587)
-
-    (setq message-kill-buffer-on-exit t)
+          smtpmail-smtp-service 587
+          message-kill-buffer-on-exit t)
 
     (use-package mu4e-alert
       :ensure t
@@ -825,8 +818,8 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
     (when (eq char1 ?)
       (setq char1 ?\n))
     (avy-with avy-goto-char-2
-      (avy--generic-jump
-       (regexp-quote (string char1 char2 char3))
-       arg
-       avy-style
-       beg end))))
+              (avy--generic-jump
+               (regexp-quote (string char1 char2 char3))
+               arg
+               avy-style
+               beg end))))
