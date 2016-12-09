@@ -66,6 +66,8 @@
   (define-key clojure-mode-map (kbd "C-x C-j")
     'projectile-toggle-between-implementation-and-test)
 
+  (add-hook 'cider-mode-hook 'flycheck-clojure-setup)
+
   (define-key java-mode-map (kbd "C-<f11>") 'meghanada-run-junit-recent)
 
   (defun kill-current-buffer ()
@@ -482,12 +484,8 @@ the current buffer."
     (setq mu4e-drafts-folder "/Drafts"
           mu4e-sent-folder   "/Sent Items"
           mu4e-trash-folder  "/Trash"
+          mu4e-sent-messages-behavior 'sent
           mu4e-msg2pdf "/usr/bin/msg2pdf"
-          mu4e-update-interval 200)
-
-    ;; don't save message to Sent Messages, Gmail/IMAP takes care of this
-    (setq mu4e-sent-messages-behavior 'sent)
-
     (setq mu4e-maildir-shortcuts
           '(("/INBOX" . ?j)
             ("/Drafts" . ?d)

@@ -12,7 +12,10 @@ values."
    dotspacemacs-ask-for-lazy-installation t
    dotspacemacs-configuration-layer-path '("~/.remote-config/config/layers/")
    dotspacemacs-configuration-layers
-   '(sql
+   '(
+     sql
+     yaml
+     sql
      html
      typescript
      mu4e
@@ -22,13 +25,13 @@ values."
      helm auto-completion better-defaults emacs-lisp git markdown
      org spell-checking syntax-checking ibuffer clojure
      jabber
-                                        ;no-dots command-log
      my-layer elfeed)
    dotspacemacs-additional-packages
    '(java-snippets ac-cider evil
                    sx crux elfeed jabber midje-mode flycheck-pos-tip
                    auto-complete-nxml sr-speedbar meghanada elpy dired+
                    evil-smartparens sr-speedbar meghanada elpy dired+
+                   flycheck-clojure flycheck-pos-tip
                    dired-explorer dired-efap dired+ emms god-mode zenburn-theme
                    easy-kill ace-link java-snippets ac-cider evil notify sx crux
                    elfeed jabber midje-mode flycheck-pos-tip auto-complete-nxml
