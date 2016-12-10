@@ -13,6 +13,7 @@ values."
    dotspacemacs-configuration-layer-path '("~/.remote-config/config/layers/")
    dotspacemacs-configuration-layers
    '(
+     windows-scripts
      sql
      yaml
      sql
@@ -182,6 +183,7 @@ values."
   (spacemacs/set-leader-keys
     "jj" 'my/avy-goto-char-3)
   (sp-use-paredit-bindings)
+
   (window-numbering-mode -1)
   (setq evil-cross-lines t)
   (require 'evil-smartparens)

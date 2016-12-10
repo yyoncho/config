@@ -784,6 +784,10 @@ If EXTERNAL is double prefix, browse in new buffer."
   (jabber-mode-line-mode t)
   (helm-flx-mode t)
   (setq evil-move-beyond-eol t)
+  (define-key evil-motion-state-map (kbd "C-f") 'forward-char)
+  (define-key evil-motion-state-map (kbd "C-e") 'end-of-line)
+  (define-key evil-motion-state-map (kbd "C-b") 'backward-char)
+  (define-key evil-motion-state-map (kbd "C-d") 'delete-char)
 
   (defun my/projectile-find-implementation ()
     "Open matching implementation or test file in other window."
@@ -818,8 +822,8 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
     (when (eq char1 ?)
       (setq char1 ?\n))
     (avy-with avy-goto-char-2
-              (avy--generic-jump
-               (regexp-quote (string char1 char2 char3))
-               arg
-               avy-style
-               beg end))))
+      (avy--generic-jump
+       (regexp-quote (string char1 char2 char3))
+       arg
+       avy-style
+       beg end))))
