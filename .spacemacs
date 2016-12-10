@@ -181,13 +181,15 @@ values."
   (load custom-file)
 
   (spacemacs/set-leader-keys
-    "jj" 'my/avy-goto-char-3)
+    "jj" 'my/goto-char-3)
   (sp-use-paredit-bindings)
 
   (window-numbering-mode -1)
   (setq evil-cross-lines t)
+  (setq evil-visual-end t)
   (require 'evil-smartparens)
   (add-hook 'smartparens-mode-hook 'evil-smartparens-mode)
   (sp-pair "(" ")" :wrap "M-(")
   (sp-pair "{" "}" :wrap "M-{")
-  (sp-pair "[" "]" :wrap "M-["))
+  (sp-pair "[" "]" :wrap "M-[")
+  (my/init))
