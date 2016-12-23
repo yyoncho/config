@@ -41,7 +41,13 @@
      (current-buffer)))
 
   (add-hook 'cider-mode-hook #'auto-highlight-symbol-mode)
+  (add-hook 'cider-mode-hook #'flycheck-mode)
 
+  (eval-after-load 'flycheck
+    '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
+
+  (eval-after-load 'flycheck '(flycheck-clojure-setup))
+  (global-flycheck-mode t)
   (setq cider-test-show-report-on-success nil)
   (setq cider-prompt-save-file-on-load 'always-save)
   (setq cider-use-fringe-indicators t)
@@ -50,12 +56,15 @@
   (setq midje-comments ";;.;.")
   (setq cider-auto-mode 't)
 
+  (define-key smartparens-mode-map (kbd "C-M-u") 'er/expand-region)
   (eval-after-load 'cider-mode
     '(define-key cider-mode-map (kbd "C-c M-r") 'cider-restart))
 
+  (add-hook 'cider-mode-hook
+            (lambda () (setq next-error-function #'flycheck-next-error-function)))
+
   (require 'meghanada)
   (require 'cc-mode)
-  (add-hook 'java-mode-hook #'java-conf)
   (add-hook 'java-mode-hook #'aggressive-indent-mode)
   (add-hook 'java-mode-hook #'yas-minor-mode)
 
@@ -84,8 +93,6 @@
       (move-end-of-line nil)
       (delete-char 1)
       (delete-horizontal-space)))
-
-  (add-hook 'auto-complete-mode-hook 'set-auto-complete-as-completion-at-point-function)
 
   (setq cider-lein-command "~/.bin/lein")
   (add-hook 'cider-mode-hook 'ac-flyspell-workaround)
@@ -486,12 +493,13 @@ the current buffer."
           mu4e-trash-folder  "/Trash"
           mu4e-sent-messages-behavior 'sent
           mu4e-msg2pdf "/usr/bin/msg2pdf"
-          mu4e-maildir-shortcuts '(("/INBOX" . ?j)
+          mu4e-maildir-shortcuts '(("/INBOX" . ?i)
                                    ("/Drafts" . ?d)
                                    ("/Trash" . ?t)
                                    ("/Sent Items" . ?s)
                                    ("/bamboo" . ?b))
           mu4e-get-mail-command "offlineimap"
+          mu4e-update-interval 100
           user-mail-address "ivan.yonchovski@tick42.com"
           user-full-name  "Ivan Yonchovski"
           mu4e-compose-signature nil)
@@ -502,10 +510,12 @@ the current buffer."
           smtpmail-starttls-credentials '(("smtp.office365.com" 587 nil nil))
           smtpmail-auth-credentials
           '(("smtp.office365.com" 587 "ivan.yonchovski@tick42.com" nil))
-          smtpmail-default-smtp-server "smtp.gmail.com"
           smtpmail-smtp-server "smtp.office365.com"
           smtpmail-smtp-service 587
           message-kill-buffer-on-exit t)
+
+    (mu4e)
+    (mu4e-alert-enable-mode-line-display)
 
     (use-package mu4e-alert
       :ensure t
@@ -653,7 +663,9 @@ With a prefix ARG invokes `projectile-commander' instead of
   (setq jiralib-url "https://jira.tick42.com")
 
   ;; truncate-lines enabled by default
-  (set-default 'truncate-lines t)
+  (set-default 'truncate-lines nil)
+  (add-hook 'hack-local-variables-hook (lambda () (setq truncate-lines t)))
+  (spacemacs/toggle-auto-fill-mode-on)
 
   (global-set-key [remap kbd-end-or-call-macro] 'my/kmacro-end-and-call-macro)
 
@@ -704,44 +716,7 @@ Remove expanded subdir of deleted dir, if any."
 
   (global-set-key [remap eww-follow-link] 'my/eww-follow-link)
 
-  (defun my/browse-url (url)
-    "Browse url in the associated app.
-URL - the url to browse.
-new-window - whether to open in new window."
-    (let ((host (elt (url-generic-parse-url url) 4)))
-      (if (or (string-equal "stackoverflow.com" host)
-              (s-index-of "stackexchange.com" host))
-          (sx-open-link url)
-        (eww-follow-link))))
 
-  (defun my/eww-follow-link (&optional external mouse-event)
-    "Browse the URL under point.
-If EXTERNAL is single prefix, browse the URL using `shr-external-browser'.
-If EXTERNAL is double prefix, browse in new buffer."
-    (interactive (list current-prefix-arg last-nonmenu-event))
-    (mouse-set-point mouse-event)
-    (let ((url (get-text-property (point) 'shr-url)))
-      (cond
-       ((not url)
-        (message "No link under point"))
-       ((string-match "^mailto:" url)
-        (browse-url-mail url))
-       ((and (consp external) (<= (car external) 4))
-        (funcall shr-external-browser url))
-       ;; This is a #target url in the same page as the current one.
-       ((and (url-target (url-generic-parse-url url))
-             (eww-same-page-p url (plist-get eww-data :url)))
-        (let ((dom (plist-get eww-data :dom)))
-          (eww-save-history)
-          (eww-display-html 'utf-8 url dom nil (current-buffer))))
-       ((string-prefix-p "http://www.google.bg/url?q=" url)
-        (message "The url is url redirect.")
-        (let* ((url-stripped-1 (s-replace "http://www.google.bg/url?q=" "" url))
-               (url-stripped (s-left (s-index-of "&" url-stripped-1) url-stripped-1)))
-          (message "Stripped google url: loading %s" url-stripped)
-          (my/browse-url url-stripped external)))
-       (t
-        (my/browse-url url external)))))
   (setq sx-question-mode-display-buffer-function #'pop-to-buffer-same-window)
 
   ;; use mobile interface
@@ -749,9 +724,18 @@ If EXTERNAL is double prefix, browse in new buffer."
                         "User-Agent: Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) "
                         "AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7\n"))
 
+  (setq w3m-user-agent url-user-agent)
+  (setq w3m-use-cookies t)
+
+
   (persistent-scratch-setup-default)
   (require 'cc-mode)
-  (add-hook 'java-mode-hook #'meghanada-mode)
+  (remove-hook 'java-mode-hook #'meghanada-mode)
+  (remove-hook 'java-mode-hook #'ensime)
+  (remove-hook 'java-mode-hook #'java-conf)
+
+
+
   (fset 'my/copy-worklog
         [?\C-c ?\C-x ?\C-w ?\C-y ?\C-y ?\C-p tab ?\C-n tab ?\C-n ?\C-k ?\C-k ?\C-n ?\M-f ?\M-f ?\M-f ?\M-f ?\C-f ?\M-x ?m ?y ?- backspace ?/ ?i ?n tab return])
 
@@ -797,6 +781,62 @@ If EXTERNAL is double prefix, browse in new buffer."
 
   (require 'sx-interaction)
 
+  (defun my/browse-url (url new-window)
+    "Browse url in the associated app.
+URL - the url to browse.
+new-window - whether to open in new window."
+    (let ((host (elt (url-generic-parse-url url) 4)))
+      (if (or (string-equal "stackoverflow.com" host)
+              (s-index-of "stackexchange.com" host))
+          (sx-open-link url)
+        (eww-follow-link))))
+
+  (defun my/eww-follow-link (&optional external mouse-event)
+    "Browse the URL under point.
+If EXTERNAL is single prefix, browse the URL using `shr-external-browser'.
+If EXTERNAL is double prefix, browse in new buffer."
+    (interactive (list current-prefix-arg last-nonmenu-event))
+    (mouse-set-point mouse-event)
+    (let ((url (get-text-property (point) 'shr-url)))
+      (cond
+       ((not url)
+        (message "No link under point"))
+       ((string-match "^mailto:" url)
+        (browse-url-mail url))
+       ((and (consp external) (<= (car external) 4))
+        (funcall shr-external-browser url))
+       ;; This is a #target url in the same page as the current one.
+       ((and (url-target (url-generic-parse-url url))
+             (eww-same-page-p url (plist-get eww-data :url)))
+        (let ((dom (plist-get eww-data :dom)))
+          (eww-save-history)
+          (eww-display-html 'utf-8 url dom nil (current-buffer))))
+       ((string-prefix-p "http://www.google.bg/url?q=" url)
+        (message "The url is url redirect.")
+        (let* ((url-stripped-1 (s-replace "http://www.google.bg/url?q=" "" url))
+               (url-stripped (s-left (s-index-of "&" url-stripped-1) url-stripped-1)))
+          (message "Stripped google url: loading %s" url-stripped)
+          (my/browse-url url-stripped external)))
+       (t
+        (my/browse-url url external)))))
+
+
+
+  (setq sx-question-mode-display-buffer-function #'pop-to-buffer-same-window)
+
+  (define-key evil-normal-state-map "p" 'evil-paste-before)
+  (define-key evil-normal-state-map "P" 'evil-paste-after)
+
+  (define-key evil-outer-text-objects-map "W" 'evil-a-word)
+  (define-key evil-outer-text-objects-map "w" 'evil-a-WORD)
+  (define-key evil-motion-state-map "W" 'evil-forward-word-begin)
+  (define-key evil-motion-state-map "w" 'evil-forward-WORD-begin)
+
+  (define-key evil-inner-text-objects-map "w" 'evil-inner-word)
+  (define-key evil-inner-text-objects-map "W" 'evil-inner-WORD)
+  (define-key evil-normal-state-map "w" 'evil-forward-WORD-begin)
+  (define-key evil-normal-state-map "W" 'evil-forward-word-begin)
+
   (defun my/emms-start ()
     "Start emms."
     (interactive)
@@ -805,6 +845,7 @@ If EXTERNAL is double prefix, browse in new buffer."
     (emms-random))
 
   (require 'avy)
+  (setq large-file-warning-threshold nil)
 
   (defun my/goto-char-3 (char1 char2 char3 &optional arg beg end)
     "Jump to the currently visible CHAR1 followed by CHAR2 and char3.
