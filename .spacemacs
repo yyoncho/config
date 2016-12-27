@@ -31,11 +31,12 @@ values."
      my-layer elfeed)
    dotspacemacs-additional-packages
    '(java-snippets ac-cider evil
-                   ensime
+                   ensime w3m
                    sx crux elfeed jabber midje-mode flycheck-pos-tip
                    auto-complete-nxml sr-speedbar meghanada elpy dired+
                    evil-smartparens sr-speedbar meghanada elpy dired+
                    flycheck-clojure excorporate flycheck-pos-tip
+                   cypher-mode
                    dired-explorer dired-efap dired+ emms god-mode zenburn-theme
                    easy-kill ace-link java-snippets ac-cider evil notify sx crux
                    elfeed jabber midje-mode flycheck-pos-tip auto-complete-nxml
