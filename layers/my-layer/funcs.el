@@ -848,6 +848,7 @@ If EXTERNAL is double prefix, browse in new buffer."
   (setq large-file-warning-threshold nil)
 
   (setq w3m-user-agent "Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC_Pyramid Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.")
+  (setq c-basic-offset 2)
 
   (defun my/goto-char-3 (char1 char2 char3 &optional arg beg end)
     "Jump to the currently visible CHAR1 followed by CHAR2 and char3.
@@ -868,4 +869,22 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
        (regexp-quote (string char1 char2 char3))
        arg
        avy-style
-       beg end))))
+       beg end)))
+
+  (dolist (m '(clojure-mode
+               clojurec-mode
+               clojurescript-mode
+               clojurex-mode
+               cider-repl-mode
+               cider-clojure-interaction-mode))
+
+    (mapc (lambda (x) (spacemacs/declare-prefix-for-mode
+                       m (car x) (cdr x)))
+          cider--key-binding-prefixes)
+
+    (spacemacs/set-leader-keys-for-major-mode m
+      "(" 'clojure-convert-collection-to-list
+      "[" 'clojure-convert-collection-to-vector
+      "{" 'clojure-convert-collection-to-map)
+    )
+  )
