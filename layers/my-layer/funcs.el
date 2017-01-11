@@ -703,6 +703,7 @@ Remove expanded subdir of deleted dir, if any."
                       (setq buf-list (cdr buf-list)))))))
        ))
 
+  (setq which-key-idle-delay 2)
   ;; python configuration
   (require 'elpy)
   (setq elpy-rpc-backend "jedi")

@@ -197,6 +197,7 @@ values."
   (sp-pair "(" ")" :wrap "M-(")
   (sp-pair "{" "}" :wrap "M-{")
   (sp-pair "[" "]" :wrap "M-[")
+  (global-subword-mode t)
   (my/init))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
