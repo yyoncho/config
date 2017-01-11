@@ -827,15 +827,18 @@ If EXTERNAL is double prefix, browse in new buffer."
   (define-key evil-normal-state-map "p" 'evil-paste-before)
   (define-key evil-normal-state-map "P" 'evil-paste-after)
 
-  (define-key evil-outer-text-objects-map "W" 'evil-a-word)
-  (define-key evil-outer-text-objects-map "w" 'evil-a-WORD)
-  (define-key evil-motion-state-map "W" 'evil-forward-word-begin)
-  (define-key evil-motion-state-map "w" 'evil-forward-WORD-begin)
+  (define-key evil-outer-text-objects-map "w" 'evil-a-word)
+  (define-key evil-outer-text-objects-map "W" 'evil-a-WORD)
+  (define-key evil-motion-state-map "w" 'evil-forward-word-begin)
+  (define-key evil-motion-state-map "W" 'evil-forward-WORD-begin)
+
+  (define-key evil-motion-state-map "b" 'evil-backward-word-begin)
+  (define-key evil-motion-state-map "B" 'evil-backward-WORD-begin)
 
   (define-key evil-inner-text-objects-map "w" 'evil-inner-word)
   (define-key evil-inner-text-objects-map "W" 'evil-inner-WORD)
-  (define-key evil-normal-state-map "w" 'evil-forward-WORD-begin)
-  (define-key evil-normal-state-map "W" 'evil-forward-word-begin)
+  (define-key evil-normal-state-map "W" 'evil-forward-WORD-begin)
+  (define-key evil-normal-state-map "w" 'evil-forward-word-begin)
 
   (defun my/emms-start ()
     "Start emms."
@@ -885,6 +888,9 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
     (spacemacs/set-leader-keys-for-major-mode m
       "(" 'clojure-convert-collection-to-list
       "[" 'clojure-convert-collection-to-vector
-      "{" 'clojure-convert-collection-to-map)
+      "{" 'clojure-convert-collection-to-map
+      "ep" 'cider-pprint-eval-defun-at-point
+      ";" 'sp-comment
+      "ej" 'cider-pprint-eval-last-sexp)
     )
   )

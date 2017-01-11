@@ -13,6 +13,7 @@ values."
    dotspacemacs-configuration-layer-path '("~/.remote-config/config/layers/")
    dotspacemacs-configuration-layers
    '(
+     haskell
      csv
      windows-scripts
      sql
@@ -28,6 +29,7 @@ values."
      helm auto-completion better-defaults emacs-lisp git markdown
      org spell-checking syntax-checking ibuffer clojure
      jabber
+     command-log
      my-layer elfeed)
    dotspacemacs-additional-packages
    '(java-snippets ac-cider evil
@@ -45,8 +47,7 @@ values."
                    persistent-scratch crux elfeed midje-mode auto-complete-nxml
                    sx sr-speedbar meghanada elpy diff-hl helm-dash dired+
                    dired-explorer dired-efap magit dired-subtree emms
-                   org-jira god-mode zenburn-theme easy-kill)
-
+                   god-mode zenburn-theme easy-kill)
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -95,7 +96,7 @@ values."
    dotspacemacs-helm-resize nil
    dotspacemacs-helm-no-header nil
    dotspacemacs-helm-position 'bottom
-   dotspacemacs-helm-use-fuzzy 'always
+   dotspacemacs-helm-use-fuzzy 'source
    dotspacemacs-enable-paste-transient-state nil
    dotspacemacs-which-key-delay 0.1
    dotspacemacs-which-key-position 'bottom
