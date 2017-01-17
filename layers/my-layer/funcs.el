@@ -402,6 +402,19 @@ ARG - the amount for increasing the value."
   (bind-key "C-<" 'mc/mark-previous-like-this)
   (bind-key "<f7>" 'sr-speedbar-toggle)
   (bind-key "<f8>" 'emms)
+  (spacemacs/set-leader-keys "a r" 'mu4e-alert-view-unread-mails)
+  (spacemacs/set-leader-keys "m m" (lambda ()
+                                     (interactive)
+                                     (mu4e~headers-jump-to-maildir "/Inbox")))
+
+  (defun get-buffers-matching-mode (mode)
+    "Returns a list of buffers where their major-mode is equal to MODE"
+    (let ((buffer-mode-matches '()))
+      (dolist (buf (buffer-list))
+        (with-current-buffer buf
+          (if (eq mode major-mode)
+              (add-to-list 'buffer-mode-matches buf))))
+      buffer-mode-matches))
 
   (defun fg-emms-track-description (track)
     "Return a somewhat nice track description."
