@@ -48,6 +48,7 @@
 
   (eval-after-load 'flycheck '(flycheck-clojure-setup))
   (global-flycheck-mode t)
+
   (setq cider-test-show-report-on-success nil)
   (setq cider-prompt-save-file-on-load 'always-save)
   (setq cider-use-fringe-indicators t)
@@ -133,12 +134,6 @@ PREFIX - whether to switch to the other window."
   (define-key term-mode-map (kbd "C-'") 'term-char-mode)
   (define-key term-raw-map  (kbd "C-y") 'term-paste)
 
-  (require 'god-mode)
-  (define-key god-local-mode-map (kbd ".") 'repeat)
-  (require 'god-mode-isearch)
-  (define-key isearch-mode-map (kbd "<escape>") 'god-mode-isearch-activate)
-  (define-key god-mode-isearch-map (kbd "<escape>") 'god-mode-isearch-disable)
-
   (setq shift-selection-mode t)
 
   (defun my/remove-dos-eol ()
@@ -156,7 +151,7 @@ PREFIX - whether to switch to the other window."
 
   (add-hook 'nxml-mode-hook
             (lambda()
-              (web-mode t)
+              (web-mode)
               (local-unset-key (kbd "C-M-u"))))
 
   (require 'browse-url)
@@ -403,6 +398,8 @@ ARG - the amount for increasing the value."
   (bind-key "<f7>" 'sr-speedbar-toggle)
   (bind-key "<f8>" 'emms)
   (spacemacs/set-leader-keys "a r" 'mu4e-alert-view-unread-mails)
+  (spacemacs/set-leader-keys "a j" 'jabber-chat-with)
+  (spacemacs/set-leader-keys "a i" 'mu4e-alert-view-unread-mails)
   (spacemacs/set-leader-keys "m m" (lambda ()
                                      (interactive)
                                      (mu4e~headers-jump-to-maildir "/Inbox")))
@@ -437,6 +434,19 @@ ARG - the amount for increasing the value."
 
   (require 'emms)
   (setq emms-track-description-function 'fg-emms-track-description)
+
+
+  (defun my/helm-projectile-switch-to-buffer
+      (&optional arg)
+    "Use projectile with Helm for finding files in project\n\nWith a prefix ARG invalidates the cache first."
+    (interactive "P")
+    (let
+        ((helm-ff-transformer-show-only-basename nil)
+         (helm-boring-file-regexp-list nil))
+      (helm :sources 'helm-source-projectile-buffers-list
+            :buffer "test"
+            :prompt "Switch to buffer: ")))
+
 
   (require 'crux)
 
@@ -712,7 +722,7 @@ Remove expanded subdir of deleted dir, if any."
                       (setq buf-list (cdr buf-list)))))))
        ))
 
-  (setq which-key-idle-delay 2)
+  (setq which-key-idle-delay 1)
   ;; python configuration
   (require 'elpy)
   (setq elpy-rpc-backend "jedi")
@@ -776,6 +786,7 @@ Remove expanded subdir of deleted dir, if any."
   (cljr-add-keybindings-with-prefix "C-c m")
   (jabber-mode-line-mode t)
   (helm-flx-mode t)
+  (global-subword-mode t)
   (setq evil-move-beyond-eol t)
   (define-key evil-motion-state-map (kbd "C-f") 'forward-char)
   (define-key evil-motion-state-map (kbd "C-e") 'end-of-line)
