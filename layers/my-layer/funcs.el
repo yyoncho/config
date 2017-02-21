@@ -66,8 +66,25 @@
 
   (require 'meghanada)
   (require 'cc-mode)
+  (defun my/configure-java ()
+    "Configure java"
+    (interactive)
+    (c-set-offset 'arglist-cont-nonempty '++)
+    (c-set-offset 'arglist-intro '++)
+    (electric-pair-mode t)
+    (electric-layout-mode t)
+    (auto-complete-mode t)
+    (rainbow-delimiters-mode-enable)
+    (indent-guide-mode t)
+    (setq c-basic-offset 2))
+
+  (setq c-default-style
+        '((java-mode . "java")
+          (awk-mode . "awk")
+          (other . "gnu")))
   (add-hook 'java-mode-hook #'aggressive-indent-mode)
   (add-hook 'java-mode-hook #'yas-minor-mode)
+  (add-hook 'java-mode-hook #'my/configure-java)
 
   (require 'cc-mode)
   (define-key java-mode-map (kbd "C-x C-j")
@@ -164,7 +181,7 @@ PREFIX - whether to switch to the other window."
   (eval-after-load 'flycheck
     '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
 
-  (add-hook 'emacs-lisp-mode-hook       #'aggressive-indent-mode)
+  (remove-hook 'emacs-lisp-mode-hook       #'aggressive-indent-mode)
   (add-hook 'lisp-mode-hook             #'aggressive-indent-mode)
 
   (dolist (mode '(clojure-mode clojurescript-mode cider-mode))
@@ -534,7 +551,6 @@ the current buffer."
           message-kill-buffer-on-exit t)
 
     (mu4e)
-    (mu4e-alert-enable-mode-line-display)
 
     (use-package mu4e-alert
       :ensure t
@@ -750,9 +766,9 @@ Remove expanded subdir of deleted dir, if any."
 
   (persistent-scratch-setup-default)
   (require 'cc-mode)
-  (remove-hook 'java-mode-hook #'meghanada-mode)
+  (add-hook 'java-mode-hook #'meghanada-mode)
+  (add-hook 'java-mode-hook #'flycheck-mode)
   (remove-hook 'java-mode-hook #'ensime)
-  (remove-hook 'java-mode-hook #'java-conf)
 
 
 
@@ -912,6 +928,12 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
       "{" 'clojure-convert-collection-to-map
       "ep" 'cider-pprint-eval-defun-at-point
       ";" 'sp-comment
-      "ej" 'cider-pprint-eval-last-sexp)
-    )
-  )
+      "ej" 'cider-pprint-eval-last-sexp))
+
+  (require 'dash)
+
+  (defun my/set-frame-name (frame)
+    (modify-frame-parameters frame
+                             (list (cons 'name "emacs"))))
+
+  (add-to-list 'after-make-frame-functions 'my/set-frame-name))
