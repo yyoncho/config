@@ -94,7 +94,11 @@
     'projectile-toggle-between-implementation-and-test)
 
   (add-hook 'cider-mode-hook 'flycheck-clojure-setup)
+  (add-hook 'cider-mode-hook 'rainbow-delimiters-mode-enable)
+  (add-hook 'cider-mode-hook 'aggressive-indent-mode)
 
+
+  (indent-guide-global-mode t)
   (define-key java-mode-map (kbd "C-<f11>") 'meghanada-run-junit-recent)
 
   (defun kill-current-buffer ()
@@ -165,7 +169,7 @@ PREFIX - whether to switch to the other window."
   (define-key ac-complete-mode-map "\C-p" 'ac-previous)
 
   (setq sgml-basic-offset 4)
-
+                                        ;(set-face-attribute 'default nil :height 200)
   (add-hook 'nxml-mode-hook
             (lambda()
               (web-mode)
@@ -508,7 +512,6 @@ the current buffer."
   (setq sr-speedbar-right-side nil)
 
   ;; python configuration
-  (add-hook 'python-mode-hook #'elpy-enable)
   (add-hook 'python-mode-hook #'eldoc-mode)
 
   (setq magit-save-repository-buffers 'dontask)
@@ -739,19 +742,8 @@ Remove expanded subdir of deleted dir, if any."
        ))
 
   (setq which-key-idle-delay 1)
-  ;; python configuration
-  (require 'elpy)
-  (setq elpy-rpc-backend "jedi")
-  (setq elpy-rpc-python-command "python")
-  (elpy-use-ipython "ipython")
-  (autoload 'jedi:setup "jedi" nil t)
-  (add-hook 'python-mode-hook 'jedi:setup)
-  (add-hook 'pyvenv-mode-hook 'jedi:setup)
-  (setq jedi:setup-keys t)
-  (setq jedi:complete-on-dot t)
 
   (global-set-key [remap eww-follow-link] 'my/eww-follow-link)
-
 
   (setq sx-question-mode-display-buffer-function #'pop-to-buffer-same-window)
 
@@ -798,6 +790,7 @@ Remove expanded subdir of deleted dir, if any."
 
   (bind-key "C-x C-j" 'my/projectile-find-implementation)
   (bind-key "C-j" 'newline-and-indent)
+  (setq clojure-enable-fancify-symbols nil)
 
   (cljr-add-keybindings-with-prefix "C-c m")
   (jabber-mode-line-mode t)
@@ -927,6 +920,8 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
       "[" 'clojure-convert-collection-to-vector
       "{" 'clojure-convert-collection-to-map
       "ep" 'cider-pprint-eval-defun-at-point
+      "ep" 'cider-pprint-eval-last-sexp
+      "," 'cider-eval-defun-at-point
       ";" 'sp-comment
       "ej" 'cider-pprint-eval-last-sexp))
 
