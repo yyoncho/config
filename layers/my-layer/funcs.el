@@ -18,7 +18,6 @@
   ;; dired configuration
   (require 'dired-x)
   (require 'dired+)
-  (require 'dired-explorer)
   (require 'dired-efap)
 
   (define-key dired-mode-map [f2] 'dired-efap)
@@ -467,9 +466,6 @@ ARG - the amount for increasing the value."
       (helm :sources 'helm-source-projectile-buffers-list
             :buffer "test"
             :prompt "Switch to buffer: ")))
-
-
-  (require 'crux)
 
   (defun my/start-or-switch-to (function buffer-name)
     "Invoke FUNCTION if there is no buffer with BUFFER-NAME.
@@ -923,7 +919,7 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
       "ep" 'cider-pprint-eval-last-sexp
       "," 'cider-eval-defun-at-point
       ";" 'sp-comment
-      "ej" 'cider-pprint-eval-last-sexp))
+      "ej" 'cider-pprint-eval-defun-at-point))
 
   (require 'dash)
 
