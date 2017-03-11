@@ -40,7 +40,6 @@ values."
      syntax-checking
      ibuffer
      clojure
-     themes-megapack
      command-log
      my-layer
      elfeed)
