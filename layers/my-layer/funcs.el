@@ -107,14 +107,6 @@
 
   (setq make-backup-files nil)
 
-  (defun join-next-line ()
-    "Joins the next line into the current one."
-    (interactive)
-    (save-excursion
-      (move-end-of-line nil)
-      (delete-char 1)
-      (delete-horizontal-space)))
-
   (setq cider-lein-command "~/.bin/lein")
   (add-hook 'cider-mode-hook 'ac-flyspell-workaround)
   (add-hook 'cider-mode-hook 'ac-cider-setup)
@@ -184,7 +176,7 @@ PREFIX - whether to switch to the other window."
   (eval-after-load 'flycheck
     '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
 
-  (remove-hook 'emacs-lisp-mode-hook       #'aggressive-indent-mode)
+  (add-hook 'emacs-lisp-mode-hook       #'aggressive-indent-mode)
   (add-hook 'lisp-mode-hook             #'aggressive-indent-mode)
 
   (dolist (mode '(clojure-mode clojurescript-mode cider-mode))
@@ -398,7 +390,7 @@ ARG - the amount for increasing the value."
   (bind-key "<f8>"   'bm-next)
   (bind-key "<M-f8>" 'bm-previous)
   (bind-key "C-x k" 'kill-current-buffer)
-  (bind-key "M-j" 'join-next-line)
+  (bind-key "M-j" 'evil-join)
   (bind-key "M-/" 'hippie-expand)
   (bind-key "C-M-u" 'er/expand-region)
   (bind-key "C->" 'mc/mark-next-like-this)
@@ -879,5 +871,8 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
   (defun my/set-frame-name (frame)
     (modify-frame-parameters frame
                              (list (cons 'name "emacs"))))
+  (spacemacs/toggle-evil-cleverparens-on)
+  (add-hook 'clojure-mode-hook #'evil-cleverparens-mode)
+  (add-hook 'emacs-lisp-mode-hook #'evil-cleverparens-mode)
 
   (add-to-list 'after-make-frame-functions 'my/set-frame-name))

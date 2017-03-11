@@ -12,8 +12,8 @@ values."
    dotspacemacs-ask-for-lazy-installation t
    dotspacemacs-configuration-layer-path '("~/.remote-config/config/layers/")
    dotspacemacs-configuration-layers
-   '(
-     lua
+   '(lua
+     evil-cleverparens
      haskell
      csv
      windows-scripts
@@ -45,17 +45,34 @@ values."
      my-layer
      elfeed)
    dotspacemacs-additional-packages
-   '(java-snippets ac-cider
-                   ensime w3m jedi
-                   auto-complete-nxml sr-speedbar meghanada
-                   evil-smartparens flycheck-clojure excorporate
-                   cypher-mode org-jira
-                    dired-efap dired+
-                   easy-kill ace-link java-snippets  notify sx
-                   midje-mode flycheck-pos-tip
-                   dired+ eww
-                   persistent-scratch
-                   diff-hl helm-dash dired-subtree emms)
+   '(java-snippets
+     ac-cider
+     ensime
+     w3m
+     auto-complete-nxml
+     sr-speedbar
+     meghanada
+     evil-smartparens
+     flycheck-clojure
+     excorporate
+     cypher-mode
+     org-jira
+     dired-efap
+     dired+
+     easy-kill
+     ace-link
+     java-snippets
+     notify
+     sx
+     midje-mode
+     flycheck-pos-tip
+     dired+
+     eww
+     persistent-scratch
+     diff-hl
+     helm-dash
+     dired-subtree
+     emms)
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -108,13 +125,10 @@ values."
    dotspacemacs-enable-paste-transient-state nil
    dotspacemacs-which-key-delay 0.1
    dotspacemacs-which-key-position 'bottom
-   ;; If non nil a progress bar is displayed when spacemacs is loading. This
-   ;; may increase the boot time on some systems and emacs builds, set it to
-   ;; nil to boost the loading time. (default t)
    dotspacemacs-loading-progress-bar t
    ;; If non nil the frame is fullscreen when Emacs starts up. (default nil)
    ;; (Emacs 24.4+ only)
-   dotspacemacs-fullscreen-at-startup nil
+   dotspacemacs-fullscreen-at-startup t
    ;; If non nil `spacemacs/toggle-fullscreen' will not use native fullscreen.
    ;; Use to disable fullscreen animations in OSX. (default nil)
    dotspacemacs-fullscreen-use-non-native nil
@@ -125,11 +139,11 @@ values."
    ;; A value from the range (0..100), in increasing opacity, which describes
    ;; the transparency level of a frame when it's active or selected.
    ;; Transparency can be toggled through `toggle-transparency'. (default 90)
-   dotspacemacs-active-transparency 90
+   dotspacemacs-active-transparency 100
    ;; A value from the range (0..100), in increasing opacity, which describes
    ;; the transparency level of a frame when it's inactive or deselected.
    ;; Transparency can be toggled through `toggle-transparency'. (default 90)
-   dotspacemacs-inactive-transparency 90
+   dotspacemacs-inactive-transparency 100
    ;; If non nil show the titles of transient states. (default t)
    dotspacemacs-show-transient-state-title t
    ;; If non nil show the color guide hint for transient state keys. (default t)
@@ -150,7 +164,7 @@ values."
    dotspacemacs-smartparens-strict-mode t
    dotspacemacs-smart-closing-parenthesis 'all
    ;; emphasis the current one). (default 'all)
-   dotspacemacs-highlight-delimiters nil
+   dotspacemacs-highlight-delimiters 'current
    ;; If non nil, advise quit functions to keep server open when quitting.
    ;; (default nil)
    dotspacemacs-persistent-server nil
@@ -203,7 +217,6 @@ values."
   (setq evil-cross-lines t)
   (setq evil-visual-end t)
   (require 'evil-smartparens)
-  (add-hook 'smartparens-mode-hook 'evil-smartparens-mode)
   (sp-pair "(" ")" :wrap "M-(")
   (sp-pair "{" "}" :wrap "M-{")
   (sp-pair "[" "]" :wrap "M-[")
