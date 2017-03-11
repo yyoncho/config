@@ -418,7 +418,6 @@ ARG - the amount for increasing the value."
   (bind-key "<f7>" 'sr-speedbar-toggle)
   (bind-key "<f8>" 'emms)
   (spacemacs/set-leader-keys "a r" 'mu4e-alert-view-unread-mails)
-  (spacemacs/set-leader-keys "a j" 'jabber-chat-with)
   (spacemacs/set-leader-keys "a i" 'mu4e-alert-view-unread-mails)
   (spacemacs/set-leader-keys "m m" (lambda ()
                                      (interactive)
@@ -567,10 +566,7 @@ the current buffer."
       ;; display stuff on modeline as well as notify
       (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
       (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
-      (require 'mu4e-alert)
-      (defun my/jabber-alert-set-window-urgency-maybe (from buf text proposed-alert)
-        "Jabber alert - make the window blinking."
-        (mu4e-alert-set-window-urgency-maybe))))
+      (require 'mu4e-alert)))
 
   ;; elfeed configuration
   (require 'elfeed)
@@ -583,39 +579,6 @@ the current buffer."
   (emms-all)
   (emms-default-players)
   (emms-mode-line -1)
-
-  ;; jabber configuration
-  (require 'jabber)
-  (setq starttls-use-gnutls t
-        starttls-gnutls-program "gnutls-cli"
-        jabber-connection-type  'ssl
-        jabber-history-enabled t
-        jabber-use-global-history nil
-        jabber-backlog-number 1000
-        jabber-backlog-days 300
-        starttls-extra-arguments '("--starttls"))
-
-  (jabber-mode-line-mode t)
-
-  (setq jabber-invalid-certificate-servers '("PIRINSOFT"))
-  (setq jabber-account-list
-        '(("iyonchovski@PIRINSOFT/work"
-           (:network-server . "jabber.pirinsoft.bg")
-           (:port . 5222))))
-
-  (defun notify-jabber-notify (from buf text proposed-alert)
-    "(jabber.el hook) Notify of new Jabber chat messages via notify.el."
-    (when (or jabber-message-alert-same-buffer
-              (not (memq (selected-window) (get-buffer-window-list buf))))
-      (if (jabber-muc-sender-p from)
-          (inotify (format "(PM) %s"
-                           (jabber-jid-displayname (jabber-jid-user from)))
-                   (format "%s: %s" (jabber-jid-resource from) text)))
-      (notify (format "%s" (jabber-jid-displayname from))
-              text)))
-
-  (add-hook 'jabber-alert-message-hooks 'notify-jabber-notify)
-  (add-hook 'jabber-alert-message-hooks 'my/jabber-alert-set-window-urgency-maybe)
 
   (defun my/find-symbol-at-point ()
     "Find the function, face, or variable definition for the symbol at point
@@ -643,9 +606,6 @@ in the other window."
                         (save-excursion
                           (goto-char (posn-point (event-start click)))
                           (my/find-symbol-at-point))))))
-
-
-  (define-key global-map "\C-c\C-j" jabber-global-keymap)
 
   (defun my/projectile-switch-project-dired (&optional arg)
     "Switch to a project we have visited before.
@@ -758,16 +718,10 @@ Remove expanded subdir of deleted dir, if any."
   (add-hook 'java-mode-hook #'flycheck-mode)
   (remove-hook 'java-mode-hook #'ensime)
 
-
-
   (fset 'my/copy-worklog
         [?\C-c ?\C-x ?\C-w ?\C-y ?\C-y ?\C-p tab ?\C-n tab ?\C-n ?\C-k ?\C-k ?\C-n ?\M-f ?\M-f ?\M-f ?\M-f ?\C-f ?\M-x ?m ?y ?- backspace ?/ ?i ?n tab return])
 
   (custom-set-variables
-   '(jabber-alert-muc-hooks nil)
-   '(jabber-alert-presence-hooks nil)
-   '(jabber-mode-line-compact t)
-   '(jabber-mode-line-mode nil)
    '(mu4e-hide-index-messages t)
    '(bmkp-last-as-first-bookmark-file "~/.emacs.d/savefile/bookmarks")
    '(excorporate-configuration
@@ -789,7 +743,6 @@ Remove expanded subdir of deleted dir, if any."
   (setq clojure-enable-fancify-symbols nil)
 
   (cljr-add-keybindings-with-prefix "C-c m")
-  (jabber-mode-line-mode t)
   (helm-flx-mode t)
   (global-subword-mode t)
   (setq evil-move-beyond-eol t)
