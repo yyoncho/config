@@ -12,7 +12,9 @@ values."
    dotspacemacs-ask-for-lazy-installation t
    dotspacemacs-configuration-layer-path '("~/.remote-config/config/layers/")
    dotspacemacs-configuration-layers
-   '(lua
+   '(
+     go
+     lua
      evil-cleverparens
      haskell
      csv
@@ -47,6 +49,7 @@ values."
    '(java-snippets
      ac-cider
      ensime
+     zonokai-theme
      w3m
      auto-complete-nxml
      sr-speedbar
