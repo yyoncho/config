@@ -35,6 +35,7 @@ values."
      auto-completion
      spacemacs-layouts
      better-defaults
+     evil-commentary
      emacs-lisp
      git
      markdown
@@ -52,6 +53,7 @@ values."
      ensime
      zonokai-theme
      w3m
+     emms
      auto-complete-nxml
      sr-speedbar
      meghanada
@@ -93,7 +95,7 @@ values."
    dotspacemacs-elpa-subdirectory nil
    dotspacemacs-editing-style 'hybrid
    dotspacemacs-verbose-loading nil
-   dotspacemacs-startup-banner 'official
+   dotspacemacs-startup-banner 'nil
    dotspacemacs-startup-lists '((recents . 5)
                                 (projects . 7))
    dotspacemacs-startup-buffer-responsive t
@@ -111,7 +113,7 @@ values."
    dotspacemacs-emacs-leader-key "M-m"
    dotspacemacs-major-mode-leader-key ","
    dotspacemacs-major-mode-emacs-leader-key "C-l"
-   dotspacemacs-remap-Y-to-y$ nil
+   dotspacemacs-remap-Y-to-y$ t
    dotspacemacs-retain-visual-state-on-shift t
    dotspacemacs-visual-line-move-text nil
    dotspacemacs-ex-substitute-global nil
@@ -203,7 +205,7 @@ values."
 
   ;; contrast configuration
   (require 'shr-color)
-  (setq shr-color-visible-distance-min 60)
+  (setq shr-color-visible-distance-min 62)
   (setq shr-color-visible-luminance-min 80)
 
   (smartparens-global-strict-mode t)
@@ -215,11 +217,12 @@ values."
   (sp-use-paredit-bindings)
   (spacemacs/toggle-highlight-current-line-globally-off)
   (spacemacs/toggle-automatic-symbol-highlight-on)
-
+  (set powerline-default-separator 'alternate)
   (window-numbering-mode -1)
   (setq evil-cross-lines t)
   (setq evil-visual-end t)
   (require 'evil-smartparens)
+  (setq emmet-self-closing-tag-style "")
   (sp-pair "(" ")" :wrap "M-(")
   (sp-pair "{" "}" :wrap "M-{")
   (sp-pair "[" "]" :wrap "M-[")
