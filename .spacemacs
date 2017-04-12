@@ -13,6 +13,7 @@ values."
    dotspacemacs-configuration-layer-path '("~/.remote-config/config/layers/")
    dotspacemacs-configuration-layers
    '(
+     rust
      go
      lua
      evil-cleverparens
@@ -99,7 +100,7 @@ values."
    dotspacemacs-scratch-mode 'text-mode
    dotspacemacs-themes '(zonokai-blue)
    dotspacemacs-colorize-cursor-according-to-state t
-   dotspacemacs-default-font '("Source Code Pro"
+   dotspacemacs-default-font '("Source Code Pro Semi-bold"
                                :size 18
                                :weight normal
                                :width normal
@@ -222,7 +223,9 @@ values."
   (sp-pair "(" ")" :wrap "M-(")
   (sp-pair "{" "}" :wrap "M-{")
   (sp-pair "[" "]" :wrap "M-[")
+  (global-evil-mc-mode t)
+  (bind-key ";" 'sp-comment)
+  (spacemacs/set-leader-keys
+    "bb" 'helm-buffers-list)
   (global-subword-mode t)
   (my/init))
-(custom-set-variables
- '(eww-search-prefix "https://www.google.com/search?q="))
