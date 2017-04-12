@@ -70,7 +70,6 @@
     (interactive)
     (c-set-offset 'arglist-cont-nonempty '++)
     (c-set-offset 'arglist-intro '++)
-    (electric-pair-mode t)
     (electric-layout-mode t)
     (auto-complete-mode t)
     (rainbow-delimiters-mode-enable)
@@ -81,7 +80,7 @@
         '((java-mode . "java")
           (awk-mode . "awk")
           (other . "gnu")))
-  (add-hook 'java-mode-hook #'aggressive-indent-mode)
+  (remove-hook 'java-mode-hook #'aggressive-indent-mode)
   (add-hook 'java-mode-hook #'yas-minor-mode)
   (add-hook 'java-mode-hook #'my/configure-java)
 
@@ -89,12 +88,9 @@
   (define-key java-mode-map (kbd "C-x C-j")
     'projectile-toggle-between-implementation-and-test)
 
-  (define-key clojure-mode-map (kbd "C-x C-j")
-    'projectile-toggle-between-implementation-and-test)
-
   (add-hook 'cider-mode-hook 'flycheck-clojure-setup)
   (add-hook 'cider-mode-hook 'rainbow-delimiters-mode-enable)
-  (add-hook 'cider-mode-hook 'aggressive-indent-mode)
+  (remove-hook 'cider-mode-hook 'aggressive-indent-mode)
 
 
   (indent-guide-global-mode t)
@@ -172,14 +168,17 @@ PREFIX - whether to switch to the other window."
 
   (set-face-attribute 'default nil :height 130)
 
+  (setq split-width-threshold 1)
+
   (require 'flycheck)
   (eval-after-load 'flycheck
     '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
 
   (add-hook 'emacs-lisp-mode-hook       #'aggressive-indent-mode)
   (add-hook 'lisp-mode-hook             #'aggressive-indent-mode)
+  (display-time-mode t)
 
-  (dolist (mode '(clojure-mode clojurescript-mode cider-mode))
+  (dolist (mode '(clojure-mode clojurescript-mode cider-mode clojurec-mode))
     (eval-after-load mode
       (font-lock-add-keywords
        mode '(("(\\(defn\\)[\[[:space:]]" ; anon funcs 1
@@ -193,6 +192,10 @@ PREFIX - whether to switch to the other window."
               ("(\\(fn\\)[\[[:space:]]"  ; anon funcs 1
                (0 (progn (compose-region (match-beginning 1)
                                          (match-end 1) "λ")
+                         nil)))
+              ("(\\(not=\\)[\[[:space:]]"  ; anon funcs 1
+               (0 (progn (compose-region (match-beginning 1)
+                                         (match-end 1) "≠")
                          nil)))
               ("(\\(def\\)[\[[:space:]]"  ; anon funcs 1
                (0 (progn (compose-region (match-beginning 1)
@@ -222,7 +225,7 @@ PREFIX - whether to switch to the other window."
   (add-hook 'midje-mode-hook
             (lambda ()
               (define-key midje-mode-map (kbd "C-c b") nil)))
-
+  (setq clojure-enable-fancify-symbols nil)
   ;; always follow symlinks
   (setq vc-follow-symlinks t)
 
@@ -710,6 +713,8 @@ Remove expanded subdir of deleted dir, if any."
   (require 'cc-mode)
   (add-hook 'java-mode-hook #'meghanada-mode)
   (add-hook 'java-mode-hook #'flycheck-mode)
+  (add-hook 'emms-playlist-mode-hook #'evil-evilified-state)
+
   (remove-hook 'java-mode-hook #'ensime)
 
   (fset 'my/copy-worklog
@@ -818,7 +823,8 @@ If EXTERNAL is double prefix, browse in new buffer."
     (interactive)
     (emms-default-players)
     (emms-add-directory-tree "~/Music")
-    (emms-random))
+    (emms-toggle-random-playlist)
+    (evil-evilified-state))
 
   (require 'avy)
   (setq large-file-warning-threshold nil)
@@ -868,7 +874,7 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
       ";" 'sp-comment
       "ej" 'cider-pprint-eval-defun-at-point))
 
-  (require 'dash)
+  (add-hook 'eww-mode-hook #'evil-evilified-state)
 
   (defun my/set-frame-name (frame)
     (modify-frame-parameters frame
