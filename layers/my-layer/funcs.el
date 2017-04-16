@@ -324,13 +324,6 @@ ARG - the amount for increasing the value."
 
   (require 'projectile)
 
-  (defun my/projectile-open-pom ()
-    "Open's pom file from the project."
-    (interactive)
-    (find-file (concat (projectile-project-root) "pom.xml")))
-
-
-
   (require 'vc-dispatcher)
   (setq vc-suppress-confirm nil)
 
@@ -369,11 +362,6 @@ ARG - the amount for increasing the value."
 
   (define-key magit-status-mode-map (kbd "q") 'my/magit-quit-session)
 
-  (global-set-key (kbd "C-x C-1") 'delete-other-windows)
-  (global-set-key (kbd "C-x C-2") 'split-window-below)
-  (global-set-key (kbd "C-x C-3") 'split-window-right)
-  (global-set-key (kbd "C-x C-0") 'delete-window)
-
   ;; redefine emacs state to intercept the escape key like insert-state does:
 
   (defun my/projectile-find-implementation ()
@@ -389,9 +377,6 @@ ARG - the amount for increasing the value."
   (bind-key "C-c C-<" 'mc/mark-all-like-this)
   (bind-key "M-p" 'move-text-up)
   (bind-key "M-n" 'move-text-down)
-  (bind-key "<C-f8>" 'bm-toggle)
-  (bind-key "<f8>"   'bm-next)
-  (bind-key "<M-f8>" 'bm-previous)
   (bind-key "C-x k" 'kill-current-buffer)
   (bind-key "M-j" 'evil-join)
   (bind-key "M-/" 'hippie-expand)
@@ -861,7 +846,7 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
                cider-clojure-interaction-mode))
 
     (mapc (lambda (x) (spacemacs/declare-prefix-for-mode
-                       m (car x) (cdr x)))
+                        m (car x) (cdr x)))
           cider--key-binding-prefixes)
 
     (spacemacs/set-leader-keys-for-major-mode m
