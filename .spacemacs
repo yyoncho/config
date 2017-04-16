@@ -13,71 +13,69 @@ values."
    dotspacemacs-configuration-layer-path '("~/.remote-config/config/layers/")
    dotspacemacs-configuration-layers
    '(
-     rust
-     go
-     lua
-     evil-cleverparens
-     haskell
-     csv
-     windows-scripts
-     sql
-     yaml
-     sql
-     html
-     typescript
-     mu4e
+     auto-completion
+     better-defaults
+     clojure
      colors
+     command-log
+     csv
+     elfeed
+     emacs-lisp
+     evil-cleverparens
+     evil-commentary
      eww
+     git
+     go
+     haskell
+     helm
+     html
+     ibuffer
      javascript
+     lua
+     markdown
+     mu4e
+     my-layer
+     org
      python
      racket
-     helm
-     auto-completion
+     rust
      spacemacs-layouts
-     better-defaults
-     evil-commentary
-     emacs-lisp
-     git
-     markdown
-     org
      spell-checking
+     sql
      syntax-checking
-     ibuffer
-     clojure
-     command-log
-     my-layer
-     elfeed)
+     typescript
+     windows-scripts
+     yaml
+     )
    dotspacemacs-additional-packages
-   '(java-snippets
+   '(
      ac-cider
-     ensime
-     zonokai-theme
-     w3m
-     emms
-     auto-complete-nxml
-     sr-speedbar
-     meghanada
-     evil-smartparens
-     flycheck-clojure
-     excorporate
-     cypher-mode
-     org-jira
-     dired-efap
-     dired+
-     easy-kill
      ace-link
-     java-snippets
-     notify
-     sx
-     midje-mode
-     flycheck-pos-tip
-     dired+
-     eww
-     persistent-scratch
+     auto-complete-nxml
+     cypher-mode
      diff-hl
-     helm-dash
+     dired+
+     dired-efap
      dired-subtree
-     emms)
+     easy-kill
+     emms
+     ensime
+     evil-smartparens
+     eww
+     excorporate
+     flycheck-clojure
+     flycheck-pos-tip
+     helm-dash
+     java-snippets
+     meghanada
+     midje-mode
+     org-jira
+     persistent-scratch
+     sr-speedbar
+     sx
+     w3m
+     zonokai-theme
+     )
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -172,7 +170,7 @@ values."
    dotspacemacs-highlight-delimiters 'current
    ;; If non nil, advise quit functions to keep server open when quitting.
    ;; (default nil)
-   dotspacemacs-persistent-server nil
+   dotspacemacs-persistent-server t
    ;; List of search tool executable names. Spacemacs uses the first installed
    ;; tool of the list. Supported tools are `ag', `pt', `ack' and `grep'.
    ;; (default '("ag" "pt" "ack" "grep"))
@@ -210,7 +208,6 @@ values."
 
   (smartparens-global-strict-mode t)
   (setq custom-file "~/.remote-config/config/.custom.el")
-  (load custom-file)
 
   (spacemacs/set-leader-keys
     "jj" 'my/goto-char-3)
@@ -218,7 +215,6 @@ values."
   (spacemacs/toggle-highlight-current-line-globally-off)
   (spacemacs/toggle-automatic-symbol-highlight-on)
   (set powerline-default-separator 'alternate)
-  (window-numbering-mode -1)
   (setq evil-cross-lines t)
   (setq evil-visual-end t)
   (require 'evil-smartparens)
@@ -232,3 +228,18 @@ values."
     "bb" 'helm-buffers-list)
   (global-subword-mode t)
   (my/init))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(eww-search-prefix "https://www.google.com/search?q=")
+ '(package-selected-packages
+   (quote
+    (toml-mode racer go-guru go-eldoc flycheck-rust company-go go-mode cargo rust-mode zonokai-theme yapfify yaml-mode ws-butler winum which-key web-mode web-beautify w3m volatile-highlights vi-tilde-fringe uuidgen use-package unfill toc-org tide tagedit sx sr-speedbar sql-indent spaceline smeargle slim-mode scss-mode sass-mode restart-emacs rainbow-mode rainbow-identifiers rainbow-delimiters racket-mode pyvenv pytest pyenv-mode py-isort pug-mode powershell pip-requirements persp-mode persistent-scratch pcre2el paradox origami orgit org-projectile org-present org-pomodoro org-plus-contrib org-jira org-download org-bullets open-junk-file neotree mwim mu4e-maildirs-extension mu4e-alert move-text mmm-mode midje-mode meghanada markdown-toc magit-gitflow macrostep lua-mode lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc java-snippets intero info+ indent-guide ibuffer-projectile hy-mode hungry-delete htmlize hlint-refactor hl-todo hindent highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-hoogle helm-gitignore helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-ag haskell-snippets google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md fuzzy flyspell-correct-helm flycheck-pos-tip flycheck-haskell flycheck-clojure flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell excorporate eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-smartparens evil-search-highlight-persist evil-numbers evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens evil-args evil-anzu ensime emms emmet-mode elisp-slime-nav elfeed-web elfeed-org elfeed-goodies easy-kill dumb-jump dired-subtree dired-efap dired+ diff-hl define-word cython-mode cypher-mode csv-mode company-web company-tern company-statistics company-ghci company-ghc company-cabal company-anaconda command-log-mode column-enforce-mode color-identifiers-mode coffee-mode cmm-mode clojure-snippets clj-refactor clean-aindent-mode cider-eval-sexp-fu auto-yasnippet auto-highlight-symbol auto-dictionary auto-complete-nxml auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell ac-cider))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
