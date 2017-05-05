@@ -1,4 +1,3 @@
-                                        ;(require 'sx)
 
 (defun my/init ()
   (interactive)
@@ -28,19 +27,6 @@
   (setq dired-recursive-deletes 'always)
   (setq dired-deletion-confirmer '(lambda (x) t))
 
-  (defun my/toggle-window-dedicated ()
-    "Toggle whether the current active window is dedicated or not."
-    (interactive)
-    (message
-     (if (let ((window (selected-window)))
-           (set-window-dedicated-p window
-                                   (not (window-dedicated-p window))))
-         "Window '%s' is dedicated"
-       "Window '%s' is normal")
-     (current-buffer)))
-
-  (add-hook 'cider-mode-hook #'auto-highlight-symbol-mode)
-  (add-hook 'cider-mode-hook #'flycheck-mode)
 
   (eval-after-load 'flycheck
     '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
@@ -48,7 +34,6 @@
   (eval-after-load 'flycheck '(flycheck-clojure-setup))
   (global-flycheck-mode t)
 
-  (setq cider-test-show-report-on-success nil)
   (setq cider-prompt-save-file-on-load 'always-save)
   (setq cider-use-fringe-indicators t)
 
@@ -170,49 +155,6 @@ PREFIX - whether to switch to the other window."
 
   (setq split-width-threshold 1)
 
-  (require 'flycheck)
-  (eval-after-load 'flycheck
-    '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
-
-  (add-hook 'emacs-lisp-mode-hook       #'aggressive-indent-mode)
-  (add-hook 'lisp-mode-hook             #'aggressive-indent-mode)
-  (display-time-mode t)
-
-  (dolist (mode '(clojure-mode clojurescript-mode cider-mode clojurec-mode))
-    (eval-after-load mode
-      (font-lock-add-keywords
-       mode '(("(\\(defn\\)[\[[:space:]]" ; anon funcs 1
-               (0 (progn (compose-region (match-beginning 1)
-                                         (match-end 1) "ƒ")
-                         nil)))
-              ("(\\(defmacro\\)[\[[:space:]]"
-               (0 (progn (compose-region (match-beginning 1)
-                                         (match-end 1) "µ")
-                         nil)))
-              ("(\\(fn\\)[\[[:space:]]"  ; anon funcs 1
-               (0 (progn (compose-region (match-beginning 1)
-                                         (match-end 1) "λ")
-                         nil)))
-              ("(\\(not=\\)[\[[:space:]]"  ; anon funcs 1
-               (0 (progn (compose-region (match-beginning 1)
-                                         (match-end 1) "≠")
-                         nil)))
-              ("(\\(def\\)[\[[:space:]]"  ; anon funcs 1
-               (0 (progn (compose-region (match-beginning 1)
-                                         (match-end 1) "≡")
-                         nil)))
-              ("\\(#\\)("                ; anon funcs 2
-               (0 (progn (compose-region (match-beginning 1)
-                                         (match-end 1) "λ")
-                         nil)))
-              ("\\(Math/PI\\)"                ; anon funcs 2
-               (0 (progn (compose-region (match-beginning 1)
-                                         (match-end 1) "π")
-                         nil)))
-              ("\\(#\\){"                 ; sets
-               (0 (progn (compose-region (match-beginning 1)
-                                         (match-end 1) "∈")
-                         nil)))))))
 
   (require 'company)
   (define-key company-active-map "\C-p" 'company-select-previous)
@@ -365,16 +307,12 @@ PREFIX - whether to switch to the other window."
   (bind-key "C-c C-<" 'mc/mark-all-like-this)
   (bind-key "C-h" 'backward-delete-char)
   (bind-key "C-M-h" 'backward-kill-word)
-  (bind-key "C-M-y" 'helm-show-kill-ring)
-  (bind-key "C-S-l" 'helm-projectile-ack)
-  (bind-key "C-S-c" 'comment-region)
   (bind-key "C-M-u" 'er/expand-region)
   (bind-key "C-<backspace>" 'subword-backward-kill)
   (bind-key "C-c C-c" 'eval-defun)
   (bind-key "C-c h" 'helm-google-suggest)
   (bind-key "C->" 'mc/mark-next-like-this)
   (bind-key "C-<" 'mc/mark-previous-like-this)
-  (bind-key "<f7>" 'sr-speedbar-toggle)
   (bind-key "<f8>" 'emms)
   (spacemacs/set-leader-keys "a r" 'mu4e-alert-view-unread-mails)
   (spacemacs/set-leader-keys "a i" 'mu4e-alert-view-unread-mails)
@@ -410,8 +348,6 @@ PREFIX - whether to switch to the other window."
        (t
         (emms-track-simple-description track)))))
 
-  (require 'emms)
-  (setq emms-track-description-function 'fg-emms-track-description)
 
 
   (defun my/helm-projectile-switch-to-buffer
@@ -626,8 +562,6 @@ With a prefix ARG invokes `projectile-commander' instead of
                ?\C-f backspace backspace ?\C-y return return return return
                ?\C-c ?\C-c])
 
-  (add-hook 'org-mode-hook #'org-bullets-mode)
-
   (eval-after-load  "dired-x"
     '(defun dired-clean-up-after-deletion (fn)
        "My. Clean up after a deleted file or directory FN.
@@ -816,7 +750,6 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
     (setq frame-resize-pixelwise t)
     (set-frame-position (selected-frame) 0 0)
     (set-frame-size (selected-frame) (* 2 1920) 1080 t))
-
 
 
   (add-hook 'eww-mode-hook #'evil-evilified-state)
