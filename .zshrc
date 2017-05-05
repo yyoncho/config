@@ -127,3 +127,5 @@ export PATH=$PATH:~/.bin
 
 alias d='emacsclient -e '"'"'(dired "'"'"'`pwd`'"'"'")'"'"''
 alias m='emacsclient -e '"'"'(magit-status "'"'"'`git rev-parse --show-toplevel`'"'"'")'"'"''
+
+export TERM=xterm-256color

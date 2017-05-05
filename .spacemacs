@@ -209,6 +209,7 @@ values."
   (setq shr-color-visible-luminance-min 80)
 
   (smartparens-global-strict-mode t)
+  (evil-visual-mark-mode t)
   (setq custom-file "~/.remote-config/config/.custom.el")
   (load custom-file)
 
@@ -256,8 +257,35 @@ values."
   (sp-pair "{" "}" :wrap "M-{")
   (sp-pair "[" "]" :wrap "M-[")
   (global-evil-mc-mode t)
+
+
+  (evil-define-operator evil-operator-clojure (beg end)
+    "Evil operator for evaluating code."
+    :move-point nil
+    (interactive "<r>")
+    (cider-eval-region beg end))
+
+  (define-key evil-normal-state-map (kbd "<RET>") 'evil-operator-clojure)
+
   (bind-key ";" 'sp-comment)
   (spacemacs/set-leader-keys
     "bb" 'helm-buffers-list)
   (global-subword-mode t)
-  (my/init))
+  (my/init)
+
+  (defun my/find-project-file (args)
+    "Find file in upper dirs"
+    (interactive "P")
+
+    (let ((pf (let ((fn (expand-file-name
+                         (concat (locate-dominating-file (buffer-file-name) "project.clj")
+                                 "project.clj"))))
+                (if (equal fn (buffer-file-name))
+                    (locate-dominating-file
+                     (file-name-directory
+                      (directory-file-name
+                       (buffer-file-name))) "project.clj")
+                  fn))))
+      (if pf
+          (find-file pf)
+        (message "Unable to find project.clj")))))
