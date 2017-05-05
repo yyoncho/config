@@ -22,7 +22,6 @@ values."
      windows-scripts
      sql
      yaml
-     sql
      html
      typescript
      mu4e
@@ -44,6 +43,7 @@ values."
      syntax-checking
      ibuffer
      clojure
+
      command-log
      my-layer
      elfeed)
@@ -218,7 +218,36 @@ values."
   (spacemacs/toggle-highlight-current-line-globally-off)
   (spacemacs/toggle-automatic-symbol-highlight-on)
   (set powerline-default-separator 'alternate)
-  (window-numbering-mode -1)
+  (setf confluence-url "https://confluence.tick42.com:8443/rpc/xmlrpc")
+
+  (require 'cider)
+  (require 'clojure-mode)
+
+  (dolist (m '(clojure-mode
+               clojurec-mode
+               clojurescript-mode
+               clojurex-mode
+               cider-repl-mode
+               cider-clojure-interaction-mode))
+
+    (mapc (lambda (x) (spacemacs/declare-prefix-for-mode
+                        m (car x) (cdr x)))
+          cider--key-binding-prefixes)
+
+    (spacemacs/set-leader-keys-for-major-mode m
+      "(" 'clojure-convert-collection-to-list
+      "[" 'clojure-convert-collection-to-vector
+      "{" 'clojure-convert-collection-to-map
+      "ep" 'cider-pprint-eval-defun-at-point
+      "qr" 'cider-restart
+      "tv" 'cider-toggle-trace-var
+      "tg" 'cider-test-rerun-test
+      "nt" 'cider-toggle-trace-ns
+      "," 'cider-eval-defun-at-point
+      ";" 'sp-comment
+      "fp" 'my/find-project-file
+      "ej" 'cider-pprint-eval-last-sexp))
+
   (setq evil-cross-lines t)
   (setq evil-visual-end t)
   (require 'evil-smartparens)

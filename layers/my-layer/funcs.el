@@ -74,7 +74,7 @@
     (auto-complete-mode t)
     (rainbow-delimiters-mode-enable)
     (indent-guide-mode t)
-    (setq c-basic-offset 2))
+    (setq c-basic-offset 4))
 
   (setq c-default-style
         '((java-mode . "java")
@@ -232,23 +232,6 @@ PREFIX - whether to switch to the other window."
   ;; use windows-1251
   (modify-coding-system-alist 'file "\\.txt\\'" 'windows-1251)
 
-  (defun my/increment-number-decimal (&optional arg)
-    "Increment the number forward from point by 'ARG'.
-ARG - the amount for increasing the value."
-    (interactive "p*")
-    (save-excursion
-      (save-match-data
-        (let (inc-by field-width answer)
-          (setq inc-by (if arg arg 1))
-          (skip-chars-backward "0123456789")
-          (when (re-search-forward "[0-9]+" nil t)
-            (setq field-width (- (match-end 0) (match-beginning 0)))
-            (setq answer (+ (string-to-number (match-string 0) 10) inc-by))
-            (when (< answer 0)
-              (setq answer (+ (expt 10 field-width) answer)))
-            (replace-match (format (concat "%0" (int-to-string field-width) "d")
-                                   answer)))))))
-
   (defun my/mvn-dependency-version-to-properties (&optional arg)
     (interactive "p")
     (save-excursion
@@ -312,24 +295,12 @@ ARG - the amount for increasing the value."
                                         ;(flush-lines "^\\s-*$"  (region-beginning) (region-end))
       (sort-lines nil (region-beginning) (region-end))))
 
-  (defun my/copy-file-name-to-clipboard ()
-    "Copy the current buffer file name to the clipboard."
-    (interactive)
-    (let ((filename (if (equal major-mode 'dired-mode)
-                        default-directory
-                      (buffer-file-name))))
-      (when filename
-        (kill-new filename)
-        (message "Copied buffer file name '%s' to the clipboard." filename))))
-
   (require 'projectile)
 
   (defun my/projectile-open-pom ()
     "Open's pom file from the project."
     (interactive)
     (find-file (concat (projectile-project-root) "pom.xml")))
-
-
 
   (require 'vc-dispatcher)
   (setq vc-suppress-confirm nil)
@@ -368,13 +339,6 @@ ARG - the amount for increasing the value."
     (jump-to-register :magit-fullscreen))
 
   (define-key magit-status-mode-map (kbd "q") 'my/magit-quit-session)
-
-  (global-set-key (kbd "C-x C-1") 'delete-other-windows)
-  (global-set-key (kbd "C-x C-2") 'split-window-below)
-  (global-set-key (kbd "C-x C-3") 'split-window-right)
-  (global-set-key (kbd "C-x C-0") 'delete-window)
-
-  ;; redefine emacs state to intercept the escape key like insert-state does:
 
   (defun my/projectile-find-implementation ()
     "Open matching implementation or test file in other window."
@@ -457,7 +421,7 @@ ARG - the amount for increasing the value."
     (let
         ((helm-ff-transformer-show-only-basename nil)
          (helm-boring-file-regexp-list nil))
-      (helm :sources 'helm-source-projectile-buffers-list
+      (helm :sources 'helm-source-
             :buffer "test"
             :prompt "Switch to buffer: ")))
 
@@ -478,13 +442,6 @@ the current buffer."
     (my/start-or-switch-to (lambda ()
                              (ansi-term crux-shell (concat crux-term-buffer-name "-term")))
                            (format "*%s-term*" crux-term-buffer-name)))
-
-
-  (global-set-key [remap kill-ring-save] 'easy-kill)
-  (global-set-key [remap other-window] 'my/other-window)
-  (global-set-key [remap crux-find-user-init-file] 'my/find-user-init-file)
-  (global-set-key [remap crux-find-shell-init-file] 'my/find-user-shell-init-file)
-  (global-set-key [remap crux-visit-term-buffer] 'my/visit-term-buffer)
 
   (bind-key "C-x 2" 'my/vsplit-last-buffer)
   (bind-key "C-x 3" 'my/hsplit-last-buffer)
@@ -853,26 +810,14 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
        avy-style
        beg end)))
 
-  (dolist (m '(clojure-mode
-               clojurec-mode
-               clojurescript-mode
-               clojurex-mode
-               cider-repl-mode
-               cider-clojure-interaction-mode))
+  (defun my/two-monitors ()
+    "Set frame size to cover 2 monitors"
+    (interactive)
+    (setq frame-resize-pixelwise t)
+    (set-frame-position (selected-frame) 0 0)
+    (set-frame-size (selected-frame) (* 2 1920) 1080 t))
 
-    (mapc (lambda (x) (spacemacs/declare-prefix-for-mode
-                       m (car x) (cdr x)))
-          cider--key-binding-prefixes)
 
-    (spacemacs/set-leader-keys-for-major-mode m
-      "(" 'clojure-convert-collection-to-list
-      "[" 'clojure-convert-collection-to-vector
-      "{" 'clojure-convert-collection-to-map
-      "ep" 'cider-pprint-eval-defun-at-point
-      "ep" 'cider-pprint-eval-last-sexp
-      "," 'cider-eval-defun-at-point
-      ";" 'sp-comment
-      "ej" 'cider-pprint-eval-defun-at-point))
 
   (add-hook 'eww-mode-hook #'evil-evilified-state)
 
