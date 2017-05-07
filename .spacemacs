@@ -25,6 +25,7 @@ values."
      html
      typescript
      mu4e
+     fasd
      colors
      eww
      javascript
