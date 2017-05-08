@@ -58,6 +58,7 @@ values."
      auto-complete-nxml
      sr-speedbar
      meghanada
+     forecast
      evil-smartparens
      flycheck-clojure
      excorporate
@@ -273,6 +274,11 @@ values."
     "bb" 'helm-buffers-list)
   (global-subword-mode t)
   (my/init)
+
+  (setq forecast-city "Sofia"
+        forecast-latitude 43.6486
+        forecast-longitude -79.3853
+        forecast-api-key "d3df1378d3d6485dc5cc81f745207f98")
 
   (defun my/find-project-file (args)
     "Find file in upper dirs"
