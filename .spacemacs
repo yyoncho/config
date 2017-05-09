@@ -26,6 +26,8 @@ values."
      typescript
      mu4e
      colors
+     shell
+     evil-snipe
      eww
      javascript
      python
@@ -37,6 +39,7 @@ values."
      evil-commentary
      emacs-lisp
      git
+     c-c++
      markdown
      org
      spell-checking
