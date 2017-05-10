@@ -12,6 +12,7 @@ then
     source .local_zshrc
 fi
 
+eval "$(fasd --init auto)"
 setopt histignorealldups sharehistory
 
 # Use emacs keybindings even if our EDITOR is set to vi

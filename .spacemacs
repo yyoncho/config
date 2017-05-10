@@ -47,7 +47,6 @@ values."
      syntax-checking
      ibuffer
      clojure
-
      command-log
      my-layer
      elfeed)
