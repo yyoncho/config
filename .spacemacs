@@ -17,6 +17,7 @@ values."
      go
      lua
      evil-cleverparens
+     version-control
      haskell
      csv
      windows-scripts
@@ -62,7 +63,6 @@ values."
      meghanada
      forecast
      evil-smartparens
-     flycheck-clojure
      excorporate
      cypher-mode
      org-jira
@@ -71,11 +71,8 @@ values."
      easy-kill
      ace-link
      java-snippets
-     notify
      sx
      midje-mode
-     flycheck-pos-tip
-     dired+
      eww
      persistent-scratch
      diff-hl
@@ -106,8 +103,8 @@ values."
    dotspacemacs-scratch-mode 'text-mode
    dotspacemacs-themes '(zonokai-blue)
    dotspacemacs-colorize-cursor-according-to-state t
-   dotspacemacs-default-font '("Source Code Pro Semi-bold"
-                               :size 18
+   dotspacemacs-default-font '("Source Code Pro"
+                               :size 14
                                :weight normal
                                :width normal
                                :powerline-scale 1.5)
@@ -187,12 +184,8 @@ values."
    dotspacemacs-default-package-repository nil
    dotspacemacs-whitespace-cleanup 'trailing))
 
-(defun dotspacemacs/user-init ()
-  (setq package-archives '(("ELPA" . "http://tromey.com/elpa/")
-                           ("gnu" . "http://elpa.gnu.org/packages/")
-                           ("melpa" . "http://melpa.org/packages/")
-                           ("melpa-stable" . "http://stable.melpa.org/packages/")
-                           ("marmalade" . "http://marmalade-repo.org/packages/"))))
+(defun dotspacemacs/user-init ())
+
 (defun dotspacemacs/user-config ()
   (setq clojure-enable-fancify-symbols t)
   (require 'eww)
@@ -217,8 +210,8 @@ values."
   (setq custom-file "~/.remote-config/config/.custom.el")
   (load custom-file)
 
-  (spacemacs/set-leader-keys
-    "jj" 'my/goto-char-3)
+  (spacemacs/set-leader-keys "jj" 'my/goto-char-3)
+
   (sp-use-paredit-bindings)
   (spacemacs/toggle-highlight-current-line-globally-off)
   (spacemacs/toggle-automatic-symbol-highlight-on)
@@ -243,18 +236,19 @@ values."
       "(" 'clojure-convert-collection-to-list
       "[" 'clojure-convert-collection-to-vector
       "{" 'clojure-convert-collection-to-map
+      "ea" 'cider-load-all-project-ns
       "ep" 'cider-pprint-eval-defun-at-point
       "qr" 'cider-restart
       "tv" 'cider-toggle-trace-var
       "tg" 'cider-test-rerun-test
       "nt" 'cider-toggle-trace-ns
+      "j"  'evil-operator-clojure
       "," 'cider-eval-defun-at-point
       ";" 'sp-comment
       "fp" 'my/find-project-file
       "ej" 'cider-pprint-eval-last-sexp))
 
   (setq evil-cross-lines t)
-  (setq evil-visual-end t)
   (require 'evil-smartparens)
   (setq emmet-self-closing-tag-style "")
   (sp-pair "(" ")" :wrap "M-(")
@@ -262,39 +256,93 @@ values."
   (sp-pair "[" "]" :wrap "M-[")
   (global-evil-mc-mode t)
 
-
   (evil-define-operator evil-operator-clojure (beg end)
     "Evil operator for evaluating code."
     :move-point nil
     (interactive "<r>")
     (cider-eval-region beg end))
 
-  (define-key evil-normal-state-map (kbd "<RET>") 'evil-operator-clojure)
+  (evil-define-operator evil-operator-duplicate (beg end)
+    "Duplicate action."
+    :move-point nil
+    (interactive "<r>")
+
+    (save-excursion
+      (kill-ring-save beg end)
+      (goto-char end)
+      (newline-and-indent)
+      (yank)))
+
+  (setq cider-save-file-on-load t)
 
   (bind-key ";" 'sp-comment)
-  (spacemacs/set-leader-keys
-    "bb" 'helm-buffers-list)
+  (spacemacs/set-leader-keys "bb" 'helm-buffers-list)
+  (spacemacs/set-leader-keys "d" 'evil-operator-duplicate)
+  (spacemacs/set-leader-keys "ga" 'magit-stage-modified)
   (global-subword-mode t)
+
   (my/init)
 
-  (setq forecast-city "Sofia"
-        forecast-latitude 43.6486
-        forecast-longitude -79.3853
-        forecast-api-key "d3df1378d3d6485dc5cc81f745207f98")
+  (defun my/switch-to-compilation-buffer (arg)
+    "Switch to compilation buffer"
+    (interactive "P")
+    (switch-to-buffer "*compilation*"))
 
+  (spacemacs/set-leader-keys "cb" 'my/switch-to-compilation-buffer)
+
+  (dolist (mode '(clojure-mode clojurescript-mode cider-mode clojurec-mode))
+    (eval-after-load mode
+      (font-lock-add-keywords
+       mode '(("(\\(defn\\)[\[[:space:]]" ; anon funcs 1
+               (0 (progn (compose-region (match-beginning 1)
+                                         (match-end 1) "ƒ")
+                         nil)))
+              ("(\\(defmacro\\)[\[[:space:]]"
+               (0 (progn (compose-region (match-beginning 1)
+                                         (match-end 1) "µ")
+                         nil)))
+              ("(\\(fn\\)[\[[:space:]]"  ; anon funcs 1
+               (0 (progn (compose-region (match-beginning 1)
+                                         (match-end 1) "λ")
+                         nil)))
+              ("(\\(not=\\)[\[[:space:]]"  ; anon funcs 1
+               (0 (progn (compose-region (match-beginning 1)
+                                         (match-end 1) "≠")
+                         nil)))
+              ("(\\(def\\)[\[[:space:]]"  ; anon funcs 1
+               (0 (progn (compose-region (match-beginning 1)
+                                         (match-end 1) "≡")
+                         nil)))
+              ("\\(#\\)("                ; anon funcs 2
+               (0 (progn (compose-region (match-beginning 1)
+                                         (match-end 1) "λ")
+                         nil)))
+              ("\\(Math/PI\\)"                ; anon funcs 2
+               (0 (progn (compose-region (match-beginning 1)
+                                         (match-end 1) "π")
+                         nil)))
+              ("\\(#\\){"                 ; sets
+               (0 (progn (compose-region (match-beginning 1)
+                                         (match-end 1) "∈")
+                         nil)))))))
+
+
+
+  (global-flycheck-mode t)
+
+  (setq clojure-enable-fancify-symbols t)
+  (setq dired-listing-switches "-aBhl  --group-directories-first")
+  (setq cider-save-file-on-load t)
   (defun my/find-project-file (args)
     "Find file in upper dirs"
     (interactive "P")
-
-    (let ((pf (let ((fn (expand-file-name
-                         (concat (locate-dominating-file (buffer-file-name) "project.clj")
-                                 "project.clj"))))
-                (if (equal fn (buffer-file-name))
-                    (locate-dominating-file
-                     (file-name-directory
-                      (directory-file-name
-                       (buffer-file-name))) "project.clj")
-                  fn))))
-      (if pf
-          (find-file pf)
-        (message "Unable to find project.clj")))))
+    (if-let ((pf (expand-file-name
+                  (concat (locate-dominating-file
+                           (if (string= (file-name-nondirectory (buffer-file-name)) "project.clj")
+                               (file-name-directory
+                                (directory-file-name (file-name-directory (buffer-file-name))))
+                             (buffer-file-name))
+                           "project.clj")
+                          "project.clj"))))
+        (find-file pf)
+      (message "Unable to find project.clj"))))

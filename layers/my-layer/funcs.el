@@ -31,7 +31,6 @@
   (eval-after-load 'flycheck
     '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
 
-  (eval-after-load 'flycheck '(flycheck-clojure-setup))
   (global-flycheck-mode t)
 
   (setq cider-prompt-save-file-on-load 'always-save)
@@ -73,7 +72,6 @@
   (define-key java-mode-map (kbd "C-x C-j")
     'projectile-toggle-between-implementation-and-test)
 
-  (add-hook 'cider-mode-hook 'flycheck-clojure-setup)
   (add-hook 'cider-mode-hook 'rainbow-delimiters-mode-enable)
   (remove-hook 'cider-mode-hook 'aggressive-indent-mode)
 
