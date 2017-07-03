@@ -279,7 +279,22 @@ values."
   (spacemacs/set-leader-keys "bb" 'helm-buffers-list)
   (spacemacs/set-leader-keys "d" 'evil-operator-duplicate)
   (spacemacs/set-leader-keys "ga" 'magit-stage-modified)
+  (setq git-commit-summary-max-length 999)
+  (setq kill-do-not-save-duplicates t)
+  (setq cider-lein-command "~/.bin/lein")
+
+  ;; disable backup files
+  (setq make-backup-files nil)
+
+  (global-diff-hl-mode t)
+  (add-hook 'cider-mode-hook 'rainbow-delimiters-mode-enable)
+  (remove-hook 'cider-mode-hook 'aggressive-indent-mode)
+
   (global-subword-mode t)
+  (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
+  (setq delete-by-moving-to-trash t)
+  (setq dired-recursive-deletes 'always)
+  (setq dired-deletion-confirmer '(lambda (x) t))
 
   (my/init)
 
@@ -325,9 +340,6 @@ values."
                (0 (progn (compose-region (match-beginning 1)
                                          (match-end 1) "∈")
                          nil)))))))
-
-
-
   (global-flycheck-mode t)
 
   (setq clojure-enable-fancify-symbols t)

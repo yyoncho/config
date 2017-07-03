@@ -2,34 +2,16 @@
 (defun my/init ()
   (interactive)
   (require 'magit)
-  (setq git-commit-summary-max-length 999)
-  (setq kill-do-not-save-duplicates t)
-
-  ;; disable backup files
-  (setq make-backup-files nil)
-
-  (global-diff-hl-mode t)
 
   (custom-set-variables
-   '(ediff-split-window-function (quote split-window-horizontally))
    '(send-mail-function (quote smtpmail-send-it)))
 
   ;; dired configuration
   (require 'dired-x)
   (require 'dired+)
-  (require 'dired-efap)
 
-  (define-key dired-mode-map [f2] 'dired-efap)
   (define-key dired-mode-map (kbd "I") 'dired-subtree-toggle)
-  (setq-default dired-omit-files-p t) ; Buffer-local variable
-  (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
-  (setq delete-by-moving-to-trash t)
-  (setq dired-recursive-deletes 'always)
-  (setq dired-deletion-confirmer '(lambda (x) t))
-
-
-  (eval-after-load 'flycheck
-    '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
+  (setq-default dired-omit-files-p t)   ; Buffer-local variable
 
   (global-flycheck-mode t)
 
@@ -37,15 +19,6 @@
   (setq cider-use-fringe-indicators t)
 
   (require 'midje-mode)
-  (setq midje-comments ";;.;.")
-  (setq cider-auto-mode 't)
-
-  (define-key smartparens-mode-map (kbd "C-M-u") 'er/expand-region)
-  (eval-after-load 'cider-mode
-    '(define-key cider-mode-map (kbd "C-c M-r") 'cider-restart))
-
-  (add-hook 'cider-mode-hook
-            (lambda () (setq next-error-function #'flycheck-next-error-function)))
 
   (require 'meghanada)
   (require 'cc-mode)
@@ -62,31 +35,16 @@
 
   (setq c-default-style
         '((java-mode . "java")
-          (awk-mode . "awk")
           (other . "gnu")))
   (remove-hook 'java-mode-hook #'aggressive-indent-mode)
   (add-hook 'java-mode-hook #'yas-minor-mode)
   (add-hook 'java-mode-hook #'my/configure-java)
 
-  (require 'cc-mode)
-  (define-key java-mode-map (kbd "C-x C-j")
-    'projectile-toggle-between-implementation-and-test)
-
-  (add-hook 'cider-mode-hook 'rainbow-delimiters-mode-enable)
-  (remove-hook 'cider-mode-hook 'aggressive-indent-mode)
-
-
   (indent-guide-global-mode t)
   (define-key java-mode-map (kbd "C-<f11>") 'meghanada-run-junit-recent)
 
-  (defun kill-current-buffer ()
-    "Kill current buffer."
-    (interactive)
-    (kill-buffer (current-buffer)))
-
   (setq make-backup-files nil)
 
-  (setq cider-lein-command "~/.bin/lein")
   (add-hook 'cider-mode-hook 'ac-flyspell-workaround)
   (add-hook 'cider-mode-hook 'ac-cider-setup)
   (add-hook 'cider-repl-mode-hook 'ac-cider-setup)
@@ -623,7 +581,6 @@ Remove expanded subdir of deleted dir, if any."
 
   (define-key calendar-mode-map (kbd  "<f2>") #'exco-calendar-show-day)
 
-  (bind-key "C-x C-j" 'my/projectile-find-implementation)
   (bind-key "C-j" 'newline-and-indent)
   (setq clojure-enable-fancify-symbols nil)
 
@@ -635,11 +592,6 @@ Remove expanded subdir of deleted dir, if any."
   (define-key evil-motion-state-map (kbd "C-e") 'end-of-line)
   (define-key evil-motion-state-map (kbd "C-b") 'backward-char)
   (define-key evil-motion-state-map (kbd "C-d") 'delete-char)
-
-  (defun my/projectile-find-implementation ()
-    "Open matching implementation or test file in other window."
-    (interactive)
-    (find-file (projectile-find-implementation-or-test (buffer-file-name))))
 
   (load "soap-client.el")
 
@@ -684,25 +636,7 @@ If EXTERNAL is double prefix, browse in new buffer."
        (t
         (my/browse-url url external)))))
 
-
-
   (setq sx-question-mode-display-buffer-function #'pop-to-buffer-same-window)
-
-  (define-key evil-normal-state-map "p" 'evil-paste-before)
-  (define-key evil-normal-state-map "P" 'evil-paste-after)
-
-  (define-key evil-outer-text-objects-map "w" 'evil-a-word)
-  (define-key evil-outer-text-objects-map "W" 'evil-a-WORD)
-  (define-key evil-motion-state-map "w" 'evil-forward-word-begin)
-  (define-key evil-motion-state-map "W" 'evil-forward-WORD-begin)
-
-  (define-key evil-motion-state-map "b" 'evil-backward-word-begin)
-  (define-key evil-motion-state-map "B" 'evil-backward-WORD-begin)
-
-  (define-key evil-inner-text-objects-map "w" 'evil-inner-word)
-  (define-key evil-inner-text-objects-map "W" 'evil-inner-WORD)
-  (define-key evil-normal-state-map "W" 'evil-forward-WORD-begin)
-  (define-key evil-normal-state-map "w" 'evil-forward-word-begin)
 
   (defun my/emms-start ()
     "Start emms."
@@ -716,7 +650,6 @@ If EXTERNAL is double prefix, browse in new buffer."
   (setq large-file-warning-threshold nil)
 
   (setq w3m-user-agent "Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC_Pyramid Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.")
-  (setq c-basic-offset 2)
 
   (defun my/goto-char-3 (char1 char2 char3 &optional arg beg end)
     "Jump to the currently visible CHAR1 followed by CHAR2 and char3.
@@ -752,8 +685,8 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
   (defun my/set-frame-name (frame)
     (modify-frame-parameters frame
                              (list (cons 'name "emacs"))))
+  (add-to-list 'after-make-frame-functions 'my/set-frame-name)
+
   (spacemacs/toggle-evil-cleverparens-on)
   (add-hook 'clojure-mode-hook #'evil-cleverparens-mode)
-  (add-hook 'emacs-lisp-mode-hook #'evil-cleverparens-mode)
-
-  (add-to-list 'after-make-frame-functions 'my/set-frame-name))
+  (add-hook 'emacs-lisp-mode-hook #'evil-cleverparens-mode))
