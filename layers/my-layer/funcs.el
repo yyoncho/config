@@ -109,8 +109,7 @@ PREFIX - whether to switch to the other window."
 
   (set-face-attribute 'default nil :height 130)
 
-  (setq split-width-threshold 1)
-
+  (setq split-width-threshold 160)
 
   (require 'company)
   (define-key company-active-map "\C-p" 'company-select-previous)
@@ -301,8 +300,6 @@ PREFIX - whether to switch to the other window."
        (t
         (emms-track-simple-description track)))))
 
-
-
   (defun my/helm-projectile-switch-to-buffer
       (&optional arg)
     "Use projectile with Helm for finding files in project\n\nWith a prefix ARG invalidates the cache first."
@@ -450,20 +447,6 @@ in the other window."
                           (goto-char (posn-point (event-start click)))
                           (my/find-symbol-at-point))))))
 
-  (defun my/projectile-switch-project-dired (&optional arg)
-    "Switch to a project we have visited before.
-Invokes the command referenced by `projectile-switch-project-action' on switch.
-With a prefix ARG invokes `projectile-commander' instead of
-`projectile-switch-project-action.'"
-    (interactive "P")
-    (let (projects)
-      (if (setq projects (projectile-relevant-known-projects))
-          (projectile-completing-read
-           "[Dired]Switch to project: " projects
-           :action (lambda (project)
-                     (dired project)))
-        (error "There are no known projects"))))
-
   (defun my/projectile-switch-project-magit (&optional arg)
     "Switch to a project we have visited before.
 Invokes the command referenced by `projectile-switch-project-action' on switch.
@@ -477,10 +460,6 @@ With a prefix ARG invokes `projectile-commander' instead of
            :action (lambda (project)
                      (magit-status project)))
         (error "There are no known projects"))))
-
-  (bind-key "C-=" 'er/expand-region)
-  (bind-key "C-c 2 d" 'my/projectile-switch-project-dired)
-  (bind-key "C-c 2 g" 'my/projectile-switch-project-magit)
 
   (setq gc-cons-threshold 20000000)
 
@@ -678,7 +657,6 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
     (setq frame-resize-pixelwise t)
     (set-frame-position (selected-frame) 0 0)
     (set-frame-size (selected-frame) (* 2 1920) 1080 t))
-
 
   (add-hook 'eww-mode-hook #'evil-evilified-state)
 

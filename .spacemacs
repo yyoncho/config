@@ -187,7 +187,7 @@ values."
 (defun dotspacemacs/user-init ())
 
 (defun dotspacemacs/user-config ()
-  (setq clojure-enable-fancify-symbols t)
+  (interactive)
   (require 'eww)
   (define-key eww-mode-map "f" 'ace-link-eww)
   (define-key eww-mode-map "g" 'eww)
@@ -208,9 +208,14 @@ values."
   (smartparens-global-strict-mode t)
   (evil-visual-mark-mode t)
   (setq custom-file "~/.remote-config/config/.custom.el")
-  (load custom-file)
+  ;; (load custom-file)
 
   (spacemacs/set-leader-keys "jj" 'my/goto-char-3)
+  (spacemacs/set-leader-keys "oo" 'recentf-open-most-recent-file)
+  (spacemacs/set-leader-keys "ot" 'projectile-find-test-file)
+  (spacemacs/set-leader-keys "pp" 'my/projectile-switch-project-dired)
+  (spacemacs/set-leader-keys "pt" 'projectile-test-project)
+  (spacemacs/set-leader-keys "pT" 'neotree-find-project-root)
 
   (sp-use-paredit-bindings)
   (spacemacs/toggle-highlight-current-line-globally-off)
@@ -291,6 +296,8 @@ values."
   (remove-hook 'cider-mode-hook 'aggressive-indent-mode)
 
   (global-subword-mode t)
+  (require 'dired)
+  (require 'dired+)
   (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
   (setq delete-by-moving-to-trash t)
   (setq dired-recursive-deletes 'always)
@@ -343,7 +350,7 @@ values."
   (global-flycheck-mode t)
 
   (setq clojure-enable-fancify-symbols t)
-  (setq dired-listing-switches "-aBhl  --group-directories-first")
+  (setq-default dired-listing-switches "-aBhl  --group-directories-first")
   (setq cider-save-file-on-load t)
   (defun my/find-project-file (args)
     "Find file in upper dirs"
@@ -357,4 +364,54 @@ values."
                            "project.clj")
                           "project.clj"))))
         (find-file pf)
-      (message "Unable to find project.clj"))))
+      (message "Unable to find project.clj")))
+  (setq clojure-indent-style :align-arguments
+        clojure-align-forms-automatically t)
+
+  (defun my/projectile-switch-project-dired (&optional arg)
+    "Switch to a project we have visited before.
+Invokes the command referenced by `projectile-switch-project-action' on switch.
+With a prefix ARG invokes `projectile-commander' instead of
+`projectile-switch-project-action.'"
+    (interactive "P")
+    (let (projects)
+      (if (setq projects (projectile-relevant-known-projects))
+          (projectile-completing-read
+           "[Dired]Switch to project: " projects
+           :action (lambda (project)
+                     (dired project)))
+        (error "There are no known projects"))))
+
+  (custom-set-faces
+   '(clojure-interop-method-face ((t (:foreground "darkgray"))))
+   '(company-preview-common ((t (:background "dark gray"))))
+   '(company-preview-search ((t (:background "dark gray"))))
+   '(diredp-compressed-file-suffix ((t (:foreground "red"))))
+   '(ediff-even-diff-A ((t (:background "dim gray"))))
+   '(ediff-even-diff-B ((t (:background "dim gray"))))
+   '(ediff-even-diff-C ((t (:background "dim gray"))))
+   '(ediff-odd-diff-A ((t (:background "dim gray"))))
+   '(ediff-odd-diff-B ((t (:background "dim gray"))))
+   '(ediff-odd-diff-C ((t (:background "dim gray"))))
+   '(evil-search-highlight-persist-highlight-face ((t (:inherit lazy-highlight :background "dim gray"))))
+   '(font-lock-builtin-face ((t (:foreground "orange red" :weight bold))))
+   '(region ((t (:background "dim gray" :foreground "#d8d8d8")))))
+
+   (define-key evil-normal-state-map "p" 'evil-paste-before)
+   (define-key evil-normal-state-map "P" 'evil-paste-after)
+   (setq projectile-create-missing-test-files t)
+   (setq cljr-warn-on-eval nil)
+
+   (evil-define-command my/goto-end-of-form (count)
+     "Go to end the the form."
+     (interactive "<c>")
+     (let ((line-end (point-at-eol)))
+       (when (or (when (sp-up-sexp count) (backward-char) t)
+                 (-when-let (enc-end (cdr (evil-cp--top-level-bounds)))
+                   (goto-char (1- enc-end))))
+         (if (<= (point) line-end)
+             (evil-insert 1)
+           (evil-insert 1)))))
+   (define-key evil-normal-state-map (kbd "M-a") 'my/goto-end-of-form)
+   (diredp-toggle-find-file-reuse-dir 1)
+   )
