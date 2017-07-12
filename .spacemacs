@@ -212,6 +212,7 @@ values."
 
   (spacemacs/set-leader-keys "jj" 'my/goto-char-3)
   (spacemacs/set-leader-keys "oo" 'recentf-open-most-recent-file)
+  (spacemacs/set-leader-keys "op" 'my/evil-operator-paste)
   (spacemacs/set-leader-keys "ot" 'projectile-find-test-file)
   (spacemacs/set-leader-keys "pp" 'my/projectile-switch-project-dired)
   (spacemacs/set-leader-keys "pt" 'projectile-test-project)
@@ -258,7 +259,7 @@ values."
   (spacemacs/set-leader-keys-for-major-mode 'org-mode "jig" 'org-jira-get-issues)
   (spacemacs/set-leader-keys-for-major-mode 'org-mode "jl" 'org-jira-worklog-time-from-org-time)
 
-  (setq evil-cross-lines t)
+
   (require 'evil-smartparens)
   (setq emmet-self-closing-tag-style "")
   (sp-pair "(" ")" :wrap "M-(")
@@ -272,6 +273,7 @@ values."
     (interactive "<r>")
     (cider-eval-region beg end))
 
+
   (evil-define-operator evil-operator-duplicate (beg end)
     "Duplicate action."
     :move-point nil
@@ -281,6 +283,16 @@ values."
       (kill-ring-save beg end)
       (goto-char end)
       (newline-and-indent)
+      (yank)))
+
+  (evil-define-operator my/evil-operator-paste (beg end)
+    "Paste action."
+    :move-point nil
+    (interactive "<r>")
+
+    (save-excursion
+      (goto-char end)
+      (insert " ")
       (yank)))
 
   (setq cider-save-file-on-load t)
@@ -405,29 +417,37 @@ With a prefix ARG invokes `projectile-commander' instead of
    '(font-lock-builtin-face ((t (:foreground "orange red" :weight bold))))
    '(region ((t (:background "dim gray" :foreground "#d8d8d8")))))
 
-   (define-key evil-normal-state-map "p" 'evil-paste-before)
-   (define-key evil-normal-state-map "P" 'evil-paste-after)
-   (setq projectile-create-missing-test-files t)
-   (setq cljr-warn-on-eval nil)
+  (define-key evil-normal-state-map "p" 'evil-paste-before)
+  (define-key evil-normal-state-map "P" 'evil-paste-after)
+  (setq projectile-create-missing-test-files t)
+  (setq cljr-warn-on-eval nil)
 
-   (evil-define-command my/goto-end-of-form (count)
-     "Go to end the the form."
-     (interactive "<c>")
-     (let ((line-end (point-at-eol)))
-       (when (or (when (sp-up-sexp count) (backward-char) t)
-                 (-when-let (enc-end (cdr (evil-cp--top-level-bounds)))
-                   (goto-char (1- enc-end))))
-         (if (<= (point) line-end)
-             (evil-insert 1)
-           (evil-insert 1)))))
-   (define-key evil-normal-state-map (kbd "M-a") 'my/goto-end-of-form)
-   (diredp-toggle-find-file-reuse-dir 1)
+  (evil-define-command my/goto-end-of-form (count)
+    "Go to end the the form."
+    (interactive "<c>")
+    (let ((line-end (point-at-eol)))
+      (when (or (when (sp-up-sexp count) (backward-char) t)
+                (-when-let (enc-end (cdr (evil-cp--top-level-bounds)))
+                  (goto-char (1- enc-end))))
+        (if (<= (point) line-end)
+            (evil-insert 1)
+          (evil-insert 1)))))
 
-   (defun my/magit-stage-modified ()
-     "Stage all changes to files"
-     (interactive)
-     (magit-with-toplevel
-       (magit-stage-1 "--all")))
+  (require 'evil-cleverparens)
 
-   (magit-wip-after-apply-mode t)
-   (setq evil-want-fine-undo nil))
+  (global-set-key [remap evil-cp-end-of-defun] 'my/goto-end-of-form)
+
+  (diredp-toggle-find-file-reuse-dir 1)
+
+  (defun my/magit-stage-modified ()
+    "Stage all changes to files"
+    (interactive)
+    (magit-with-toplevel
+      (magit-stage-1 "--all")))
+
+  (magit-wip-after-apply-mode t)
+  (setq evil-want-fine-undo nil
+        evil-cross-lines t)
+  ;; jira configuration
+  (setq jiralib-url "https://jira.tick42.com"
+        jiralib-user-login-name "iyonchovski"))

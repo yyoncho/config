@@ -1,7 +1,6 @@
 
 (defun my/init ()
   (interactive)
-  (require 'magit)
 
   (custom-set-variables
    '(send-mail-function (quote smtpmail-send-it)))
@@ -17,8 +16,6 @@
 
   (setq cider-prompt-save-file-on-load 'always-save)
   (setq cider-use-fringe-indicators t)
-
-  (require 'midje-mode)
 
   (require 'meghanada)
   (require 'cc-mode)
@@ -73,6 +70,9 @@ PREFIX - whether to switch to the other window."
     (split-window-horizontally)
     (other-window 1 nil)
     (if (= prefix 1) (switch-to-next-buffer)))
+
+  (global-set-key [remap kbd-end-or-call-macro] 'my/kmacro-end-and-call-macro)
+  (global-set-key [remap split-window-right] 'my/hsplit-last-buffer)
 
   ;; prevent prompt for killing emcacsclient buffer
   (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
@@ -461,38 +461,11 @@ With a prefix ARG invokes `projectile-commander' instead of
                      (magit-status project)))
         (error "There are no known projects"))))
 
-  (setq gc-cons-threshold 20000000)
 
-  (setq helm-M-x-fuzzy-match                  t
-        helm-bookmark-show-location           t
-        helm-buffers-fuzzy-matching           t
-        helm-completion-in-region-fuzzy-match t
-        helm-file-cache-fuzzy-match           t
-        helm-imenu-fuzzy-match                t
-        helm-mode-fuzzy-match                 t
-        helm-locate-fuzzy-match               nil
-        helm-quick-update                     t
-        helm-recentf-fuzzy-match              t
-        helm-semantic-fuzzy-match             t)
-
-  ;; org-jira-mode
-  (setq jiralib-url "https://jira.tick42.com")
-
-  ;; truncate-lines enabled by default
-  (set-default 'truncate-lines nil)
   (add-hook 'hack-local-variables-hook (lambda () (setq truncate-lines t)))
-  (spacemacs/toggle-auto-fill-mode-on)
 
   (global-set-key [remap kbd-end-or-call-macro] 'my/kmacro-end-and-call-macro)
 
-  (fset 'my/send-to-jpm-mail
-        [?\M-x ?c ?o ?p ?y ?- ?f ?i ?l ?e ?- ?n
-               ?a ?m ?e ?- ?t ?o ?- ?c ?l ?i ?e backspace ?p return ?\M-x
-               ?m ?u ?r ?3 backspace backspace ?4 ?3 backspace ?e ?- ?c ?o
-               ?m ?p ?o ?s ?e return ?i ?v ?a ?n ?. ?y ?o ?n ?c ?h ?o ?v
-               ?s ?k ?i ?@ ?j ?p tab ?\C-n ?\C-y ?\C-n ?\C-n ?\C-c ?\C-a
-               ?\C-f backspace backspace ?\C-y return return return return
-               ?\C-c ?\C-c])
 
   (eval-after-load  "dired-x"
     '(defun dired-clean-up-after-deletion (fn)
@@ -514,10 +487,7 @@ Remove expanded subdir of deleted dir, if any."
                (and buf-list
                     (while buf-list
                       (save-excursion (kill-buffer (car buf-list)))
-                      (setq buf-list (cdr buf-list)))))))
-       ))
-
-  (setq which-key-idle-delay 1)
+                      (setq buf-list (cdr buf-list)))))))))
 
   (global-set-key [remap eww-follow-link] 'my/eww-follow-link)
 
@@ -561,7 +531,7 @@ Remove expanded subdir of deleted dir, if any."
   (define-key calendar-mode-map (kbd  "<f2>") #'exco-calendar-show-day)
 
   (bind-key "C-j" 'newline-and-indent)
-  (setq clojure-enable-fancify-symbols nil)
+  (setq clojure-enable-fancify-symbols t)
 
   (cljr-add-keybindings-with-prefix "C-c m")
   (helm-flx-mode t)
