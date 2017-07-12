@@ -253,6 +253,11 @@ values."
       "fp" 'my/find-project-file
       "ej" 'cider-pprint-eval-last-sexp))
 
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "ju" 'org-jira-progress-issue)
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jiu" 'org-jira-update-issue)
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jig" 'org-jira-get-issues)
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jl" 'org-jira-worklog-time-from-org-time)
+
   (setq evil-cross-lines t)
   (require 'evil-smartparens)
   (setq emmet-self-closing-tag-style "")
@@ -283,7 +288,10 @@ values."
   (bind-key ";" 'sp-comment)
   (spacemacs/set-leader-keys "bb" 'helm-buffers-list)
   (spacemacs/set-leader-keys "d" 'evil-operator-duplicate)
-  (spacemacs/set-leader-keys "ga" 'magit-stage-modified)
+  (spacemacs/set-leader-keys "ga" 'my/magit-stage-modified)
+  (spacemacs/set-leader-keys "gc" 'magit-commit)
+  (spacemacs/set-leader-keys "gwc" 'magit-wip-commit)
+  (spacemacs/set-leader-keys "gwl" 'magit-wip-log)
   (setq git-commit-summary-max-length 999)
   (setq kill-do-not-save-duplicates t)
   (setq cider-lein-command "~/.bin/lein")
@@ -414,4 +422,12 @@ With a prefix ARG invokes `projectile-commander' instead of
            (evil-insert 1)))))
    (define-key evil-normal-state-map (kbd "M-a") 'my/goto-end-of-form)
    (diredp-toggle-find-file-reuse-dir 1)
-   )
+
+   (defun my/magit-stage-modified ()
+     "Stage all changes to files"
+     (interactive)
+     (magit-with-toplevel
+       (magit-stage-1 "--all")))
+
+   (magit-wip-after-apply-mode t)
+   (setq evil-want-fine-undo nil))
