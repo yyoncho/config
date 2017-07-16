@@ -13,8 +13,9 @@ values."
    dotspacemacs-configuration-layer-path '("~/.remote-config/config/layers/")
    dotspacemacs-configuration-layers
    '(
-     rust
+     vinegar
      go
+     imenu-list
      lua
      evil-cleverparens
      version-control
