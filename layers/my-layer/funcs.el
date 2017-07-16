@@ -12,11 +12,6 @@
   (define-key dired-mode-map (kbd "I") 'dired-subtree-toggle)
   (setq-default dired-omit-files-p t)   ; Buffer-local variable
 
-  (global-flycheck-mode t)
-
-  (setq cider-prompt-save-file-on-load 'always-save)
-  (setq cider-use-fringe-indicators t)
-
   (require 'meghanada)
   (require 'cc-mode)
   (defun my/configure-java ()
@@ -95,6 +90,9 @@ PREFIX - whether to switch to the other window."
   (require 'auto-complete)
   (define-key ac-complete-mode-map "\C-n" 'ac-next)
   (define-key ac-complete-mode-map "\C-p" 'ac-previous)
+
+  (define-key company-active-map (kbd "<escape>") 'company-abort)
+  (define-key ac-complete-mode-map (kbd "<escape>") 'ac-abort)
 
   (setq sgml-basic-offset 4)
                                         ;(set-face-attribute 'default nil :height 200)

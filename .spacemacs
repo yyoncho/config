@@ -29,7 +29,6 @@ values."
      fasd
      colors
      shell
-     evil-snipe
      eww
      javascript
      python
@@ -103,8 +102,8 @@ values."
    dotspacemacs-scratch-mode 'text-mode
    dotspacemacs-themes '(zonokai-blue)
    dotspacemacs-colorize-cursor-according-to-state t
-   dotspacemacs-default-font '("Source Code Pro"
-                               :size 14
+   dotspacemacs-default-font '("Source Code Pro Medium"
+                               :size 12
                                :weight normal
                                :width normal
                                :powerline-scale 1.5)
@@ -127,7 +126,7 @@ values."
    dotspacemacs-helm-resize nil
    dotspacemacs-helm-no-header nil
    dotspacemacs-helm-position 'bottom
-   dotspacemacs-helm-use-fuzzy 'source
+   dotspacemacs-helm-use-fuzzy 'always
    dotspacemacs-enable-paste-transient-state nil
    dotspacemacs-which-key-delay 0.1
    dotspacemacs-which-key-position 'bottom
@@ -249,16 +248,20 @@ values."
       "tg" 'cider-test-rerun-test
       "nt" 'cider-toggle-trace-ns
       "j"  'evil-operator-clojure
+      "es" 'my/mount-restart
       "," 'cider-eval-defun-at-point
       ";" 'sp-comment
       "fp" 'my/find-project-file
       "ej" 'cider-pprint-eval-last-sexp))
 
-  (spacemacs/set-leader-keys-for-major-mode 'org-mode "ju" 'org-jira-progress-issue)
-  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jiu" 'org-jira-update-issue)
-  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jig" 'org-jira-get-issues)
-  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jl" 'org-jira-worklog-time-from-org-time)
+  ;; org jira keybindings
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jp" 'org-jira-progress-issue)
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "ji" 'org-jira-update-issue)
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jg" 'org-jira-get-issues)
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jl" 'org-jira-update-worklogs-from-org-clocks)
 
+  ;; Emacs lisp
+  (spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "," 'eval-defun)
 
   (require 'evil-smartparens)
   (setq emmet-self-closing-tag-style "")
@@ -289,7 +292,6 @@ values."
     "Paste action."
     :move-point nil
     (interactive "<r>")
-
     (save-excursion
       (goto-char end)
       (insert " ")
@@ -419,6 +421,7 @@ With a prefix ARG invokes `projectile-commander' instead of
 
   (define-key evil-normal-state-map "p" 'evil-paste-before)
   (define-key evil-normal-state-map "P" 'evil-paste-after)
+
   (setq projectile-create-missing-test-files t)
   (setq cljr-warn-on-eval nil)
 
@@ -450,4 +453,26 @@ With a prefix ARG invokes `projectile-commander' instead of
         evil-cross-lines t)
   ;; jira configuration
   (setq jiralib-url "https://jira.tick42.com"
-        jiralib-user-login-name "iyonchovski"))
+        jiralib-user-login-name "iyonchovski")
+  (setq cider-prompt-save-file-on-load t)
+  (setq cider-use-fringe-indicators t)
+  (setq-default dotspacemacs-configuration-layers
+                '((clojure :variables clojure-enable-fancify-symbols t)))
+  (mu4e-alert-enable-mode-line-display)
+  (setq evil-lisp-state-enter-lisp-state-on-command nil)
+
+  (defun my/mount-restart ()
+    "Restarts mount"
+    (interactive "P")
+    (let* ((form "(do (mount/stop) (mount/start))")
+           (override cider-interactive-eval-override)
+           (ns-form (if (cider-ns-form-p form) "" (format "(ns %s)" (cider-current-ns)))))
+      (with-current-buffer (get-buffer-create cider-read-eval-buffer)
+        (erase-buffer)
+        (clojure-mode)
+        (unless (string= "" ns-form)
+          (insert ns-form "\n\n"))
+        (insert form)
+        (let ((cider-interactive-eval-override override))
+          (cider-interactive-eval form)))))
+  )
