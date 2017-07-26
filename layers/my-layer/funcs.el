@@ -1,4 +1,3 @@
-
 (defun my/init ()
   (interactive)
 
@@ -86,15 +85,7 @@ PREFIX - whether to switch to the other window."
     (setq buffer-display-table (make-display-table))
     (aset buffer-display-table ?\^M []))
 
-  ;; auto complete settings
-  (require 'auto-complete)
-  (define-key ac-complete-mode-map "\C-n" 'ac-next)
-  (define-key ac-complete-mode-map "\C-p" 'ac-previous)
 
-  (define-key company-active-map (kbd "<escape>") 'company-abort)
-  (define-key ac-complete-mode-map (kbd "<escape>") 'ac-abort)
-
-  (setq sgml-basic-offset 4)
                                         ;(set-face-attribute 'default nil :height 200)
   (add-hook 'nxml-mode-hook
             (lambda()
@@ -191,11 +182,6 @@ PREFIX - whether to switch to the other window."
       (sort-lines nil (region-beginning) (region-end))))
 
   (require 'projectile)
-
-  (defun my/projectile-open-pom ()
-    "Open's pom file from the project."
-    (interactive)
-    (find-file (concat (projectile-project-root) "pom.xml")))
 
   (require 'vc-dispatcher)
   (setq vc-suppress-confirm nil)
@@ -326,11 +312,6 @@ the current buffer."
     (my/start-or-switch-to (lambda ()
                              (ansi-term crux-shell (concat crux-term-buffer-name "-term")))
                            (format "*%s-term*" crux-term-buffer-name)))
-
-  (bind-key "C-x 2" 'my/vsplit-last-buffer)
-  (bind-key "C-x 3" 'my/hsplit-last-buffer)
-  (bind-key "C-c M-p" 'my/projectile-open-pom)
-
   (require 'nxml-mode)
   (bind-key "C-c M-e" 'my/mvn-dependency-version-to-properties nxml-mode-map)
 
@@ -506,8 +487,6 @@ Remove expanded subdir of deleted dir, if any."
   (add-hook 'java-mode-hook #'flycheck-mode)
   (add-hook 'emms-playlist-mode-hook #'evil-evilified-state)
 
-  (remove-hook 'java-mode-hook #'ensime)
-
   (fset 'my/copy-worklog
         [?\C-c ?\C-x ?\C-w ?\C-y ?\C-y ?\C-p tab ?\C-n tab ?\C-n ?\C-k ?\C-k ?\C-n ?\M-f ?\M-f ?\M-f ?\M-f ?\C-f ?\M-x ?m ?y ?- backspace ?/ ?i ?n tab return])
 
@@ -526,10 +505,9 @@ Remove expanded subdir of deleted dir, if any."
    '(projectile-globally-ignored-directories
      (quote (".idea" ".ensime_cache" ".eunit" "target" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "target" ))))
 
-  (define-key calendar-mode-map (kbd  "<f2>") #'exco-calendar-show-day)
+  (define-key calendar-mode-map (kbd "<f2>") #'exco-calendar-show-day)
 
   (bind-key "C-j" 'newline-and-indent)
-  (setq clojure-enable-fancify-symbols t)
 
   (cljr-add-keybindings-with-prefix "C-c m")
   (helm-flx-mode t)

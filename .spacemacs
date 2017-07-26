@@ -14,10 +14,12 @@ values."
    dotspacemacs-configuration-layers
    '(
      vinegar
-     go
      imenu-list
      lua
      evil-cleverparens
+     spacemacs
+     spacemacs-base
+     spacemacs-bootstrap
      version-control
      haskell
      csv
@@ -53,8 +55,6 @@ values."
      elfeed)
    dotspacemacs-additional-packages
    '(java-snippets
-     ac-cider
-     ensime
      zonokai-theme
      w3m
      emms
@@ -78,7 +78,8 @@ values."
      diff-hl
      helm-dash
      dired-subtree
-     emms)
+     emms
+     flycheck-clojure)
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -104,7 +105,7 @@ values."
    dotspacemacs-themes '(zonokai-blue)
    dotspacemacs-colorize-cursor-according-to-state t
    dotspacemacs-default-font '("Source Code Pro Medium"
-                               :size 12
+                               :size 15
                                :weight normal
                                :width normal
                                :powerline-scale 1.5)
@@ -200,6 +201,9 @@ values."
 
   (setq helm-ff-guess-ffap-filenames t)
 
+  ;; do not ask when deleting buffers
+  (setq kill-buffer-query-functions (delq 'process-kill-buffer-query-function kill-buffer-query-functions))
+
   ;; contrast configuration
   (require 'shr-color)
   (setq shr-color-visible-distance-min 62)
@@ -211,12 +215,14 @@ values."
   ;; (load custom-file)
 
   (spacemacs/set-leader-keys "jj" 'my/goto-char-3)
+  (spacemacs/set-leader-keys "xts" 'transpose-sexps)
   (spacemacs/set-leader-keys "oo" 'recentf-open-most-recent-file)
-  (spacemacs/set-leader-keys "op" 'my/evil-operator-paste)
   (spacemacs/set-leader-keys "ot" 'projectile-find-test-file)
   (spacemacs/set-leader-keys "pp" 'my/projectile-switch-project-dired)
   (spacemacs/set-leader-keys "pt" 'projectile-test-project)
   (spacemacs/set-leader-keys "pT" 'neotree-find-project-root)
+  (spacemacs/set-leader-keys "oP" 'spacemacs/paste-transient-state/evil-paste-after)
+  (spacemacs/set-leader-keys "op" 'spacemacs/paste-transient-state/evil-paste-before)
 
   (sp-use-paredit-bindings)
   (spacemacs/toggle-highlight-current-line-globally-off)
@@ -251,6 +257,8 @@ values."
       "j"  'evil-operator-clojure
       "es" 'my/mount-restart
       "," 'cider-eval-defun-at-point
+      "dl" 'cider-inspect-last-result
+      "k" 'cider-interrupt
       ";" 'sp-comment
       "fp" 'my/find-project-file
       "ej" 'cider-pprint-eval-last-sexp))
@@ -316,6 +324,9 @@ values."
 
   (global-diff-hl-mode t)
   (add-hook 'cider-mode-hook 'rainbow-delimiters-mode-enable)
+
+  (spacemacs|define-jump-handlers java-mode meghanada-jump-declaration)
+
   (remove-hook 'cider-mode-hook 'aggressive-indent-mode)
 
   (global-subword-mode t)
@@ -366,10 +377,18 @@ values."
                (0 (progn (compose-region (match-beginning 1)
                                          (match-end 1) "π")
                          nil)))
-              ("\\(#\\){"                 ; sets
+              ("(\\(partial\\)[\[[:space:]]"
                (0 (progn (compose-region (match-beginning 1)
-                                         (match-end 1) "∈")
-                         nil)))))))
+                                         (match-end 1) "Ƥ"))))
+              ("(\\(comp\\)[\[[:space:]]"
+               (0 (progn (compose-region (match-beginning 1)
+                                         (match-end 1) "∘"))))
+              ("\\(#\\)("
+               (0 (progn (compose-region (match-beginning 1)
+                                         (match-end 1) "ƒ"))))
+              ("\\(#\\){"
+               (0 (progn (compose-region (match-beginning 1)
+                                         (match-end 1) "∈"))))))))
   (global-flycheck-mode t)
 
   (setq clojure-enable-fancify-symbols t)
@@ -476,4 +495,41 @@ With a prefix ARG invokes `projectile-commander' instead of
         (insert form)
         (let ((cider-interactive-eval-override override))
           (cider-interactive-eval form)))))
-  )
+
+  (require 'auto-complete)
+  (define-key ac-complete-mode-map "\C-n" 'ac-next)
+  (define-key ac-complete-mode-map "\C-p" 'ac-previous)
+  (define-key company-active-map (kbd "<escape>") 'company-abort)
+
+  (require 'company)
+  (define-key ac-complete-mode-map (kbd "<escape>") 'ac-abort)
+  (setq magit-diff-arguments '("--stat" "--no-ext-diff" "--ignore-all-space"))
+  (defun eval-and-replace ()
+    "Replace the preceding sexp with its value."
+    (interactive)
+    (backward-kill-sexp)
+    (condition-case nil
+        (prin1 (eval (read (current-kill 0)))
+               (current-buffer))
+      (error (message "Invalid expression")
+             (insert (current-kill 0)))))
+  (setq evil-move-cursor-back nil)
+
+  (spacemacs/set-leader-keys-for-major-mode 'java-mode
+    "tt" 'meghanada-run-junit-test-case
+    "tg" 'meghanada-run-junit-recent
+    "ea" 'meghanada-compile-project
+    "eb" 'meghanada-compile-file
+    "qr" 'meghanada-restart
+    "tn" 'meghanada-run-junit-class)
+  (defun my/switch-full-screen ()
+    (interactive)
+    (shell-command "wmctrl -r :ACTIVE: -b remove,maximized_horz")
+    (shell-command "wmctrl -r :ACTIVE: -b remove,maximized_vert")
+    (my/two-monitors)
+    (shell-command "wmctrl -r :ACTIVE: -b add,above"))
+  (spacemacs/set-leader-keys "of" 'my/switch-full-screen)
+  (eval-after-load 'flycheck '(flycheck-clojure-setup))
+  (add-hook 'clojure-mode-hook 'flycheck-mode)
+  (eval-after-load 'flycheck
+    '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
