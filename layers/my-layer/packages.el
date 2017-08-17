@@ -1,11 +1,5 @@
 (defconst my-layer-packages
-  '(ac-cider
-    ace-link
-    auto-complete-nxml
-    flycheck-clojure
-    flycheck-pos-tip
-    java-snippets
-    persistent-scratch
+  '(auto-complete-nxml
     evil-smartparens))
 
 (defun my-layer/init-sx ()

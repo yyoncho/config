@@ -36,10 +36,6 @@
 
   (setq make-backup-files nil)
 
-  (add-hook 'cider-mode-hook 'ac-flyspell-workaround)
-  (add-hook 'cider-mode-hook 'ac-cider-setup)
-  (add-hook 'cider-repl-mode-hook 'ac-cider-setup)
-
   (setenv "PATH" (concat (getenv "PATH") ":~/.bin"))
   (put 'set-goal-column 'disabled nil)
 

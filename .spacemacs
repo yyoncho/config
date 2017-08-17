@@ -217,6 +217,7 @@ values."
   (spacemacs/set-leader-keys "jj" 'my/goto-char-3)
   (spacemacs/set-leader-keys "xts" 'transpose-sexps)
   (spacemacs/set-leader-keys "oo" 'recentf-open-most-recent-file)
+  (spacemacs/set-leader-keys "od" 'my/duplicate-2)
   (spacemacs/set-leader-keys "ot" 'projectile-find-test-file)
   (spacemacs/set-leader-keys "pp" 'my/projectile-switch-project-dired)
   (spacemacs/set-leader-keys "pt" 'projectile-test-project)
@@ -256,6 +257,8 @@ values."
       "nt" 'cider-toggle-trace-ns
       "j"  'evil-operator-clojure
       "es" 'my/mount-restart
+      "ld" 'my/timbre-debug
+      "li" 'my/timbre-info
       "," 'cider-eval-defun-at-point
       "dl" 'cider-inspect-last-result
       "k" 'cider-interrupt
@@ -263,7 +266,7 @@ values."
       "fp" 'my/find-project-file
       "ej" 'cider-pprint-eval-last-sexp))
 
-  ;; org jira keybindings
+  ;; org jira key bindings
   (spacemacs/set-leader-keys-for-major-mode 'org-mode "jp" 'org-jira-progress-issue)
   (spacemacs/set-leader-keys-for-major-mode 'org-mode "ji" 'org-jira-update-issue)
   (spacemacs/set-leader-keys-for-major-mode 'org-mode "jg" 'org-jira-get-issues)
@@ -278,7 +281,8 @@ values."
   (sp-pair "{" "}" :wrap "M-{")
   (sp-pair "[" "]" :wrap "M-[")
   (global-evil-mc-mode t)
-
+  (setq-default which-key-idle-delay 2.0)
+  (setq-default which-key-idle-secondary-delay 1.0)
   (evil-define-operator evil-operator-clojure (beg end)
     "Evil operator for evaluating code."
     :move-point nil
@@ -481,11 +485,9 @@ With a prefix ARG invokes `projectile-commander' instead of
   (mu4e-alert-enable-mode-line-display)
   (setq evil-lisp-state-enter-lisp-state-on-command nil)
 
-  (defun my/mount-restart ()
-    "Restarts mount"
-    (interactive "P")
-    (let* ((form "(do (mount/stop) (mount/start))")
-           (override cider-interactive-eval-override)
+  (defun my/exec-clj-code (form)
+    "Exec clj code"
+    (let* ((override cider-interactive-eval-override)
            (ns-form (if (cider-ns-form-p form) "" (format "(ns %s)" (cider-current-ns)))))
       (with-current-buffer (get-buffer-create cider-read-eval-buffer)
         (erase-buffer)
@@ -495,6 +497,21 @@ With a prefix ARG invokes `projectile-commander' instead of
         (insert form)
         (let ((cider-interactive-eval-override override))
           (cider-interactive-eval form)))))
+
+  (defun my/mount-restart ()
+    "Restarts mount"
+    (interactive)
+    (my/exec-clj-code "(do (mount/stop) (mount/start))"))
+
+  (defun my/timbre-debug ()
+    "Change level to debug"
+    (interactive )
+    (my/exec-clj-code "(taoensso.timbre/set-level! :debug)"))
+
+  (defun my/timbre-info ()
+    "Change level to info"
+    (interactive)
+    (my/exec-clj-code "(taoensso.timbre/set-level! :info)"))
 
   (require 'auto-complete)
   (define-key ac-complete-mode-map "\C-n" 'ac-next)
@@ -522,14 +539,30 @@ With a prefix ARG invokes `projectile-commander' instead of
     "eb" 'meghanada-compile-file
     "qr" 'meghanada-restart
     "tn" 'meghanada-run-junit-class)
+
   (defun my/switch-full-screen ()
     (interactive)
     (shell-command "wmctrl -r :ACTIVE: -b remove,maximized_horz")
     (shell-command "wmctrl -r :ACTIVE: -b remove,maximized_vert")
     (my/two-monitors)
     (shell-command "wmctrl -r :ACTIVE: -b add,above"))
+
   (spacemacs/set-leader-keys "of" 'my/switch-full-screen)
   (eval-after-load 'flycheck '(flycheck-clojure-setup))
   (add-hook 'clojure-mode-hook 'flycheck-mode)
   (eval-after-load 'flycheck
-    '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
+    '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
+  (display-time-mode t)
+  (fset 'my/duplicate-2
+        (lambda (&optional arg) "Keyboard macro."
+          (interactive "p")
+          (kmacro-exec-ring-item (quote (" d2L" 0 "%d")) arg))))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(eww-search-prefix "https://www.google.com/search?q=")
+ '(package-selected-packages
+   (quote
+    (typescript-mode faceup org-category-capture ht alert log4e gntp markdown-mode skewer-mode json-snatcher json-reformat js2-mode parent-mode projectile request haml-mode gitignore-mode fringe-helper git-gutter+ git-gutter flyspell-correct pos-tip flycheck flx url-http-ntlm soap-client fsm ntlm magit magit-popup git-commit with-editor iedit org-plus-contrib orgit zonokai-theme yapfify yaml-mode xterm-color ws-butler winum which-key web-mode web-beautify w3m volatile-highlights vi-tilde-fringe uuidgen use-package unfill toc-org tide tagedit sx sr-speedbar sql-indent spaceline smeargle slim-mode shell-pop scss-mode sass-mode restart-emacs rainbow-mode rainbow-identifiers rainbow-delimiters racket-mode pyvenv pytest pyenv-mode py-isort pug-mode powershell pip-requirements persp-mode persistent-scratch pcre2el paradox origami org-projectile org-present org-pomodoro org-jira org-download org-bullets open-junk-file neotree mwim multi-term mu4e-maildirs-extension mu4e-alert move-text mmm-mode midje-mode meghanada markdown-toc magit-gitflow macrostep lua-mode lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc java-snippets intero info+ indent-guide imenu-list ibuffer-projectile hy-mode hungry-delete htmlize hlint-refactor hl-todo hindent highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-hoogle helm-gitignore helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-ag haskell-snippets google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md fuzzy forecast flyspell-correct-helm flycheck-pos-tip flycheck-haskell flycheck-clojure flx-ido fill-column-indicator fasd fancy-battery eyebrowse expand-region exec-path-from-shell excorporate eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-smartparens evil-search-highlight-persist evil-numbers evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens evil-args evil-anzu eshell-z eshell-prompt-extras esh-help emms emmet-mode elisp-slime-nav elfeed-web elfeed-org elfeed-goodies easy-kill dumb-jump disaster dired-subtree dired-efap dired+ diff-hl define-word cython-mode cypher-mode csv-mode company-web company-tern company-statistics company-ghci company-ghc company-cabal company-c-headers company-anaconda command-log-mode column-enforce-mode color-identifiers-mode coffee-mode cmm-mode cmake-mode clojure-snippets clj-refactor clean-aindent-mode clang-format cider-eval-sexp-fu auto-yasnippet auto-highlight-symbol auto-dictionary auto-complete-nxml auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell))))
