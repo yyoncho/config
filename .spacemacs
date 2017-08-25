@@ -57,6 +57,7 @@ values."
    '(java-snippets
      zonokai-theme
      w3m
+     key-chord
      emms
      auto-complete-nxml
      sr-speedbar
@@ -72,14 +73,16 @@ values."
      ace-link
      java-snippets
      sx
-     midje-mode
      eww
      persistent-scratch
      diff-hl
      helm-dash
      dired-subtree
      emms
-     flycheck-clojure)
+     flycheck-clojure
+     all-the-icons
+     all-the-icons-dired
+     yahoo-weather)
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -214,16 +217,6 @@ values."
   (setq custom-file "~/.remote-config/config/.custom.el")
   ;; (load custom-file)
 
-  (spacemacs/set-leader-keys "jj" 'my/goto-char-3)
-  (spacemacs/set-leader-keys "xts" 'transpose-sexps)
-  (spacemacs/set-leader-keys "oo" 'recentf-open-most-recent-file)
-  (spacemacs/set-leader-keys "od" 'my/duplicate-2)
-  (spacemacs/set-leader-keys "ot" 'projectile-find-test-file)
-  (spacemacs/set-leader-keys "pp" 'my/projectile-switch-project-dired)
-  (spacemacs/set-leader-keys "pt" 'projectile-test-project)
-  (spacemacs/set-leader-keys "pT" 'neotree-find-project-root)
-  (spacemacs/set-leader-keys "oP" 'spacemacs/paste-transient-state/evil-paste-after)
-  (spacemacs/set-leader-keys "op" 'spacemacs/paste-transient-state/evil-paste-before)
 
   (sp-use-paredit-bindings)
   (spacemacs/toggle-highlight-current-line-globally-off)
@@ -254,11 +247,13 @@ values."
       "qr" 'cider-restart
       "tv" 'cider-toggle-trace-var
       "tg" 'cider-test-rerun-test
+      "te" 'cider-visit-error-buffer
       "nt" 'cider-toggle-trace-ns
       "j"  'evil-operator-clojure
       "es" 'my/mount-restart
       "ld" 'my/timbre-debug
       "li" 'my/timbre-info
+      "lt" 'my/timbre-trace
       "," 'cider-eval-defun-at-point
       "dl" 'cider-inspect-last-result
       "k" 'cider-interrupt
@@ -309,16 +304,14 @@ values."
       (goto-char end)
       (insert " ")
       (yank)))
-
-  (setq cider-save-file-on-load t)
+  (require 'skype)
+  (setq skype--my-user-handle "yonchovski")
+  (setq cider-save-file-on-load t
+        cider-auto-jump-to-error nil
+        cider-auto-select-test-report-buffer nil
+        cider-show-error-buffer nil)
 
   (bind-key ";" 'sp-comment)
-  (spacemacs/set-leader-keys "bb" 'helm-buffers-list)
-  (spacemacs/set-leader-keys "d" 'evil-operator-duplicate)
-  (spacemacs/set-leader-keys "ga" 'my/magit-stage-modified)
-  (spacemacs/set-leader-keys "gc" 'magit-commit)
-  (spacemacs/set-leader-keys "gwc" 'magit-wip-commit)
-  (spacemacs/set-leader-keys "gwl" 'magit-wip-log)
   (setq git-commit-summary-max-length 999)
   (setq kill-do-not-save-duplicates t)
   (setq cider-lein-command "~/.bin/lein")
@@ -328,6 +321,7 @@ values."
 
   (global-diff-hl-mode t)
   (add-hook 'cider-mode-hook 'rainbow-delimiters-mode-enable)
+  (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
 
   (spacemacs|define-jump-handlers java-mode meghanada-jump-declaration)
 
@@ -348,7 +342,6 @@ values."
     (interactive "P")
     (switch-to-buffer "*compilation*"))
 
-  (spacemacs/set-leader-keys "cb" 'my/switch-to-compilation-buffer)
 
   (dolist (mode '(clojure-mode clojurescript-mode cider-mode clojurec-mode))
     (eval-after-load mode
@@ -513,6 +506,11 @@ With a prefix ARG invokes `projectile-commander' instead of
     (interactive)
     (my/exec-clj-code "(taoensso.timbre/set-level! :info)"))
 
+  (defun my/timbre-trace ()
+    "Change level to info"
+    (interactive)
+    (my/exec-clj-code "(taoensso.timbre/set-level! :trace)"))
+
   (require 'auto-complete)
   (define-key ac-complete-mode-map "\C-n" 'ac-next)
   (define-key ac-complete-mode-map "\C-p" 'ac-previous)
@@ -547,16 +545,81 @@ With a prefix ARG invokes `projectile-commander' instead of
     (my/two-monitors)
     (shell-command "wmctrl -r :ACTIVE: -b add,above"))
 
-  (spacemacs/set-leader-keys "of" 'my/switch-full-screen)
   (eval-after-load 'flycheck '(flycheck-clojure-setup))
   (add-hook 'clojure-mode-hook 'flycheck-mode)
+  (add-hook 'clojure-mode-hook (lambda () (eval-sexp-fu-flash-mode -1)))
   (eval-after-load 'flycheck
     '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
   (display-time-mode t)
+  (setq helm-exit-idle-delay 0)
+
   (fset 'my/duplicate-2
         (lambda (&optional arg) "Keyboard macro."
           (interactive "p")
-          (kmacro-exec-ring-item (quote (" d2L" 0 "%d")) arg))))
+          (kmacro-exec-ring-item (quote (" d2L" 0 "%d")) arg)))
+
+  (setq key-chord-two-keys-delay 0.1)
+  (setq key-chord-one-key-delay  0.1)
+;;(key-chord-define-global "jk" 'next-buffer)
+  ;;(key-chord-define-global "kj" 'previous-buffer)
+  (key-chord-mode 1)
+
+  (fset 'my/format-defun
+        (lambda (&optional arg) "Keyboard macro." (interactive "p")
+          (save-mark-and-excursion
+           (kmacro-exec-ring-item (quote ("vad j=" 0 "%d")) arg))))
+
+  (defun my/show-error (text)
+    "Shows error message"
+    (interactive)
+    (message (propertize (s-replace "\n" "" text) 'face 'cider-test-failure-face)))
+
+  (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+
+
+  (require 'cider)
+  (defun cider-emit-interactive-eval-err-output (output)
+    "Emit err OUTPUT resulting from interactive code evaluation.
+The output can be send to either a dedicated output buffer or the current
+REPL buffer.  This is controlled via
+`cider-interactive-eval-output-destination'."
+    (my/show-error output)
+    (cider--emit-interactive-eval-output output 'cider-repl-emit-interactive-stderr))
+
+  ;; weather
+  (yahoo-weather-mode t)
+  (setq yahoo-weather-location "Sofia")
+  (setq yahoo-weather-format "|%(weather) %(temperature)C|")
+
+  (spacemacs/set-leader-keys "bb" 'helm-buffers-list)
+  (spacemacs/set-leader-keys "cb" 'my/switch-to-compilation-buffer)
+  (spacemacs/set-leader-keys "d" 'evil-operator-duplicate)
+  (spacemacs/set-leader-keys "ga" 'my/magit-stage-modified)
+  (spacemacs/set-leader-keys "gc" 'magit-commit)
+  (spacemacs/set-leader-keys "gwc" 'magit-wip-commit)
+  (spacemacs/set-leader-keys "gwl" 'magit-wip-log)
+  (spacemacs/set-leader-keys "jj" 'my/goto-char-3)
+  (spacemacs/set-leader-keys "oP" 'spacemacs/paste-transient-state/evil-paste-after)
+  (spacemacs/set-leader-keys "od" 'my/duplicate-2)
+  (spacemacs/set-leader-keys "of" 'my/switch-full-screen)
+  (spacemacs/set-leader-keys "oo" 'recentf-open-most-recent-file)
+  (spacemacs/set-leader-keys "o=" 'my/format-defun)
+  (spacemacs/set-leader-keys "op" 'spacemacs/paste-transient-state/evil-paste-before)
+  (spacemacs/set-leader-keys "ot" 'projectile-find-test-file)
+  (spacemacs/set-leader-keys "ghn" 'diff-hl-next-hunk)
+  (spacemacs/set-leader-keys "jr" 'jump-to-register)
+  (spacemacs/set-leader-keys "ghk" 'diff-hl-revert-hunk)
+  (spacemacs/set-leader-keys "ghv" 'diff-hl-mark-hunk)
+  (spacemacs/set-leader-keys "ghp" 'diff-hl-previous-hunk)
+  (spacemacs/set-leader-keys "pT" 'neotree-find-project-root)
+  (spacemacs/set-leader-keys "so" 'helm-do-grep-ag)
+  (spacemacs/set-leader-keys "xts" 'transpose-sexps)
+  (spacemacs/set-leader-keys "pp" 'my/projectile-switch-project-dired)
+  (spacemacs/set-leader-keys "pt" 'projectile-test-project)
+
+  )
+
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
