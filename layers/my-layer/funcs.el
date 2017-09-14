@@ -1,202 +1,18 @@
 (defun my/init ()
   (interactive)
-
-  (custom-set-variables
-   '(send-mail-function (quote smtpmail-send-it)))
-
-  ;; dired configuration
-  (require 'dired-x)
-  (require 'dired+)
-
-  (define-key dired-mode-map (kbd "I") 'dired-subtree-toggle)
-  (setq-default dired-omit-files-p t)   ; Buffer-local variable
-
-  (require 'meghanada)
-  (require 'cc-mode)
-  (defun my/configure-java ()
-    "Configure java"
-    (interactive)
-    (c-set-offset 'arglist-cont-nonempty '++)
-    (c-set-offset 'arglist-intro '++)
-    (electric-layout-mode t)
-    (auto-complete-mode t)
-    (rainbow-delimiters-mode-enable)
-    (indent-guide-mode t)
-    (setq c-basic-offset 4))
-
-  (setq c-default-style
-        '((java-mode . "java")
-          (other . "gnu")))
-  (remove-hook 'java-mode-hook #'aggressive-indent-mode)
-  (add-hook 'java-mode-hook #'yas-minor-mode)
-  (add-hook 'java-mode-hook #'my/configure-java)
-
-  (indent-guide-global-mode t)
-  (define-key java-mode-map (kbd "C-<f11>") 'meghanada-run-junit-recent)
-
   (setq make-backup-files nil)
 
   (setenv "PATH" (concat (getenv "PATH") ":~/.bin"))
-  (put 'set-goal-column 'disabled nil)
-
-  (require 'ediff-diff)
-
-  (setq ediff-diff-options "-w")
-
-  ;; better window splitting
-  (defun my/vsplit-last-buffer (prefix)
-    "Split the window vertically and display the previous buffer.
-PREFIX - whether to switch to the other window."
-    (interactive "p")
-    (split-window-vertically)
-    (other-window 1 nil)
-    (if (= prefix 1)
-        (switch-to-next-buffer)))
-
-  (defun my/hsplit-last-buffer (prefix)
-    "Split the window horizontally and display the previous buffer.
-PREFIX - whether to switch to the other window."
-    (interactive "p")
-    (split-window-horizontally)
-    (other-window 1 nil)
-    (if (= prefix 1) (switch-to-next-buffer)))
-
-  (global-set-key [remap kbd-end-or-call-macro] 'my/kmacro-end-and-call-macro)
-  (global-set-key [remap split-window-right] 'my/hsplit-last-buffer)
 
   ;; prevent prompt for killing emcacsclient buffer
   (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
-  (setq inhibit-splash-screen t)
 
-  (require 'term)
-  (define-key term-raw-map  (kbd "C-'") 'term-line-mode)
-  (define-key term-mode-map (kbd "C-'") 'term-char-mode)
-  (define-key term-raw-map  (kbd "C-y") 'term-paste)
+  ;;(set-face-attribute 'default nil :height 120)
 
-  (setq shift-selection-mode t)
-
-  (defun my/remove-dos-eol ()
-    "Do not show ^M in files containing mixed UNIX and DOS line endings."
-    (interactive)
-    (setq buffer-display-table (make-display-table))
-    (aset buffer-display-table ?\^M []))
-
-
-                                        ;(set-face-attribute 'default nil :height 200)
-  (add-hook 'nxml-mode-hook
-            (lambda()
-              (web-mode)
-              (local-unset-key (kbd "C-M-u"))))
 
   (require 'browse-url)
   (setq browse-url-browser-function 'eww-browse-url
         browse-url-generic-program "conkeror")
-
-  (set-face-attribute 'default nil :height 130)
-
-  (setq split-width-threshold 160)
-
-  (require 'company)
-  (define-key company-active-map "\C-p" 'company-select-previous)
-  (define-key company-active-map "\C-n" 'company-select-next)
-  (define-key company-active-map "\C-j" 'company-complete-selection)
-
-  (require 'cc-mode)
-  (define-key java-mode-map "\M-j" 'join-next-line)
-
-  (add-hook 'midje-mode-hook
-            (lambda ()
-              (define-key midje-mode-map (kbd "C-c b") nil)))
-  (setq clojure-enable-fancify-symbols nil)
-  ;; always follow symlinks
-  (setq vc-follow-symlinks t)
-
-  ;; use windows-1251
-  (modify-coding-system-alist 'file "\\.txt\\'" 'windows-1251)
-
-  (defun my/mvn-dependency-version-to-properties (&optional arg)
-    (interactive "p")
-    (save-excursion
-      (search-forward "<version>")
-      (kill-region (point) (progn
-                             (search-forward "</version>"
-                                             nil nil arg)
-                             (backward-char 10)
-                             (point)))
-      (let ((version (car kill-ring-yank-pointer)))
-        (search-backward "<dependency>")
-        (search-forward "<artifactId>")
-        (kill-ring-save (point) (progn
-                                  (search-forward "</artifactId>"
-                                                  nil nil arg)
-                                  (backward-char 13)
-                                  (point)))
-        (let ((group-id (car kill-ring-yank-pointer)))
-          (search-backward "<dependency>")
-          (search-forward "<version>")
-          (insert "${" group-id ".version}")
-          (search-backward "</properties>")
-          (search-backward ">")
-          (forward-char 1)
-          (insert "\n")
-          (indent-for-tab-command)
-          (insert "<" group-id ".version>" version "</" group-id ".version>" )))))
-
-  (defun my/mvn-inline-property ()
-    "Inline mvn property."
-    (interactive "p")
-    (save-excursion
-      (search-forward "<")
-      (kill-region (point) (progn
-                             (search-forward ">"
-                                             nil nil nil)
-                             (backward-char 1)
-                             (point)))
-      (let ((property-name (car kill-ring-yank-pointer)))
-        (forward-char 1)
-        (kill-region (point) (progn
-                               (search-forward "<"
-                                               nil nil nil)
-                               (backward-char 1)
-                               (point)))
-
-        (let ((property-value (car kill-ring-yank-pointer)))
-          (beginning-of-line)
-          (kill-line)
-          (kill-line)
-          (replace-match (concat "${" property-name "}") property-value)))))
-
-  (defun my/mvn-sort-properties ()
-    "Sort maven properties."
-    (interactive "p")
-    (save-excursion
-      (beginning-of-buffer)
-      (search-forward "<properties>")
-      (set-mark-command (point))
-      (search-forward "</properties>")
-                                        ;(flush-lines "^\\s-*$"  (region-beginning) (region-end))
-      (sort-lines nil (region-beginning) (region-end))))
-
-  (require 'projectile)
-
-  (require 'vc-dispatcher)
-  (setq vc-suppress-confirm nil)
-
-  (defun my/other-window (arg)
-    "Select ARGth window or switch buffer if there is only one window."
-    (interactive "p")
-    (let ((old-window  (selected-window)))
-      (other-window arg)
-      (when (equal old-window (selected-window))
-        (other-frame arg))))
-
-  ;; Save point position between sessions
-  (require 'saveplace)
-  (setq-default save-place t)
-  (setq save-place-file (expand-file-name ".places" user-emacs-directory))
-
-  ;; Auto refresh buffers
-  (global-auto-revert-mode 1)
 
   ;; Also auto refresh dired, but be quiet about it
   (setq global-auto-revert-non-file-buffers t)
@@ -217,210 +33,19 @@ PREFIX - whether to switch to the other window."
 
   (define-key magit-status-mode-map (kbd "q") 'my/magit-quit-session)
 
-  (defun my/projectile-find-implementation ()
-    "Open matching implementation or test file in other window."
-    (interactive)
-    (find-file (projectile-find-implementation-or-test (buffer-file-name))))
-
-  ;; unset the suspend frame command
-  (global-unset-key (kbd "C-z"))
-  (global-unset-key (kbd "C-x C-z"))
-
   ;; global key configuration
-  (bind-key "C-c C-<" 'mc/mark-all-like-this)
-  (bind-key "M-p" 'move-text-up)
-  (bind-key "M-n" 'move-text-down)
   (bind-key "C-x k" 'kill-current-buffer)
   (bind-key "M-j" 'evil-join)
   (bind-key "M-/" 'hippie-expand)
-  (bind-key "C-M-u" 'er/expand-region)
-  (bind-key "C->" 'mc/mark-next-like-this)
-  (bind-key "C-<" 'mc/mark-previous-like-this)
-  (bind-key "C-c C-<" 'mc/mark-all-like-this)
   (bind-key "C-h" 'backward-delete-char)
   (bind-key "C-M-h" 'backward-kill-word)
-  (bind-key "C-M-u" 'er/expand-region)
+
   (bind-key "C-<backspace>" 'subword-backward-kill)
-  (bind-key "C-c C-c" 'eval-defun)
-  (bind-key "C-c h" 'helm-google-suggest)
-  (bind-key "C->" 'mc/mark-next-like-this)
-  (bind-key "C-<" 'mc/mark-previous-like-this)
-  (bind-key "<f8>" 'emms)
-  (spacemacs/set-leader-keys "a r" 'mu4e-alert-view-unread-mails)
-  (spacemacs/set-leader-keys "a i" 'mu4e-alert-view-unread-mails)
-  (spacemacs/set-leader-keys "m m" (lambda ()
-                                     (interactive)
-                                     (mu4e~headers-jump-to-maildir "/Inbox")))
-
-  (defun get-buffers-matching-mode (mode)
-    "Returns a list of buffers where their major-mode is equal to MODE"
-    (let ((buffer-mode-matches '()))
-      (dolist (buf (buffer-list))
-        (with-current-buffer buf
-          (if (eq mode major-mode)
-              (add-to-list 'buffer-mode-matches buf))))
-      buffer-mode-matches))
-
-  (defun fg-emms-track-description (track)
-    "Return a somewhat nice track description."
-    (let ((artist (emms-track-get track 'info-artist))
-          (year (emms-track-get track 'info-year))
-          (album (emms-track-get track 'info-album))
-          (tracknumber (emms-track-get track 'info-tracknumber))
-          (title (emms-track-get track 'info-title)))
-      (cond
-       ((or artist title)
-        (concat (if (> (length artist) 0) artist "Unknown artist") " - "
-                (if (> (length year) 0) year "XXXX") " - "
-                (if (> (length album) 0) album "Unknown album") " - "
-                (if (> (length tracknumber) 0)
-                    (format "%02d" (string-to-number tracknumber))
-                  "XX") " - "
-                  (if (> (length title) 0) title "Unknown title")))
-       (t
-        (emms-track-simple-description track)))))
-
-  (defun my/helm-projectile-switch-to-buffer
-      (&optional arg)
-    "Use projectile with Helm for finding files in project\n\nWith a prefix ARG invalidates the cache first."
-    (interactive "P")
-    (let
-        ((helm-ff-transformer-show-only-basename nil)
-         (helm-boring-file-regexp-list nil))
-      (helm :sources 'helm-source-
-            :buffer "test"
-            :prompt "Switch to buffer: ")))
-
-  (defun my/start-or-switch-to (function buffer-name)
-    "Invoke FUNCTION if there is no buffer with BUFFER-NAME.
-Otherwise switch to the buffer named BUFFER-NAME.  Don't clobber
-the current buffer."
-    (if (not (get-buffer buffer-name))
-        (progn
-          (split-window-sensibly (selected-window))
-          (other-window 1)
-          (funcall function))
-      (switch-to-buffer buffer-name)))
-
-  (defun my/visit-term-buffer ()
-    "Create or visit a terminal buffer."
-    (interactive)
-    (my/start-or-switch-to (lambda ()
-                             (ansi-term crux-shell (concat crux-term-buffer-name "-term")))
-                           (format "*%s-term*" crux-term-buffer-name)))
-  (require 'nxml-mode)
-  (bind-key "C-c M-e" 'my/mvn-dependency-version-to-properties nxml-mode-map)
-
-  (require 'auto-complete-nxml)
-  ;; Keystroke to popup help about something at point.
-  (setq auto-complete-nxml-popup-help-key "C-:")
-  ;; Keystroke to toggle on/off automatic completion.
-  (setq auto-complete-nxml-toggle-automatic-key "C-c C-t")
-  (require 'sr-speedbar)
-  (setq sr-speedbar-right-side nil)
-
-  ;; python configuration
-  (add-hook 'python-mode-hook #'eldoc-mode)
-
-  (setq magit-save-repository-buffers 'dontask)
-
-  (when (file-exists-p "/usr/local/share/emacs/site-lisp/mu4e")
-    (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
-    (require 'mu4e)
-    (require 'mu4e-speedbar)
-
-    (defun my/mu4e-go-to-inbox ()
-      "Go to inbox."
-      (interactive)
-      (mu4e-headers-search
-       (format "maildir:\"%s\"" "/INBOX")))
-
-    (setq mu4e-drafts-folder "/Drafts"
-          mu4e-sent-folder   "/Sent Items"
-          mu4e-trash-folder  "/Trash"
-          mu4e-sent-messages-behavior 'sent
-          mu4e-msg2pdf "/usr/bin/msg2pdf"
-          mu4e-maildir-shortcuts '(("/INBOX" . ?i)
-                                   ("/Drafts" . ?d)
-                                   ("/Trash" . ?t)
-                                   ("/Sent Items" . ?s)
-                                   ("/bamboo" . ?b))
-          mu4e-get-mail-command "offlineimap"
-          mu4e-update-interval 100
-          user-mail-address "ivan.yonchovski@tick42.com"
-          user-full-name  "Ivan Yonchovski"
-          mu4e-compose-signature nil)
-
-    (require 'smtpmail)
-    (define-key mu4e-main-mode-map "j" nil)
-    (define-key mu4e-main-mode-map "i" 'mu4e~headers-jump-to-maildir)
-    (setq message-send-mail-function 'smtpmail-send-it
-          starttls-use-gnutls t
-          smtpmail-starttls-credentials '(("smtp.office365.com" 587 nil nil))
-          smtpmail-auth-credentials
-          '(("smtp.office365.com" 587 "ivan.yonchovski@tick42.com" nil))
-          smtpmail-smtp-server "smtp.office365.com"
-          smtpmail-smtp-service 587
-          message-kill-buffer-on-exit t)
-
-    (mu4e)
-
-    (use-package mu4e-alert
-      :ensure t
-      :config
-      (mu4e-alert-enable-notifications)
-      (mu4e-alert-set-default-style 'libnotify)
-      (setq mu4e-alert-interesting-mail-query
-            (concat "maildir:/INBOX and flag:unread"))
-
-      (alert-add-rule
-       :category "mu4e-alert"
-       :predicate (lambda (_) (string-match-p "^mu4e-" (symbol-name major-mode)))
-       :continue )
-
-      ;; display stuff on modeline as well as notify
-      (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
-      (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
-      (require 'mu4e-alert)))
-
-  ;; elfeed configuration
-  (require 'elfeed)
-  (setq elfeed-feeds
-        '("http://sachachua.com/blog/feed/"
-          "http://feeds.feedburner.com/cyclingnews/news?format=xml"
-          "http://endlessparentheses.com/atom.xml"))
 
   (require 'emms-setup)
   (emms-all)
   (emms-default-players)
   (emms-mode-line -1)
-
-  (defun my/find-symbol-at-point ()
-    "Find the function, face, or variable definition for the symbol at point
-in the other window."
-    (interactive)
-    (let ((symb (symbol-at-point)))
-      (cond
-       ((and (or (functionp symb)
-                 (fboundp symb))
-             (find-definition-noselect symb nil))
-        (find-function symb))
-       ((and (facep symb) (find-definition-noselect symb 'defface))
-        (find-face-definition symb))
-       ((and (boundp symb) (find-definition-noselect symb 'defvar))
-        (find-variable-other-window symb))
-       (t (message "No symbol at point")))))
-
-  (global-set-key [(control down-mouse-1)]
-                  (lambda (click)
-                    (interactive "e")
-                    (mouse-minibuffer-check click)
-                    (let* ((window (posn-window (event-start click)))
-                           (buf (window-buffer window)))
-                      (with-current-buffer buf
-                        (save-excursion
-                          (goto-char (posn-point (event-start click)))
-                          (my/find-symbol-at-point))))))
 
   (defun my/projectile-switch-project-magit (&optional arg)
     "Switch to a project we have visited before.
@@ -441,32 +66,8 @@ With a prefix ARG invokes `projectile-commander' instead of
 
   (global-set-key [remap kbd-end-or-call-macro] 'my/kmacro-end-and-call-macro)
 
-
-  (eval-after-load  "dired-x"
-    '(defun dired-clean-up-after-deletion (fn)
-       "My. Clean up after a deleted file or directory FN.
-Remove expanded subdir of deleted dir, if any."
-       (save-excursion (and (cdr dired-subdir-alist)
-                            (dired-goto-subdir fn)
-                            (dired-kill-subdir)))
-
-       ;; Offer to kill buffer of deleted file FN.
-       (if dired-clean-up-buffers-too
-           (progn
-             (let ((buf (get-file-buffer fn)))
-               (and buf
-                    (save-excursion ; you never know where kill-buffer leaves you
-                      (kill-buffer buf))))
-             (let ((buf-list (dired-buffers-for-dir (expand-file-name fn)))
-                   (buf nil))
-               (and buf-list
-                    (while buf-list
-                      (save-excursion (kill-buffer (car buf-list)))
-                      (setq buf-list (cdr buf-list)))))))))
-
   (global-set-key [remap eww-follow-link] 'my/eww-follow-link)
 
-  (setq sx-question-mode-display-buffer-function #'pop-to-buffer-same-window)
 
   ;; use mobile interface
   (setq url-user-agent (concat
@@ -501,112 +102,7 @@ Remove expanded subdir of deleted dir, if any."
    '(projectile-globally-ignored-directories
      (quote (".idea" ".ensime_cache" ".eunit" "target" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "target" ))))
 
-  (define-key calendar-mode-map (kbd "<f2>") #'exco-calendar-show-day)
-
-  (bind-key "C-j" 'newline-and-indent)
-
-  (cljr-add-keybindings-with-prefix "C-c m")
-  (helm-flx-mode t)
   (global-subword-mode t)
   (setq evil-move-beyond-eol t)
-  (define-key evil-motion-state-map (kbd "C-f") 'forward-char)
-  (define-key evil-motion-state-map (kbd "C-e") 'end-of-line)
-  (define-key evil-motion-state-map (kbd "C-b") 'backward-char)
-  (define-key evil-motion-state-map (kbd "C-d") 'delete-char)
 
-  (load "soap-client.el")
-
-  (require 'sx-interaction)
-
-  (defun my/browse-url (url new-window)
-    "Browse url in the associated app.
-URL - the url to browse.
-new-window - whether to open in new window."
-    (let ((host (elt (url-generic-parse-url url) 4)))
-      (if (or (string-equal "stackoverflow.com" host)
-              (s-index-of "stackexchange.com" host))
-          (sx-open-link url)
-        (eww-follow-link))))
-
-  (defun my/eww-follow-link (&optional external mouse-event)
-    "Browse the URL under point.
-If EXTERNAL is single prefix, browse the URL using `shr-external-browser'.
-If EXTERNAL is double prefix, browse in new buffer."
-    (interactive (list current-prefix-arg last-nonmenu-event))
-    (mouse-set-point mouse-event)
-    (let ((url (get-text-property (point) 'shr-url)))
-      (cond
-       ((not url)
-        (message "No link under point"))
-       ((string-match "^mailto:" url)
-        (browse-url-mail url))
-       ((and (consp external) (<= (car external) 4))
-        (funcall shr-external-browser url))
-       ;; This is a #target url in the same page as the current one.
-       ((and (url-target (url-generic-parse-url url))
-             (eww-same-page-p url (plist-get eww-data :url)))
-        (let ((dom (plist-get eww-data :dom)))
-          (eww-save-history)
-          (eww-display-html 'utf-8 url dom nil (current-buffer))))
-       ((string-prefix-p "http://www.google.bg/url?q=" url)
-        (message "The url is url redirect.")
-        (let* ((url-stripped-1 (s-replace "http://www.google.bg/url?q=" "" url))
-               (url-stripped (s-left (s-index-of "&" url-stripped-1) url-stripped-1)))
-          (message "Stripped google url: loading %s" url-stripped)
-          (my/browse-url url-stripped external)))
-       (t
-        (my/browse-url url external)))))
-
-  (setq sx-question-mode-display-buffer-function #'pop-to-buffer-same-window)
-
-  (defun my/emms-start ()
-    "Start emms."
-    (interactive)
-    (emms-default-players)
-    (emms-add-directory-tree "~/Music")
-    (emms-toggle-random-playlist)
-    (evil-evilified-state))
-
-  (require 'avy)
-  (setq large-file-warning-threshold nil)
-
-  (setq w3m-user-agent "Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC_Pyramid Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.")
-
-  (defun my/goto-char-3 (char1 char2 char3 &optional arg beg end)
-    "Jump to the currently visible CHAR1 followed by CHAR2 and char3.
-The window scope is determined by `avy-all-windows' (ARG negates it)."
-    (interactive (list (read-char "char 1: " t)
-                       (read-char "char 2: " t)
-                       (read-char "char 3: " t)
-                       current-prefix-arg
-                       nil nil))
-    (when (eq char1 ?)
-      (setq char1 ?\n))
-    (when (eq char2 ?)
-      (setq char2 ?\n))
-    (when (eq char1 ?)
-      (setq char1 ?\n))
-    (avy-with avy-goto-char-2
-      (avy--generic-jump
-       (regexp-quote (string char1 char2 char3))
-       arg
-       avy-style
-       beg end)))
-
-  (defun my/two-monitors ()
-    "Set frame size to cover 2 monitors"
-    (interactive)
-    (setq frame-resize-pixelwise t)
-    (set-frame-position (selected-frame) 0 0)
-    (set-frame-size (selected-frame) (* 2 1920) 1080 t))
-
-  (add-hook 'eww-mode-hook #'evil-evilified-state)
-
-  (defun my/set-frame-name (frame)
-    (modify-frame-parameters frame
-                             (list (cons 'name "emacs"))))
-  (add-to-list 'after-make-frame-functions 'my/set-frame-name)
-
-  (spacemacs/toggle-evil-cleverparens-on)
-  (add-hook 'clojure-mode-hook #'evil-cleverparens-mode)
-  (add-hook 'emacs-lisp-mode-hook #'evil-cleverparens-mode))
+  (load "soap-client.el"))

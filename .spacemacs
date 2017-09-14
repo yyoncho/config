@@ -15,7 +15,6 @@ values."
    '(
      vinegar
      imenu-list
-     lua
      evil-cleverparens
      spacemacs
      spacemacs-base
@@ -55,11 +54,13 @@ values."
      elfeed)
    dotspacemacs-additional-packages
    '(java-snippets
+     autopair
      zonokai-theme
      w3m
      key-chord
      emms
      auto-complete-nxml
+     skype
      sr-speedbar
      meghanada
      forecast
@@ -192,7 +193,14 @@ values."
 
 (defun dotspacemacs/user-config ()
   (interactive)
+
+  (require 'helm-bookmark)
   (require 'eww)
+  ;; eww configuration
+  (add-hook 'eww-mode-hook #'evil-evilified-state)
+
+  (setq w3m-user-agent "Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC_Pyramid Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.")
+
   (define-key eww-mode-map "f" 'ace-link-eww)
   (define-key eww-mode-map "g" 'eww)
   (define-key eww-mode-map "r" 'eww)
@@ -323,8 +331,9 @@ values."
   (add-hook 'cider-mode-hook 'rainbow-delimiters-mode-enable)
   (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
 
-  (spacemacs|define-jump-handlers java-mode meghanada-jump-declaration)
+  (spacemacs|define-jump-handlers java-mode '(meghanada-jump-declaration :async t))
 
+  ;; (setq spacemacs-jump-handlers-java-mode '((meghanada-jump-declaration :async t)))
   (remove-hook 'cider-mode-hook 'aggressive-indent-mode)
 
   (global-subword-mode t)
@@ -475,7 +484,7 @@ With a prefix ARG invokes `projectile-commander' instead of
   (setq cider-use-fringe-indicators t)
   (setq-default dotspacemacs-configuration-layers
                 '((clojure :variables clojure-enable-fancify-symbols t)))
-  (mu4e-alert-enable-mode-line-display)
+
   (setq evil-lisp-state-enter-lisp-state-on-command nil)
 
   (defun my/exec-clj-code (form)
@@ -514,9 +523,9 @@ With a prefix ARG invokes `projectile-commander' instead of
   (require 'auto-complete)
   (define-key ac-complete-mode-map "\C-n" 'ac-next)
   (define-key ac-complete-mode-map "\C-p" 'ac-previous)
-  (define-key company-active-map (kbd "<escape>") 'company-abort)
 
   (require 'company)
+  (define-key company-active-map (kbd "<escape>") 'company-abort)
   (define-key ac-complete-mode-map (kbd "<escape>") 'ac-abort)
   (setq magit-diff-arguments '("--stat" "--no-ext-diff" "--ignore-all-space"))
   (defun eval-and-replace ()
@@ -532,8 +541,12 @@ With a prefix ARG invokes `projectile-commander' instead of
 
   (spacemacs/set-leader-keys-for-major-mode 'java-mode
     "tt" 'meghanada-run-junit-test-case
+    "rai" 'meghanada-import-all
     "tg" 'meghanada-run-junit-recent
-    "ea" 'meghanada-compile-project
+    "ea" (lambda ()
+           (interactive)
+           (projectile-save-project-buffers)
+           (meghanada-compile-project))
     "eb" 'meghanada-compile-file
     "qr" 'meghanada-restart
     "tn" 'meghanada-run-junit-class)
@@ -560,7 +573,7 @@ With a prefix ARG invokes `projectile-commander' instead of
 
   (setq key-chord-two-keys-delay 0.1)
   (setq key-chord-one-key-delay  0.1)
-;;(key-chord-define-global "jk" 'next-buffer)
+  ;;(key-chord-define-global "jk" 'next-buffer)
   ;;(key-chord-define-global "kj" 'previous-buffer)
   (key-chord-mode 1)
 
@@ -591,6 +604,295 @@ REPL buffer.  This is controlled via
   (setq yahoo-weather-location "Sofia")
   (setq yahoo-weather-format "|%(weather) %(temperature)C|")
 
+  ;; indent mode
+  (indent-guide-global-mode t)
+
+  ;; better window splitting
+  (defun my/vsplit-last-buffer (prefix)
+    "Split the window vertically and display the previous buffer.
+PREFIX - whether to switch to the other window."
+    (interactive "p")
+    (split-window-vertically)
+    (other-window 1 nil)
+    (if (= prefix 1)
+        (switch-to-next-buffer)))
+
+  (defun my/hsplit-last-buffer (prefix)
+    "Split the window horizontally and display the previous buffer.
+PREFIX - whether to switch to the other window."
+    (interactive "p")
+    (split-window-horizontally)
+    (other-window 1 nil)
+    (if (= prefix 1) (switch-to-next-buffer)))
+
+
+  (require 'term)
+  (define-key term-raw-map  (kbd "C-'") 'term-line-mode)
+  (define-key term-mode-map (kbd "C-'") 'term-char-mode)
+  (define-key term-raw-map  (kbd "C-y") 'term-paste)
+
+  (global-set-key [remap kbd-end-or-call-macro] 'my/kmacro-end-and-call-macro)
+  (global-set-key [remap split-window-right] 'my/hsplit-last-buffer)
+
+  (put 'set-goal-column 'disabled nil)
+
+  ;; enable shift selection mode
+  (setq shift-selection-mode t)
+
+  ;; java configuration
+  (defun my/configure-java ()
+    "Configure java"
+    (interactive)
+    (c-set-offset 'arglist-cont-nonempty '++)
+    (c-set-offset 'arglist-intro '++)
+    (electric-layout-mode t)
+    (auto-complete-mode t)
+    (rainbow-delimiters-mode-enable)
+    (indent-guide-mode t)
+    (setq c-basic-offset 4))
+
+  (setq c-default-style
+        '((java-mode . "java")
+          (other . "gnu")))
+  (remove-hook 'java-mode-hook #'aggressive-indent-mode)
+  (add-hook 'java-mode-hook #'yas-minor-mode)
+  (add-hook 'java-mode-hook #'my/configure-java)
+
+  ;; company key configuration
+  (require 'company)
+  (define-key company-active-map "\C-p" 'company-select-previous)
+  (define-key company-active-map "\C-n" 'company-select-next)
+  (define-key company-active-map "\C-j" 'company-complete-selection)
+
+
+  ;; always follow symlinks
+  (setq vc-follow-symlinks t)
+
+  (require 'vc-dispatcher)
+  (setq vc-suppress-confirm nil)
+
+  ;; Save point position between sessions
+  (require 'saveplace)
+  (setq-default save-place t)
+  (setq save-place-file (expand-file-name ".places" user-emacs-directory))
+
+  ;; cleverparens configuration
+  (spacemacs/toggle-evil-cleverparens-on)
+  (add-hook 'clojure-mode-hook #'evil-cleverparens-mode)
+  (add-hook 'emacs-lisp-mode-hook #'evil-cleverparens-mode)
+
+  ;; set frame name to emacs
+  (defun my/set-frame-name (frame)
+    (modify-frame-parameters frame
+                             (list (cons 'name "emacs"))))
+  (add-to-list 'after-make-frame-functions 'my/set-frame-name)
+
+  (add-hook 'yas-before-expand-snippet-hook (lambda () (autopair-mode 1)))
+  (add-hook 'yas-after-exit-snippet-hook (lambda () (autopair-mode -1)))
+
+  (defun my/two-monitors ()
+    "Set frame size to cover 2 monitors"
+    (interactive)
+    (setq frame-resize-pixelwise t)
+    (set-frame-position (selected-frame) 0 0)
+    (set-frame-size (selected-frame) (* 2 1920) 1080 t))
+
+
+  (defun my/goto-char-3 (char1 char2 char3 &optional arg beg end)
+    "Jump to the currently visible CHAR1 followed by CHAR2 and char3.
+The window scope is determined by `avy-all-windows' (ARG negates it)."
+    (interactive (list (read-char "char 1: " t)
+                       (read-char "char 2: " t)
+                       (read-char "char 3: " t)
+                       current-prefix-arg
+                       nil nil))
+    (when (eq char1 ?)
+      (setq char1 ?\n))
+    (when (eq char2 ?)
+      (setq char2 ?\n))
+    (when (eq char1 ?)
+      (setq char1 ?\n))
+    (avy-with avy-goto-char-2
+              (avy--generic-jump
+               (regexp-quote (string char1 char2 char3))
+               arg
+               avy-style
+               beg end)))
+
+  (require 'sx-interaction)
+  (setq sx-question-mode-display-buffer-function #'pop-to-buffer-same-window)
+
+  (bind-key "C-j" 'newline-and-indent)
+
+  (define-key evil-motion-state-map (kbd "C-f") 'forward-char)
+  (define-key evil-motion-state-map (kbd "C-e") 'end-of-line)
+  (define-key evil-motion-state-map (kbd "C-b") 'backward-char)
+  (define-key evil-motion-state-map (kbd "C-d") 'delete-char)
+
+  (defun my/mvn-dependency-version-to-properties ()
+    (interactive)
+    (save-excursion
+      (search-forward "<version>")
+      (kill-region (point) (progn
+                             (search-forward "</version>"
+                                             nil nil arg)
+                             (backward-char 10)
+                             (point)))
+      (let ((version (car kill-ring-yank-pointer)))
+        (search-backward "<dependency>")
+        (search-forward "<artifactId>")
+        (kill-ring-save (point) (progn
+                                  (search-forward "</artifactId>"
+                                                  nil nil arg)
+                                  (backward-char 13)
+                                  (point)))
+        (let ((group-id (car kill-ring-yank-pointer)))
+          (search-backward "<dependency>")
+          (search-forward "<version>")
+          (insert "${" group-id ".version}")
+          (search-backward "</properties>")
+          (search-backward ">")
+          (forward-char 1)
+          (insert "\n")
+          (indent-for-tab-command)
+          (insert "<" group-id ".version>" version "</" group-id ".version>" )))))
+
+  (defun my/mvn-inline-property ()
+    "Inline mvn property."
+    (interactive)
+    (save-excursion
+      (search-forward "<")
+      (kill-region (point (progn
+                            (search-forward ">"
+                                            nil nil nil)
+                            (backward-char 1)
+                            (point))))
+      (let ((property-name (car kill-ring-yank-pointer)))
+        (forward-char 1)
+        (kill-region (point) (progn
+                               (search-forward "<"
+                                               nil nil nil)
+                               (backward-char 1)
+                               (point)))
+
+        (let ((property-value (car kill-ring-yank-pointer)))
+          (beginning-of-line)
+          (kill-line)
+          (kill-line)
+          (replace-match (concat "${" property-name "}") property-value)))))
+
+  (defun my/mvn-sort-properties ()
+    "Sort maven properties."
+    (interactive "p")
+    (save-excursion
+      (beginning-of-buffer)
+      (search-forward "<properties>")
+      (set-mark-command (point))
+      (search-forward "</properties>")
+                                        ;(flush-lines "^\\s-*$"  (region-beginning) (region-end))
+      (sort-lines nil (region-beginning) (region-end))))
+
+  (defun my/other-window (arg)
+    "Select ARGth window or switch buffer if there is only one window."
+    (interactive "p")
+    (let ((old-window  (selected-window)))
+      (other-window arg)
+      (when (equal old-window (selected-window))
+        (other-frame arg))))
+
+  ;; Auto refresh buffers
+  (global-auto-revert-mode 1)
+
+  ;; elfeed configuration
+  (require 'elfeed)
+  (setq elfeed-feeds
+        '("http://sachachua.com/blog/feed/"
+          "http://feeds.feedburner.com/cyclingnews/news?format=xml"))
+
+  (load-file "~/.remote-config/config/my-mu4e.el")
+
+  ;; dired configuration
+  (require 'dired-x)
+  (require 'dired+)
+
+  (define-key dired-mode-map (kbd "I") 'dired-subtree-toggle)
+  ;; Buffer-local variable
+  (setq-default dired-omit-files-p t)
+
+  (eval-after-load  "dired-x"
+    '(defun dired-clean-up-after-deletion (fn)
+       "My. Clean up after a deleted file or directory FN.
+Remove expanded subdir of deleted dir, if any."
+       (save-excursion (and (cdr dired-subdir-alist)
+                            (dired-goto-subdir fn)
+                            (dired-kill-subdir)))
+
+       ;; Offer to kill buffer of deleted file FN.
+       (if dired-clean-up-buffers-too
+           (progn
+             (let ((buf (get-file-buffer fn)))
+               (and buf
+                    (save-excursion ; you never know where kill-buffer leaves you
+                      (kill-buffer buf))))
+             (let ((buf-list (dired-buffers-for-dir (expand-file-name fn)))
+                   (buf nil))
+               (and buf-list
+                    (while buf-list
+                      (save-excursion (kill-buffer (car buf-list)))
+                      (setq buf-list (cdr buf-list)))))))))
+
+  (define-key calendar-mode-map (kbd "<f2>") #'exco-calendar-show-day)
+
+  (defun my/browse-url (url new-window)
+    "Browse url in the associated app.
+URL - the url to browse.
+new-window - whether to open in new window."
+    (let ((host (elt (url-generic-parse-url url) 4)))
+      (if (or (string-equal "stackoverflow.com" host)
+              (s-index-of "stackexchange.com" host))
+          (sx-open-link url)
+        (eww-follow-link))))
+
+  (defun my/eww-follow-link (&optional external mouse-event)
+    "Browse the URL under point.
+If EXTERNAL is single prefix, browse the URL using `shr-external-browser'.
+If EXTERNAL is double prefix, browse in new buffer."
+    (interactive (list current-prefix-arg last-nonmenu-event))
+    (mouse-set-point mouse-event)
+    (let ((url (get-text-property (point) 'shr-url)))
+      (cond
+       ((not url)
+        (message "No link under point"))
+       ((string-match "^mailto:" url)
+        (browse-url-mail url))
+       ((and (consp external) (<= (car external) 4))
+        (funcall shr-external-browser url))
+       ;; This is a #target url in the same page as the current one.
+       ((and (url-target (url-generic-parse-url url))
+             (eww-same-page-p url (plist-get eww-data :url)))
+        (let ((dom (plist-get eww-data :dom)))
+          (eww-save-history)
+          (eww-display-html 'utf-8 url dom nil (current-buffer))))
+       ((string-prefix-p "http://www.google.bg/url?q=" url)
+        (message "The url is url redirect.")
+        (let* ((url-stripped-1 (s-replace "http://www.google.bg/url?q=" "" url))
+               (url-stripped (s-left (s-index-of "&" url-stripped-1) url-stripped-1)))
+          (message "Stripped google url: loading %s" url-stripped)
+          (my/browse-url url-stripped external)))
+       (t
+        (my/browse-url url external)))))
+
+  (setq large-file-warning-threshold nil)
+
+  (defun my/emms-start ()
+    "Start emms."
+    (interactive)
+    (emms-default-players)
+    (emms-add-directory-tree "~/Music")
+    (emms-toggle-random-playlist)
+    (evil-evilified-state))
+
+  ;; global leader key configuration
   (spacemacs/set-leader-keys "bb" 'helm-buffers-list)
   (spacemacs/set-leader-keys "cb" 'my/switch-to-compilation-buffer)
   (spacemacs/set-leader-keys "d" 'evil-operator-duplicate)
@@ -602,7 +904,7 @@ REPL buffer.  This is controlled via
   (spacemacs/set-leader-keys "oP" 'spacemacs/paste-transient-state/evil-paste-after)
   (spacemacs/set-leader-keys "od" 'my/duplicate-2)
   (spacemacs/set-leader-keys "of" 'my/switch-full-screen)
-  (spacemacs/set-leader-keys "oo" 'recentf-open-most-recent-file)
+  (spacemacs/set-leader-keys "or" 'recentf-open-most-recent-file)
   (spacemacs/set-leader-keys "o=" 'my/format-defun)
   (spacemacs/set-leader-keys "op" 'spacemacs/paste-transient-state/evil-paste-before)
   (spacemacs/set-leader-keys "ot" 'projectile-find-test-file)
@@ -616,16 +918,106 @@ REPL buffer.  This is controlled via
   (spacemacs/set-leader-keys "xts" 'transpose-sexps)
   (spacemacs/set-leader-keys "pp" 'my/projectile-switch-project-dired)
   (spacemacs/set-leader-keys "pt" 'projectile-test-project)
+  (spacemacs/set-leader-keys "ar" 'mu4e-alert-view-unread-mails)
+  (spacemacs/set-leader-keys "ai" 'mu4e-alert-view-unread-mails)
+  (spacemacs/set-leader-keys "os" 'my/store-the-default-buffer)
+  (spacemacs/set-leader-keys "oo" 'my/go-to-the-default-buffer)
+  (spacemacs/set-leader-keys "bl" 'my/list-repls)
+  (spacemacs/set-leader-keys "mm" (lambda () (interactive) (mu4e~headers-jump-to-maildir "/Inbox")))
 
-  )
+  (spacemacs/toggle-evil-visual-mark-mode-off)
+  (spacemacs/toggle-mode-line-off)
 
+  (defun buffer-mode (buffer-or-string)
+    "Returns the major mode associated with a buffer."
+    (with-current-buffer buffer-or-string
+      major-mode))
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(eww-search-prefix "https://www.google.com/search?q=")
- '(package-selected-packages
-   (quote
-    (typescript-mode faceup org-category-capture ht alert log4e gntp markdown-mode skewer-mode json-snatcher json-reformat js2-mode parent-mode projectile request haml-mode gitignore-mode fringe-helper git-gutter+ git-gutter flyspell-correct pos-tip flycheck flx url-http-ntlm soap-client fsm ntlm magit magit-popup git-commit with-editor iedit org-plus-contrib orgit zonokai-theme yapfify yaml-mode xterm-color ws-butler winum which-key web-mode web-beautify w3m volatile-highlights vi-tilde-fringe uuidgen use-package unfill toc-org tide tagedit sx sr-speedbar sql-indent spaceline smeargle slim-mode shell-pop scss-mode sass-mode restart-emacs rainbow-mode rainbow-identifiers rainbow-delimiters racket-mode pyvenv pytest pyenv-mode py-isort pug-mode powershell pip-requirements persp-mode persistent-scratch pcre2el paradox origami org-projectile org-present org-pomodoro org-jira org-download org-bullets open-junk-file neotree mwim multi-term mu4e-maildirs-extension mu4e-alert move-text mmm-mode midje-mode meghanada markdown-toc magit-gitflow macrostep lua-mode lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc java-snippets intero info+ indent-guide imenu-list ibuffer-projectile hy-mode hungry-delete htmlize hlint-refactor hl-todo hindent highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-hoogle helm-gitignore helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-ag haskell-snippets google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md fuzzy forecast flyspell-correct-helm flycheck-pos-tip flycheck-haskell flycheck-clojure flx-ido fill-column-indicator fasd fancy-battery eyebrowse expand-region exec-path-from-shell excorporate eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-smartparens evil-search-highlight-persist evil-numbers evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens evil-args evil-anzu eshell-z eshell-prompt-extras esh-help emms emmet-mode elisp-slime-nav elfeed-web elfeed-org elfeed-goodies easy-kill dumb-jump disaster dired-subtree dired-efap dired+ diff-hl define-word cython-mode cypher-mode csv-mode company-web company-tern company-statistics company-ghci company-ghc company-cabal company-c-headers company-anaconda command-log-mode column-enforce-mode color-identifiers-mode coffee-mode cmm-mode cmake-mode clojure-snippets clj-refactor clean-aindent-mode clang-format cider-eval-sexp-fu auto-yasnippet auto-highlight-symbol auto-dictionary auto-complete-nxml auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell))))
+  (defun my/list-repls ()
+    (interactive)
+    (helm :sources (helm-build-sync-source "REPS"
+                     :candidates (-map 'buffer-name
+                                       (-filter (lambda (buffer)
+                                                  (s-equals?
+                                                   (buffer-mode buffer) "cider-repl-mode"))
+                                                (buffer-list)))
+                     :action '(("Switch to REPL" . switch-to-buffer)
+                               ("Kill" . (lambda (candidate)
+                                           (interactive)
+                                           (with-current-buffer candidate
+                                             (cider-quit))))))
+          :buffer "*helm sync source*"))
+
+  (defun my/find-symbol-at-point ()
+    "Find the function, face, or variable definition for the symbol at point
+in the other window."
+    (interactive)
+    (let ((symb (symbol-at-point)))
+      (cond
+       ((and (or (functionp symb)
+                 (fboundp symb))
+             (find-definition-noselect symb nil))
+        (find-function symb))
+       ((and (facep symb) (find-definition-noselect symb 'defface))
+        (find-face-definition symb))
+       ((and (boundp symb) (find-definition-noselect symb 'defvar))
+        (find-variable-other-window symb))
+       (t (message "No symbol at point")))))
+
+  (evil-define-operator evil-cp-change (beg end type register yank-handler delete-func)
+    "Call `evil-change' while keeping parentheses balanced."
+    :move-point t
+    (interactive "<R><x><y>")
+    (if (or (= beg end)
+            (evil-cp--override)
+            (and (eq type 'block) (evil-cp--balanced-block-p beg end))
+            (and (sp-region-ok-p beg end) (not (eq type 'block))))
+        (evil-change beg end type register yank-handler delete-func)
+      (let ((delete-func (or delete-func #'evil-cp-delete))
+            (nlines (1+ (- (line-number-at-pos end)
+                           (line-number-at-pos beg))))
+            (opoint (save-excursion
+                      (goto-char beg)
+                      (line-beginning-position))))
+        (cond ((eq type 'line)
+               (save-excursion
+                 (evil-cp--delete-characters
+                  (+ beg
+                     (save-excursion
+                       (beginning-of-line)
+                       (sp-forward-whitespace t)))
+                  (1- end)))
+               (evil-cp-first-non-blank-non-opening)
+               (indent-according-to-mode)
+               (evil-insert 1))
+
+              ((eq type 'block)
+               (evil-cp-delete beg end type register yank-handler)
+               (evil-insert 1 nlines))
+
+              (t
+               (funcall delete-func beg end type register yank-handler)
+               (evil-insert 1))))))
+
+  (defun my/store-the-default-buffer ()
+    "Stores the default buffer."
+    (interactive)
+    (setq my/default-buffer (buffer-file-name (current-buffer)))
+    (message (s-concat "Stored the default buffer:" my/default-buffer)))
+
+  (defun my/go-to-the-default-buffer ()
+    "Goes to the default buffer."
+    (interactive)
+    (find-file my/default-buffer))
+
+  (global-set-key [(control down-mouse-1)]
+                  (lambda (click)
+                    (interactive "e")
+                    (mouse-minibuffer-check click)
+                    (let* ((window (posn-window (event-start click)))
+                           (buf (window-buffer window)))
+                      (with-current-buffer buf
+                        (save-excursion
+                          (goto-char (posn-point (event-start click)))
+                          (my/find-symbol-at-point))))))
+  (setq magit-save-repository-buffers 'dontask))
