@@ -7,6 +7,7 @@ autoload -Uz promptinit
 promptinit
 #prompt adam1
 
+
 if [ -f .local_zshrc ] ;
 then
     source .local_zshrc
@@ -124,7 +125,7 @@ zle -N _quote-previous-word-in-double
 bindkey '^[s' _quote-previous-word-in-double
 
 alias fix-spaces="sed -i -e 's/[ \t]*$//' -e 's/\t/    /g'"
-export PATH=$PATH:~/.bin
+export PATH=$PATH:~/.bin:~/.cask/bin/
 
 alias d='emacsclient -e '"'"'(dired "'"'"'`pwd`'"'"'")'"'"''
 alias m='emacsclient -e '"'"'(magit-status "'"'"'`git rev-parse --show-toplevel`'"'"'")'"'"''

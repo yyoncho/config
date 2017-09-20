@@ -12,11 +12,14 @@ values."
    dotspacemacs-ask-for-lazy-installation t
    dotspacemacs-configuration-layer-path '("~/.remote-config/config/layers/")
    dotspacemacs-configuration-layers
-   '(
+   '(javascript
      vinegar
+     jabber
      imenu-list
      evil-cleverparens
      spacemacs
+     (java :variables java-backend 'meghanada)
+
      spacemacs-base
      spacemacs-bootstrap
      version-control
@@ -32,9 +35,7 @@ values."
      colors
      shell
      eww
-     javascript
      python
-     racket
      helm
      auto-completion
      spacemacs-layouts
@@ -49,37 +50,35 @@ values."
      syntax-checking
      ibuffer
      clojure
+     w3m
      command-log
      my-layer
-     elfeed)
+     elfeed
+     semantic)
    dotspacemacs-additional-packages
    '(java-snippets
+     flash-region
+     evil-textobj-anyblock
      autopair
+     company-lsp
+     lsp-java
      zonokai-theme
-     w3m
-     key-chord
+     ecukes
+     feature-mode
      emms
-     auto-complete-nxml
      skype
-     sr-speedbar
-     meghanada
-     forecast
      evil-smartparens
      excorporate
      cypher-mode
      org-jira
      dired-efap
      dired+
-     easy-kill
-     ace-link
-     java-snippets
      sx
      eww
      persistent-scratch
      diff-hl
      helm-dash
      dired-subtree
-     emms
      flycheck-clojure
      all-the-icons
      all-the-icons-dired
@@ -111,7 +110,9 @@ values."
    dotspacemacs-default-font '("Source Code Pro Medium"
                                :size 15
                                :weight normal
-                               :width normal
+
+                               :weight normal
+:width normal
                                :powerline-scale 1.5)
    dotspacemacs-leader-key "SPC"
    dotspacemacs-emacs-command-key "SPC"
@@ -132,14 +133,14 @@ values."
    dotspacemacs-helm-resize nil
    dotspacemacs-helm-no-header nil
    dotspacemacs-helm-position 'bottom
-   dotspacemacs-helm-use-fuzzy 'always
+   dotspacemacs-helm-use-fuzzy 'source
    dotspacemacs-enable-paste-transient-state nil
    dotspacemacs-which-key-delay 0.1
    dotspacemacs-which-key-position 'bottom
    dotspacemacs-loading-progress-bar t
    ;; If non nil the frame is fullscreen when Emacs starts up. (default nil)
    ;; (Emacs 24.4+ only)
-   dotspacemacs-fullscreen-at-startup t
+   dotspacemacs-fullscreen-at-startup nil
    ;; If non nil `spacemacs/toggle-fullscreen' will not use native fullscreen.
    ;; Use to disable fullscreen animations in OSX. (default nil)
    dotspacemacs-fullscreen-use-non-native nil
@@ -194,6 +195,8 @@ values."
 (defun dotspacemacs/user-config ()
   (interactive)
 
+  (setq helm-projectile-fuzzy-match nil)
+
   (require 'helm-bookmark)
   (require 'eww)
   ;; eww configuration
@@ -210,6 +213,8 @@ values."
   (define-key eww-mode-map "h" 'helm-eww-history)
   (define-key eww-mode-map "l" 'helm-eww-links)
 
+  (spacemacs/toggle-spelling-checking-off)
+
   (setq helm-ff-guess-ffap-filenames t)
 
   ;; do not ask when deleting buffers
@@ -221,6 +226,7 @@ values."
   (setq shr-color-visible-luminance-min 80)
 
   (smartparens-global-strict-mode t)
+
   (evil-visual-mark-mode t)
   (setq custom-file "~/.remote-config/config/.custom.el")
   ;; (load custom-file)
@@ -232,66 +238,41 @@ values."
   (set powerline-default-separator 'alternate)
   (setf confluence-url "https://confluence.tick42.com:8443/rpc/xmlrpc")
 
-  (require 'cider)
-  (require 'clojure-mode)
-
-  (dolist (m '(clojure-mode
-               clojurec-mode
-               clojurescript-mode
-               clojurex-mode
-               cider-repl-mode
-               cider-clojure-interaction-mode))
-
-    (mapc (lambda (x) (spacemacs/declare-prefix-for-mode
-                        m (car x) (cdr x)))
-          cider--key-binding-prefixes)
-
-    (spacemacs/set-leader-keys-for-major-mode m
-      "(" 'clojure-convert-collection-to-list
-      "[" 'clojure-convert-collection-to-vector
-      "{" 'clojure-convert-collection-to-map
-      "ea" 'cider-load-all-project-ns
-      "ep" 'cider-pprint-eval-defun-at-point
-      "qr" 'cider-restart
-      "tv" 'cider-toggle-trace-var
-      "tg" 'cider-test-rerun-test
-      "te" 'cider-visit-error-buffer
-      "nt" 'cider-toggle-trace-ns
-      "j"  'evil-operator-clojure
-      "es" 'my/mount-restart
-      "ld" 'my/timbre-debug
-      "li" 'my/timbre-info
-      "lt" 'my/timbre-trace
-      "," 'cider-eval-defun-at-point
-      "dl" 'cider-inspect-last-result
-      "k" 'cider-interrupt
-      ";" 'sp-comment
-      "fp" 'my/find-project-file
-      "ej" 'cider-pprint-eval-last-sexp))
+  (spacemacs/toggle-spelling-checking-off)
 
   ;; org jira key bindings
   (spacemacs/set-leader-keys-for-major-mode 'org-mode "jp" 'org-jira-progress-issue)
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "ja" 'org-jira-assign-issue)
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jg" 'org-jira-get-issue)
   (spacemacs/set-leader-keys-for-major-mode 'org-mode "ji" 'org-jira-update-issue)
-  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jg" 'org-jira-get-issues)
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jG" 'org-jira-get-issues)
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jr" 'org-jira-refresh-issue)
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jR" 'org-jira-refresh-issues-in-buffer)
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jc" 'org-jira-update-comment)
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jd" 'org-jira-download-attachment)
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jt" 'org-jira-todo-to-jira)
   (spacemacs/set-leader-keys-for-major-mode 'org-mode "jl" 'org-jira-update-worklogs-from-org-clocks)
 
   ;; Emacs lisp
   (spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "," 'eval-defun)
 
+  (c-set-offset 'substatement-open 0)
+  (setenv "EMACS" (expand-file-name "~/.bin/emacs/bin/emacs-25.2"))
   (require 'evil-smartparens)
   (setq emmet-self-closing-tag-style "")
   (sp-pair "(" ")" :wrap "M-(")
   (sp-pair "{" "}" :wrap "M-{")
   (sp-pair "[" "]" :wrap "M-[")
-  (global-evil-mc-mode t)
-  (setq-default which-key-idle-delay 2.0)
-  (setq-default which-key-idle-secondary-delay 1.0)
-  (evil-define-operator evil-operator-clojure (beg end)
-    "Evil operator for evaluating code."
-    :move-point nil
-    (interactive "<r>")
-    (cider-eval-region beg end))
 
+  ;; (setq-default grep-find-ignored-directories (add-to-list 'grep-find-ignored-directories "target"))
+  ;; (setq-default helm-grep-ignored-directories (add-to-list 'grep-find-ignored-directories "target"))
+
+  ;; evil-mc configuration
+  (global-evil-mc-mode t)
+
+  ;; which key configuration
+  (setq-default which-key-idle-delay 1.0
+                which-key-idle-secondary-delay 0.1)
 
   (evil-define-operator evil-operator-duplicate (beg end)
     "Duplicate action."
@@ -304,45 +285,24 @@ values."
       (newline-and-indent)
       (yank)))
 
-  (evil-define-operator my/evil-operator-paste (beg end)
-    "Paste action."
+  (evil-define-operator my/evil-replace-with-kill-ring (beg end)
+    "Replace with killring action."
     :move-point nil
     (interactive "<r>")
+
     (save-excursion
-      (goto-char end)
-      (insert " ")
-      (yank)))
-  (require 'skype)
-  (setq skype--my-user-handle "yonchovski")
-  (setq cider-save-file-on-load t
-        cider-auto-jump-to-error nil
-        cider-auto-select-test-report-buffer nil
-        cider-show-error-buffer nil)
+      (delete-region beg end)
+      (call-interactively 'evil-paste-before 1)))
 
-  (bind-key ";" 'sp-comment)
-  (setq git-commit-summary-max-length 999)
-  (setq kill-do-not-save-duplicates t)
-  (setq cider-lein-command "~/.bin/lein")
+  (setq git-commit-summary-max-length 999
+        kill-do-not-save-duplicates t
 
-  ;; disable backup files
-  (setq make-backup-files nil)
+        ;; disable backup files
+        make-backup-files nil)
 
   (global-diff-hl-mode t)
-  (add-hook 'cider-mode-hook 'rainbow-delimiters-mode-enable)
-  (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
-
-  (spacemacs|define-jump-handlers java-mode '(meghanada-jump-declaration :async t))
-
-  ;; (setq spacemacs-jump-handlers-java-mode '((meghanada-jump-declaration :async t)))
-  (remove-hook 'cider-mode-hook 'aggressive-indent-mode)
 
   (global-subword-mode t)
-  (require 'dired)
-  (require 'dired+)
-  (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
-  (setq delete-by-moving-to-trash t)
-  (setq dired-recursive-deletes 'always)
-  (setq dired-deletion-confirmer '(lambda (x) t))
 
   (my/init)
 
@@ -351,70 +311,38 @@ values."
     (interactive "P")
     (switch-to-buffer "*compilation*"))
 
-
-  (dolist (mode '(clojure-mode clojurescript-mode cider-mode clojurec-mode))
-    (eval-after-load mode
-      (font-lock-add-keywords
-       mode '(("(\\(defn\\)[\[[:space:]]" ; anon funcs 1
-               (0 (progn (compose-region (match-beginning 1)
-                                         (match-end 1) "ƒ")
-                         nil)))
-              ("(\\(defmacro\\)[\[[:space:]]"
-               (0 (progn (compose-region (match-beginning 1)
-                                         (match-end 1) "µ")
-                         nil)))
-              ("(\\(fn\\)[\[[:space:]]"  ; anon funcs 1
-               (0 (progn (compose-region (match-beginning 1)
-                                         (match-end 1) "λ")
-                         nil)))
-              ("(\\(not=\\)[\[[:space:]]"  ; anon funcs 1
-               (0 (progn (compose-region (match-beginning 1)
-                                         (match-end 1) "≠")
-                         nil)))
-              ("(\\(def\\)[\[[:space:]]"  ; anon funcs 1
-               (0 (progn (compose-region (match-beginning 1)
-                                         (match-end 1) "≡")
-                         nil)))
-              ("\\(#\\)("                ; anon funcs 2
-               (0 (progn (compose-region (match-beginning 1)
-                                         (match-end 1) "λ")
-                         nil)))
-              ("\\(Math/PI\\)"                ; anon funcs 2
-               (0 (progn (compose-region (match-beginning 1)
-                                         (match-end 1) "π")
-                         nil)))
-              ("(\\(partial\\)[\[[:space:]]"
-               (0 (progn (compose-region (match-beginning 1)
-                                         (match-end 1) "Ƥ"))))
-              ("(\\(comp\\)[\[[:space:]]"
-               (0 (progn (compose-region (match-beginning 1)
-                                         (match-end 1) "∘"))))
-              ("\\(#\\)("
-               (0 (progn (compose-region (match-beginning 1)
-                                         (match-end 1) "ƒ"))))
-              ("\\(#\\){"
-               (0 (progn (compose-region (match-beginning 1)
-                                         (match-end 1) "∈"))))))))
   (global-flycheck-mode t)
 
   (setq clojure-enable-fancify-symbols t)
-  (setq-default dired-listing-switches "-aBhl  --group-directories-first")
-  (setq cider-save-file-on-load t)
-  (defun my/find-project-file (args)
+
+  (defun my/find-pom-file ()
     "Find file in upper dirs"
-    (interactive "P")
+    (interactive)
     (if-let ((pf (expand-file-name
                   (concat (locate-dominating-file
-                           (if (string= (file-name-nondirectory (buffer-file-name)) "project.clj")
+                           (if (string= (file-name-nondirectory (buffer-file-name)) "pom.xml")
                                (file-name-directory
                                 (directory-file-name (file-name-directory (buffer-file-name))))
                              (buffer-file-name))
-                           "project.clj")
-                          "project.clj"))))
+                           "pom.xml")
+                          "pom.xml"))))
         (find-file pf)
-      (message "Unable to find project.clj")))
+      (message "Unable to find pom.xml")))
+
+  (require 'semantic)
+  (global-semantic-idle-summary-mode -1)
+  (global-evil-surround-mode 1)
+  (setq imenu-list-auto-resize nil)
+  (setq imenu-list-position 'right)
+
   (setq clojure-indent-style :align-arguments
         clojure-align-forms-automatically t)
+
+  (global-flycheck-mode -1)
+
+  (add-hook 'emacs-lisp-mode-hook
+            (lambda ()
+              (delete 'company-capf company-backends)))
 
   (defun my/projectile-switch-project-dired (&optional arg)
     "Switch to a project we have visited before.
@@ -448,8 +376,13 @@ With a prefix ARG invokes `projectile-commander' instead of
   (define-key evil-normal-state-map "p" 'evil-paste-before)
   (define-key evil-normal-state-map "P" 'evil-paste-after)
 
+  (require 'company)
+  (setq company-backends (-remove-item 'company-capf company-backends))
+
+  ;; projectile
+  (require 'projectile)
+  (add-to-list 'projectile-globally-ignored-directories ".cask")
   (setq projectile-create-missing-test-files t)
-  (setq cljr-warn-on-eval nil)
 
   (evil-define-command my/goto-end-of-form (count)
     "Go to end the the form."
@@ -466,59 +399,39 @@ With a prefix ARG invokes `projectile-commander' instead of
 
   (global-set-key [remap evil-cp-end-of-defun] 'my/goto-end-of-form)
 
-  (diredp-toggle-find-file-reuse-dir 1)
+  ;; general emacs configuration
 
+  ;; Also auto refresh dired, but be quiet about it
+  (setq global-auto-revert-non-file-buffers t)
+  (setq auto-revert-verbose nil)
+
+  ;; emms configuration
+  (require 'emms-setup)
+  (emms-all)
+  (emms-default-players)
+  (emms-mode-line -1)
+
+  (require 'magit)
   (defun my/magit-stage-modified ()
     "Stage all changes to files"
     (interactive)
     (magit-with-toplevel
       (magit-stage-1 "--all")))
 
+
   (magit-wip-after-apply-mode t)
+
   (setq evil-want-fine-undo nil
         evil-cross-lines t)
+
   ;; jira configuration
   (setq jiralib-url "https://jira.tick42.com"
         jiralib-user-login-name "iyonchovski")
-  (setq cider-prompt-save-file-on-load t)
-  (setq cider-use-fringe-indicators t)
   (setq-default dotspacemacs-configuration-layers
                 '((clojure :variables clojure-enable-fancify-symbols t)))
 
   (setq evil-lisp-state-enter-lisp-state-on-command nil)
 
-  (defun my/exec-clj-code (form)
-    "Exec clj code"
-    (let* ((override cider-interactive-eval-override)
-           (ns-form (if (cider-ns-form-p form) "" (format "(ns %s)" (cider-current-ns)))))
-      (with-current-buffer (get-buffer-create cider-read-eval-buffer)
-        (erase-buffer)
-        (clojure-mode)
-        (unless (string= "" ns-form)
-          (insert ns-form "\n\n"))
-        (insert form)
-        (let ((cider-interactive-eval-override override))
-          (cider-interactive-eval form)))))
-
-  (defun my/mount-restart ()
-    "Restarts mount"
-    (interactive)
-    (my/exec-clj-code "(do (mount/stop) (mount/start))"))
-
-  (defun my/timbre-debug ()
-    "Change level to debug"
-    (interactive )
-    (my/exec-clj-code "(taoensso.timbre/set-level! :debug)"))
-
-  (defun my/timbre-info ()
-    "Change level to info"
-    (interactive)
-    (my/exec-clj-code "(taoensso.timbre/set-level! :info)"))
-
-  (defun my/timbre-trace ()
-    "Change level to info"
-    (interactive)
-    (my/exec-clj-code "(taoensso.timbre/set-level! :trace)"))
 
   (require 'auto-complete)
   (define-key ac-complete-mode-map "\C-n" 'ac-next)
@@ -537,19 +450,40 @@ With a prefix ARG invokes `projectile-commander' instead of
                (current-buffer))
       (error (message "Invalid expression")
              (insert (current-kill 0)))))
-  (setq evil-move-cursor-back nil)
+  (add-to-list 'warning-suppress-types '(yasnippet backquote-change))
+  (persistent-scratch-setup-default)
 
-  (spacemacs/set-leader-keys-for-major-mode 'java-mode
-    "tt" 'meghanada-run-junit-test-case
-    "rai" 'meghanada-import-all
-    "tg" 'meghanada-run-junit-recent
-    "ea" (lambda ()
-           (interactive)
-           (projectile-save-project-buffers)
-           (meghanada-compile-project))
-    "eb" 'meghanada-compile-file
-    "qr" 'meghanada-restart
-    "tn" 'meghanada-run-junit-class)
+  (setq evil-move-cursor-back nil
+        evil-move-beyond-eol t)
+
+  (defun my/add-throws ()
+    (interactive)
+    (save-mark-and-excursion
+     (c-beginning-of-defun)
+     (re-search-forward "{")
+     (re-search-backward ")")
+     (forward-char)
+     (insert-string " throws Exception ")))
+
+  (defun my/rename-current-method ()
+    (interactive)
+    (c-beginning-of-defun)
+    (re-search-forward "{")
+    (re-search-backward "(")
+    (backward-sexp))
+
+  (defun my/find-function-bound-to-key ()
+    "Find function bound to key."
+    (interactive)
+    (find-function (lookup-key (current-global-map)
+                               (read-key-sequence "Enter key sequence:"))))
+
+  (setq recentf-exclude '("/tmp/meghanada-*"))
+
+  (add-hook 'xml-mode-hook 'web-mode)
+
+  (spacemacs/set-leader-keys-for-major-mode 'web-mode
+    "fp" 'my/find-pom-file)
 
   (defun my/switch-full-screen ()
     (interactive)
@@ -558,8 +492,10 @@ With a prefix ARG invokes `projectile-commander' instead of
     (my/two-monitors)
     (shell-command "wmctrl -r :ACTIVE: -b add,above"))
 
+  (add-hook 'view-mode-hook 'evil-evilified-state)
+
   (eval-after-load 'flycheck '(flycheck-clojure-setup))
-  (add-hook 'clojure-mode-hook 'flycheck-mode)
+  (remove-hook 'clojure-mode-hook 'flycheck-mode)
   (add-hook 'clojure-mode-hook (lambda () (eval-sexp-fu-flash-mode -1)))
   (eval-after-load 'flycheck
     '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
@@ -571,11 +507,12 @@ With a prefix ARG invokes `projectile-commander' instead of
           (interactive "p")
           (kmacro-exec-ring-item (quote (" d2L" 0 "%d")) arg)))
 
-  (setq key-chord-two-keys-delay 0.1)
-  (setq key-chord-one-key-delay  0.1)
-  ;;(key-chord-define-global "jk" 'next-buffer)
-  ;;(key-chord-define-global "kj" 'previous-buffer)
-  (key-chord-mode 1)
+
+                                        ;(setq company-frontends (list 'helm-company))
+  (setq company-auto-complete nil)
+  (setq company-tooltip-idle-delay 2)
+  (setq company-auto-complete-chars nil)
+  (setq-default company-auto-complete nil)
 
   (fset 'my/format-defun
         (lambda (&optional arg) "Keyboard macro." (interactive "p")
@@ -589,18 +526,8 @@ With a prefix ARG invokes `projectile-commander' instead of
 
   (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 
-
-  (require 'cider)
-  (defun cider-emit-interactive-eval-err-output (output)
-    "Emit err OUTPUT resulting from interactive code evaluation.
-The output can be send to either a dedicated output buffer or the current
-REPL buffer.  This is controlled via
-`cider-interactive-eval-output-destination'."
-    (my/show-error output)
-    (cider--emit-interactive-eval-output output 'cider-repl-emit-interactive-stderr))
-
   ;; weather
-  (yahoo-weather-mode t)
+  ;;(yahoo-weather-mode t)
   (setq yahoo-weather-location "Sofia")
   (setq yahoo-weather-format "|%(weather) %(temperature)C|")
 
@@ -654,9 +581,6 @@ PREFIX - whether to switch to the other window."
   (setq c-default-style
         '((java-mode . "java")
           (other . "gnu")))
-  (remove-hook 'java-mode-hook #'aggressive-indent-mode)
-  (add-hook 'java-mode-hook #'yas-minor-mode)
-  (add-hook 'java-mode-hook #'my/configure-java)
 
   ;; company key configuration
   (require 'company)
@@ -666,6 +590,7 @@ PREFIX - whether to switch to the other window."
 
 
   ;; always follow symlinks
+
   (setq vc-follow-symlinks t)
 
   (require 'vc-dispatcher)
@@ -680,6 +605,7 @@ PREFIX - whether to switch to the other window."
   (spacemacs/toggle-evil-cleverparens-on)
   (add-hook 'clojure-mode-hook #'evil-cleverparens-mode)
   (add-hook 'emacs-lisp-mode-hook #'evil-cleverparens-mode)
+  (add-hook 'emacs-lisp-mode-hook (lambda () (semantic-mode nil)))
 
   ;; set frame name to emacs
   (defun my/set-frame-name (frame)
@@ -698,31 +624,10 @@ PREFIX - whether to switch to the other window."
     (set-frame-size (selected-frame) (* 2 1920) 1080 t))
 
 
-  (defun my/goto-char-3 (char1 char2 char3 &optional arg beg end)
-    "Jump to the currently visible CHAR1 followed by CHAR2 and char3.
-The window scope is determined by `avy-all-windows' (ARG negates it)."
-    (interactive (list (read-char "char 1: " t)
-                       (read-char "char 2: " t)
-                       (read-char "char 3: " t)
-                       current-prefix-arg
-                       nil nil))
-    (when (eq char1 ?)
-      (setq char1 ?\n))
-    (when (eq char2 ?)
-      (setq char2 ?\n))
-    (when (eq char1 ?)
-      (setq char1 ?\n))
-    (avy-with avy-goto-char-2
-              (avy--generic-jump
-               (regexp-quote (string char1 char2 char3))
-               arg
-               avy-style
-               beg end)))
-
   (require 'sx-interaction)
   (setq sx-question-mode-display-buffer-function #'pop-to-buffer-same-window)
 
-  (bind-key "C-j" 'newline-and-indent)
+
 
   (define-key evil-motion-state-map (kbd "C-f") 'forward-char)
   (define-key evil-motion-state-map (kbd "C-e") 'end-of-line)
@@ -734,16 +639,14 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
     (save-excursion
       (search-forward "<version>")
       (kill-region (point) (progn
-                             (search-forward "</version>"
-                                             nil nil arg)
+                             (search-forward "</version>")
                              (backward-char 10)
                              (point)))
       (let ((version (car kill-ring-yank-pointer)))
         (search-backward "<dependency>")
         (search-forward "<artifactId>")
         (kill-ring-save (point) (progn
-                                  (search-forward "</artifactId>"
-                                                  nil nil arg)
+                                  (search-forward "</artifactId>")
                                   (backward-char 13)
                                   (point)))
         (let ((group-id (car kill-ring-yank-pointer)))
@@ -809,49 +712,20 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
         '("http://sachachua.com/blog/feed/"
           "http://feeds.feedburner.com/cyclingnews/news?format=xml"))
 
-  (load-file "~/.remote-config/config/my-mu4e.el")
 
-  ;; dired configuration
-  (require 'dired-x)
-  (require 'dired+)
-
-  (define-key dired-mode-map (kbd "I") 'dired-subtree-toggle)
-  ;; Buffer-local variable
-  (setq-default dired-omit-files-p t)
-
-  (eval-after-load  "dired-x"
-    '(defun dired-clean-up-after-deletion (fn)
-       "My. Clean up after a deleted file or directory FN.
-Remove expanded subdir of deleted dir, if any."
-       (save-excursion (and (cdr dired-subdir-alist)
-                            (dired-goto-subdir fn)
-                            (dired-kill-subdir)))
-
-       ;; Offer to kill buffer of deleted file FN.
-       (if dired-clean-up-buffers-too
-           (progn
-             (let ((buf (get-file-buffer fn)))
-               (and buf
-                    (save-excursion ; you never know where kill-buffer leaves you
-                      (kill-buffer buf))))
-             (let ((buf-list (dired-buffers-for-dir (expand-file-name fn)))
-                   (buf nil))
-               (and buf-list
-                    (while buf-list
-                      (save-excursion (kill-buffer (car buf-list)))
-                      (setq buf-list (cdr buf-list)))))))))
-
+  (require 'calendar)
   (define-key calendar-mode-map (kbd "<f2>") #'exco-calendar-show-day)
+
+  (setq browse-url-browser-function 'my/browse-url)
 
   (defun my/browse-url (url new-window)
     "Browse url in the associated app.
 URL - the url to browse.
 new-window - whether to open in new window."
-    (let ((host (elt (url-generic-parse-url url) 4)))
-      (if (or (string-equal "stackoverflow.com" host)
-              (s-index-of "stackexchange.com" host))
-          (sx-open-link url)
-        (eww-follow-link))))
+    (if (or (s-contains? "stackoverflow.com" url)
+            (s-contains? "stackexchange.com" url))
+        (sx-open-link url)
+      (eww-follow-link)))
 
   (defun my/eww-follow-link (&optional external mouse-event)
     "Browse the URL under point.
@@ -896,17 +770,15 @@ If EXTERNAL is double prefix, browse in new buffer."
   (spacemacs/set-leader-keys "bb" 'helm-buffers-list)
   (spacemacs/set-leader-keys "cb" 'my/switch-to-compilation-buffer)
   (spacemacs/set-leader-keys "d" 'evil-operator-duplicate)
+  (spacemacs/set-leader-keys "op" 'my/evil-replace-with-kill-ring)
   (spacemacs/set-leader-keys "ga" 'my/magit-stage-modified)
   (spacemacs/set-leader-keys "gc" 'magit-commit)
   (spacemacs/set-leader-keys "gwc" 'magit-wip-commit)
   (spacemacs/set-leader-keys "gwl" 'magit-wip-log)
-  (spacemacs/set-leader-keys "jj" 'my/goto-char-3)
-  (spacemacs/set-leader-keys "oP" 'spacemacs/paste-transient-state/evil-paste-after)
   (spacemacs/set-leader-keys "od" 'my/duplicate-2)
   (spacemacs/set-leader-keys "of" 'my/switch-full-screen)
   (spacemacs/set-leader-keys "or" 'recentf-open-most-recent-file)
   (spacemacs/set-leader-keys "o=" 'my/format-defun)
-  (spacemacs/set-leader-keys "op" 'spacemacs/paste-transient-state/evil-paste-before)
   (spacemacs/set-leader-keys "ot" 'projectile-find-test-file)
   (spacemacs/set-leader-keys "ghn" 'diff-hl-next-hunk)
   (spacemacs/set-leader-keys "jr" 'jump-to-register)
@@ -916,37 +788,30 @@ If EXTERNAL is double prefix, browse in new buffer."
   (spacemacs/set-leader-keys "pT" 'neotree-find-project-root)
   (spacemacs/set-leader-keys "so" 'helm-do-grep-ag)
   (spacemacs/set-leader-keys "xts" 'transpose-sexps)
+  (spacemacs/set-leader-keys "gd" 'magit-diff-buffer-file)
   (spacemacs/set-leader-keys "pp" 'my/projectile-switch-project-dired)
   (spacemacs/set-leader-keys "pt" 'projectile-test-project)
   (spacemacs/set-leader-keys "ar" 'mu4e-alert-view-unread-mails)
   (spacemacs/set-leader-keys "ai" 'mu4e-alert-view-unread-mails)
   (spacemacs/set-leader-keys "os" 'my/store-the-default-buffer)
+  (spacemacs/set-leader-keys "<SPC>" 'helm-buffers-list)
   (spacemacs/set-leader-keys "oo" 'my/go-to-the-default-buffer)
+  (spacemacs/set-leader-keys "sR" 'my/helm-ag-recentf)
   (spacemacs/set-leader-keys "bl" 'my/list-repls)
-  (spacemacs/set-leader-keys "mm" (lambda () (interactive) (mu4e~headers-jump-to-maildir "/Inbox")))
+  (spacemacs/set-leader-keys "mm" (lambda () (interactive)
+                                    (mu4e~headers-jump-to-maildir "/Inbox")))
+
 
   (spacemacs/toggle-evil-visual-mark-mode-off)
-  (spacemacs/toggle-mode-line-off)
+  (spacemacs/toggle-mode-line-on)
+
+  (add-to-list 'auto-mode-alist '("\\.xml\\'" . web-mode))
 
   (defun buffer-mode (buffer-or-string)
     "Returns the major mode associated with a buffer."
     (with-current-buffer buffer-or-string
       major-mode))
 
-  (defun my/list-repls ()
-    (interactive)
-    (helm :sources (helm-build-sync-source "REPS"
-                     :candidates (-map 'buffer-name
-                                       (-filter (lambda (buffer)
-                                                  (s-equals?
-                                                   (buffer-mode buffer) "cider-repl-mode"))
-                                                (buffer-list)))
-                     :action '(("Switch to REPL" . switch-to-buffer)
-                               ("Kill" . (lambda (candidate)
-                                           (interactive)
-                                           (with-current-buffer candidate
-                                             (cider-quit))))))
-          :buffer "*helm sync source*"))
 
   (defun my/find-symbol-at-point ()
     "Find the function, face, or variable definition for the symbol at point
@@ -999,16 +864,39 @@ in the other window."
                (funcall delete-func beg end type register yank-handler)
                (evil-insert 1))))))
 
+  (setq helm-imenu-fuzzy-match nil)
+
+  (require 'recentf)
+  (recentf-auto-cleanup)
+
+  (custom-set-variables
+   '(helm-ag-command-option "-i"))
+
+  (defun my/helm-ag-recentf ()
+    "Search through the recent file."
+    (interactive)
+    (helm-do-ag "~/" recentf-list))
+
+  (defun my/helm-ag-recentf-only-matches ()
+    "Search through the recent file."
+    (interactive)
+    (let ((helm-ag-command-option "-i -l"))
+      (helm-do-ag "~/" recentf-list)))
+
   (defun my/store-the-default-buffer ()
     "Stores the default buffer."
     (interactive)
-    (setq my/default-buffer (buffer-file-name (current-buffer)))
-    (message (s-concat "Stored the default buffer:" my/default-buffer)))
+    (setq my/default-buffer (or (buffer-file-name (current-buffer)) (buffer-name (current-buffer))))
+    (message (s-concat "Stored the default buffer:"   (if (bufferp my/default-buffer)
+                                                          (buffer-name my/default-buffer)
+                                                        my/default-buffer))))
 
   (defun my/go-to-the-default-buffer ()
     "Goes to the default buffer."
     (interactive)
-    (find-file my/default-buffer))
+    (if (file-exists-p my/default-buffer)
+        (find-file my/default-buffer)
+      (switch-to-buffer my/default-buffer)))
 
   (global-set-key [(control down-mouse-1)]
                   (lambda (click)
@@ -1020,4 +908,112 @@ in the other window."
                         (save-excursion
                           (goto-char (posn-point (event-start click)))
                           (my/find-symbol-at-point))))))
-  (setq magit-save-repository-buffers 'dontask))
+
+  (setq magit-save-repository-buffers 'dontask)
+
+  (setq-default default-input-method 'bulgarian-phonetic)
+
+  ;; Make movement keys work like they should
+  (define-key evil-normal-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
+  (define-key evil-normal-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
+  (define-key evil-motion-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
+  (define-key evil-motion-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
+
+  ;; bind key
+  (bind-key "C-h" 'backward-delete-char)
+  (bind-key "M-/" 'hippie-expand)
+  (bind-key "M-j" 'evil-join)
+  (bind-key "C-x k" 'kill-current-buffer)
+  (bind-key "C-M-h" 'backward-kill-word)
+  (bind-key "C-j" 'newline-and-indent)
+
+  (evil-define-text-object my/function-text-object (count)
+    "Function text object"
+    (interactive)
+    (save-mark-and-excursion
+     (mark-defun)
+     (let ((m (mark)))
+       (if (looking-back "*/\n")
+           (progn
+             (previous-line)
+             (list m (first (sp-get-comment-bounds))))
+         (list m (point))))))
+
+  (evil-define-text-object my/statement-text-object (count)
+    "Statement text object."
+    (interactive)
+    (save-mark-and-excursion
+     (call-interactively 'c-beginning-of-statement)
+     (let ((point-start (point)))
+       (c-end-of-statement count)
+       (list point-start (point)))))
+
+  (define-key evil-inner-text-objects-map "m" 'my/function-text-object)
+  (define-key evil-outer-text-objects-map "m" 'my/function-text-object)
+  (define-key evil-outer-text-objects-map "e" 'my/statement-text-object)
+
+  (load-file "~/.remote-config/config/my-mu4e.el")
+  (load-file "~/.remote-config/config/my-pidgin.el")
+  (load-file "~/.remote-config/config/my-cider.el")
+  (load-file "~/.remote-config/config/my-java.el")
+  (load-file "~/.remote-config/config/my-dired.el")
+  (load-file "~/.remote-config/config/my-snippets.el")
+  (customize-variable 'helm-exit-idle-delay)
+  ;;
+  (require 'helm)
+  (setq-default helm-display-function 'helm-default-display-buffer)
+
+  ;; cucumber
+  (require 'feature-mode)
+
+  (add-to-list 'auto-mode-alist '("\.feature$" . feature-mode))
+
+  (setq feature-step-search-path "features/steps/*steps.el")
+
+  (set-frame-name "emacs")
+
+  (evil-define-key 'normal evil-mc-key-map (kbd "C-p") 'evil-paste-pop)
+  (evil-define-key 'visual evil-mc-key-map (kbd "C-p") 'evil-paste-pop)
+
+  (setq w3m-default-display-inline-images t)
+  ;; w3m mode
+  (setq w3m-home-page "https://www.google.com")
+  ;; W3M Home Page
+  (setq w3m-default-display-inline-images t)
+  (setq w3m-default-toggle-inline-images t)
+  ;; W3M default display images
+  (setq w3m-command-arguments '("-cookie" "-F"))
+  (setq w3m-use-cookies t)
+  ;; W3M use cookies
+  (setq browse-url-browser-function 'w3m-browse-url)
+  ;; Browse url function use w3m
+  (setq w3m-view-this-url-new-session-in-background t)
+  ;; W3M view url new session in background
+
+  (require 'flash-region)
+  (defun my/flash-region (beg end &optional register yank-handler)
+    (flash-region beg end eval-sexp-fu-flash-face 0.1))
+
+  (add-function :before (symbol-function 'evil-yank-characters) #'my/flash-region)
+  (add-function :before (symbol-function 'evil-yank-lines) #'my/flash-region)
+  (add-function :before (symbol-function 'evil-yank-rectangle) #'my/flash-region))
+
+(defun dotspacemacs/emacs-custom-settings ()
+  "Emacs custom settings.
+This is an auto-generated function, do not modify its content directly, use
+Emacs customize menu instead.
+This function is called at the very end of Spacemacs initialization."
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(eww-search-prefix "https://www.google.com/search?q=")
+ '(package-selected-packages
+   (quote
+    (gradle-mode ensime sbt-mode scala-mode company-emacs-eclim eclim ecukes ansi espuds commander symon string-inflection sayid realgud test-simple loc-changes load-relative password-generator org-brain impatient-mode helm-purpose window-purpose evil-org evil-lion editorconfig dante cmake-ide levenshtein browse-at-remote zonokai-theme yapfify yaml-mode yahoo-weather xterm-color ws-butler winum which-key web-mode web-beautify w3m volatile-highlights vi-tilde-fringe uuidgen use-package unfill toc-org tide tagedit sx sr-speedbar sql-indent spaceline smeargle slim-mode skype shell-pop scss-mode sass-mode restart-emacs rainbow-mode rainbow-identifiers rainbow-delimiters racket-mode pyvenv pytest pyenv-mode py-isort pug-mode powershell pip-requirements persp-mode persistent-scratch pcre2el paradox origami orgit org-projectile org-present org-pomodoro org-jira org-download org-bullets open-junk-file neotree mwim multi-term mu4e-maildirs-extension mu4e-alert move-text mmm-mode meghanada markdown-toc magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode key-chord json-mode js2-refactor js-doc java-snippets intero info+ indent-guide imenu-list ibuffer-projectile hy-mode hungry-delete htmlize hlint-refactor hl-todo hindent highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-hoogle helm-gitignore helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-ag haskell-snippets google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md fuzzy forecast flyspell-correct-helm flycheck-pos-tip flycheck-haskell flycheck-clojure flx-ido fill-column-indicator fasd fancy-battery eyebrowse expand-region exec-path-from-shell excorporate eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-text-object-python evil-surround evil-smartparens evil-search-highlight-persist evil-numbers evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens evil-args evil-anzu eshell-z eshell-prompt-extras esh-help emms emmet-mode elisp-slime-nav elfeed-web elfeed-org elfeed-goodies easy-kill dumb-jump disaster dired-subtree dired-efap dired+ diff-hl define-word cython-mode cypher-mode csv-mode company-web company-tern company-statistics company-ghci company-ghc company-cabal company-c-headers company-anaconda command-log-mode column-enforce-mode color-identifiers-mode coffee-mode cmm-mode cmake-mode clojure-snippets clj-refactor clean-aindent-mode clang-format cider-eval-sexp-fu autopair auto-yasnippet auto-highlight-symbol auto-dictionary auto-complete-nxml auto-compile all-the-icons-dired aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.))
