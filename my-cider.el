@@ -88,6 +88,9 @@ REPL buffer.  This is controlled via
          "lt" 'my/timbre-trace
          "," 'cider-eval-defun-at-point
          "dl" 'cider-inspect-last-result
+         "ey" (lambda ()
+                (interactive)
+                (cider-read-and-eval (current-kill 1 t)))
          "k" 'cider-interrupt
          ";" 'sp-comment
          "fp" 'my/find-project-file
