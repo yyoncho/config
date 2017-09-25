@@ -48,7 +48,7 @@
            cider-auto-jump-to-error nil
            cider-auto-select-test-report-buffer nil
            cider-show-error-buffer nil
-           cider-lein-command "~/.bin/lein"
+           cider-lein-command "C:/yart/bin/lein.bat"
            cider-prompt-save-file-on-load t
            cider-use-fringe-indicators t)
 

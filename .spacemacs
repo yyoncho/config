@@ -10,7 +10,6 @@ values."
    dotspacemacs-distribution 'spacemacs
    dotspacemacs-enable-lazy-installation 'unused
    dotspacemacs-ask-for-lazy-installation t
-   dotspacemacs-configuration-layer-path '("~/.remote-config/config/layers/")
    dotspacemacs-configuration-layers
    '(
      vinegar
@@ -27,11 +26,8 @@ values."
      yaml
      html
      typescript
-     mu4e
-     fasd
      colors
      shell
-     eww
      javascript
      python
      racket
@@ -45,13 +41,10 @@ values."
      c-c++
      markdown
      org
-     spell-checking
      syntax-checking
      ibuffer
      clojure
-     command-log
-     my-layer
-     elfeed)
+     command-log)
    dotspacemacs-additional-packages
    '(java-snippets
      autopair
@@ -60,10 +53,8 @@ values."
      key-chord
      emms
      auto-complete-nxml
-     skype
      sr-speedbar
      meghanada
-     forecast
      evil-smartparens
      excorporate
      cypher-mode
@@ -74,16 +65,12 @@ values."
      ace-link
      java-snippets
      sx
-     eww
      persistent-scratch
      diff-hl
      helm-dash
      dired-subtree
      emms
-     flycheck-clojure
-     all-the-icons
-     all-the-icons-dired
-     yahoo-weather)
+     flycheck-clojure)
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -275,8 +262,6 @@ values."
       (insert " ")
       (yank)))
 
-  (require 'skype)
-  (setq skype--my-user-handle "yonchovski")
 
   (bind-key ";" 'sp-comment)
   (setq git-commit-summary-max-length 999
@@ -290,8 +275,6 @@ values."
   (spacemacs|define-jump-handlers java-mode '(meghanada-jump-declaration :async t))
 
   (global-subword-mode t)
-
-  (my/init)
 
   (defun my/switch-to-compilation-buffer (arg)
     "Switch to compilation buffer"
@@ -475,16 +458,6 @@ With a prefix ARG invokes `projectile-commander' instead of
     (interactive)
     (message (propertize (s-replace "\n" "" text) 'face 'cider-test-failure-face)))
 
-  (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
-
-
-
-
-  ;; weather
-  (yahoo-weather-mode t)
-  (setq yahoo-weather-location "Sofia")
-  (setq yahoo-weather-format "|%(weather) %(temperature)C|")
-
   ;; indent mode
   (indent-guide-global-mode t)
 
@@ -594,11 +567,11 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
     (when (eq char1 ?)
       (setq char1 ?\n))
     (avy-with avy-goto-char-2
-              (avy--generic-jump
-               (regexp-quote (string char1 char2 char3))
-               arg
-               avy-style
-               beg end)))
+      (avy--generic-jump
+       (regexp-quote (string char1 char2 char3))
+       arg
+       avy-style
+       beg end)))
 
   (require 'sx-interaction)
   (setq sx-question-mode-display-buffer-function #'pop-to-buffer-same-window)
@@ -684,17 +657,10 @@ The window scope is determined by `avy-all-windows' (ARG negates it)."
   ;; Auto refresh buffers
   (global-auto-revert-mode 1)
 
-  ;; elfeed configuration
-  (require 'elfeed)
-  (setq elfeed-feeds
-        '("http://sachachua.com/blog/feed/"
-          "http://feeds.feedburner.com/cyclingnews/news?format=xml"))
+  (load-file "my-cider.el")
+  (load-file "my-dired.el")
 
-  (load-file "~/.remote-config/config/my-mu4e.el")
-  (load-file "~/.remote-config/config/my-cider.el")
-  (load-file "~/.remote-config/config/my-dired.el")
-
-  (define-key calendar-mode-map (kbd "<f2>") #'exco-calendar-show-day)
+  (require 'calendar)
 
   (defun my/browse-url (url new-window)
     "Browse url in the associated app.
@@ -859,25 +825,11 @@ in the other window."
                         (save-excursion
                           (goto-char (posn-point (event-start click)))
                           (my/find-symbol-at-point))))))
-  (setq magit-save-repository-buffers 'dontask))
-(defun dotspacemacs/emacs-custom-settings ()
-  "Emacs custom settings.
+  (setq magit-save-repository-buffers 'dontask)
+  (defun dotspacemacs/emacs-custom-settings ()
+    "Emacs custom settings.
 This is an auto-generated function, do not modify its content directly, use
 Emacs customize menu instead.
 This function is called at the very end of Spacemacs initialization."
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(eww-search-prefix "https://www.google.com/search?q=")
- '(package-selected-packages
-   (quote
-    (symon string-inflection sayid realgud test-simple loc-changes load-relative password-generator org-brain impatient-mode helm-purpose window-purpose evil-org evil-lion editorconfig dante cmake-ide levenshtein browse-at-remote zonokai-theme yapfify yaml-mode yahoo-weather xterm-color ws-butler winum which-key web-mode web-beautify w3m volatile-highlights vi-tilde-fringe uuidgen use-package unfill toc-org tide tagedit sx sr-speedbar sql-indent spaceline smeargle slim-mode skype shell-pop scss-mode sass-mode restart-emacs rainbow-mode rainbow-identifiers rainbow-delimiters racket-mode pyvenv pytest pyenv-mode py-isort pug-mode powershell pip-requirements persp-mode persistent-scratch pcre2el paradox origami orgit org-projectile org-present org-pomodoro org-jira org-download org-bullets open-junk-file neotree mwim multi-term mu4e-maildirs-extension mu4e-alert move-text mmm-mode meghanada markdown-toc magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode key-chord json-mode js2-refactor js-doc java-snippets intero info+ indent-guide imenu-list ibuffer-projectile hy-mode hungry-delete htmlize hlint-refactor hl-todo hindent highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-hoogle helm-gitignore helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-ag haskell-snippets google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md fuzzy forecast flyspell-correct-helm flycheck-pos-tip flycheck-haskell flycheck-clojure flx-ido fill-column-indicator fasd fancy-battery eyebrowse expand-region exec-path-from-shell excorporate eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-text-object-python evil-surround evil-smartparens evil-search-highlight-persist evil-numbers evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens evil-args evil-anzu eshell-z eshell-prompt-extras esh-help emms emmet-mode elisp-slime-nav elfeed-web elfeed-org elfeed-goodies easy-kill dumb-jump disaster dired-subtree dired-efap dired+ diff-hl define-word cython-mode cypher-mode csv-mode company-web company-tern company-statistics company-ghci company-ghc company-cabal company-c-headers company-anaconda command-log-mode column-enforce-mode color-identifiers-mode coffee-mode cmm-mode cmake-mode clojure-snippets clj-refactor clean-aindent-mode clang-format cider-eval-sexp-fu autopair auto-yasnippet auto-highlight-symbol auto-dictionary auto-complete-nxml auto-compile all-the-icons-dired aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-)
+
+    ))

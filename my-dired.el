@@ -28,7 +28,7 @@ Remove expanded subdir of deleted dir, if any."
                     (save-excursion (kill-buffer (car buf-list)))
                     (setq buf-list (cdr buf-list)))))))))
 
-(add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+(remove-hook 'dired-mode-hook 'all-the-icons-dired-mode)
 
 (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$")
       delete-by-moving-to-trash t
