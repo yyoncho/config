@@ -62,7 +62,6 @@ values."
      autopair
      company-lsp
      lsp-java
-     zonokai-theme
      ecukes
      feature-mode
      emms
@@ -105,14 +104,12 @@ values."
                                 (projects . 7))
    dotspacemacs-startup-buffer-responsive t
    dotspacemacs-scratch-mode 'text-mode
-   dotspacemacs-themes '(zonokai-blue)
    dotspacemacs-colorize-cursor-according-to-state t
    dotspacemacs-default-font '("Source Code Pro Medium"
                                :size 15
                                :weight normal
-
                                :weight normal
-:width normal
+                               :width normal
                                :powerline-scale 1.5)
    dotspacemacs-leader-key "SPC"
    dotspacemacs-emacs-command-key "SPC"
@@ -292,6 +289,7 @@ values."
 
     (save-excursion
       (delete-region beg end)
+      (goto-char beg)
       (call-interactively 'evil-paste-before 1)))
 
   (setq git-commit-summary-max-length 999
@@ -314,6 +312,7 @@ values."
   (global-flycheck-mode t)
 
   (setq clojure-enable-fancify-symbols t)
+  (add-hook 'custom-mode-hook 'evil-evilified-state)
 
   (defun my/find-pom-file ()
     "Find file in upper dirs"
@@ -358,23 +357,9 @@ With a prefix ARG invokes `projectile-commander' instead of
                      (dired project)))
         (error "There are no known projects"))))
 
-  (custom-set-faces
-   '(clojure-interop-method-face ((t (:foreground "darkgray"))))
-   '(company-preview-common ((t (:background "dark gray"))))
-   '(company-preview-search ((t (:background "dark gray"))))
-   '(diredp-compressed-file-suffix ((t (:foreground "red"))))
-   '(ediff-even-diff-A ((t (:background "dim gray"))))
-   '(ediff-even-diff-B ((t (:background "dim gray"))))
-   '(ediff-even-diff-C ((t (:background "dim gray"))))
-   '(ediff-odd-diff-A ((t (:background "dim gray"))))
-   '(ediff-odd-diff-B ((t (:background "dim gray"))))
-   '(ediff-odd-diff-C ((t (:background "dim gray"))))
-   '(evil-search-highlight-persist-highlight-face ((t (:inherit lazy-highlight :background "dim gray"))))
-   '(font-lock-builtin-face ((t (:foreground "orange red" :weight bold))))
-   '(region ((t (:background "dim gray" :foreground "#d8d8d8")))))
-
   (define-key evil-normal-state-map "p" 'evil-paste-before)
   (define-key evil-normal-state-map "P" 'evil-paste-after)
+  (define-key evil-normal-state-map "go" 'my/evil-replace-with-kill-ring)
 
   (require 'company)
   (setq company-backends (-remove-item 'company-capf company-backends))
@@ -522,7 +507,7 @@ With a prefix ARG invokes `projectile-commander' instead of
   (defun my/show-error (text)
     "Shows error message"
     (interactive)
-    (message (propertize (s-replace "\n" "" text) 'face 'cider-test-failure-face)))
+    (message (propertize (s-replace "\n" "" text) 'face 'cider-error-highlight-face)))
 
   (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 
@@ -584,10 +569,9 @@ PREFIX - whether to switch to the other window."
 
   ;; company key configuration
   (require 'company)
-  (define-key company-active-map "\C-p" 'company-select-previous)
-  (define-key company-active-map "\C-n" 'company-select-next)
-  (define-key company-active-map "\C-j" 'company-complete-selection)
-
+  ;; (define-key company-active-map "\C-p" 'company-select-previous)
+  ;; (define-key company-active-map "\C-n" 'company-select-next)
+  ;; (define-key company-active-map "\C-j" 'company-complete-selection)
 
   ;; always follow symlinks
 
@@ -712,7 +696,6 @@ PREFIX - whether to switch to the other window."
         '("http://sachachua.com/blog/feed/"
           "http://feeds.feedburner.com/cyclingnews/news?format=xml"))
 
-
   (require 'calendar)
   (define-key calendar-mode-map (kbd "<f2>") #'exco-calendar-show-day)
 
@@ -776,7 +759,7 @@ If EXTERNAL is double prefix, browse in new buffer."
   (spacemacs/set-leader-keys "gwc" 'magit-wip-commit)
   (spacemacs/set-leader-keys "gwl" 'magit-wip-log)
   (spacemacs/set-leader-keys "od" 'my/duplicate-2)
-  (spacemacs/set-leader-keys "of" 'my/switch-full-screen)
+  (spacemacs/set-leader-keys "of" 'my/helm-find-file-in-directory)
   (spacemacs/set-leader-keys "or" 'recentf-open-most-recent-file)
   (spacemacs/set-leader-keys "o=" 'my/format-defun)
   (spacemacs/set-leader-keys "ot" 'projectile-find-test-file)
@@ -794,7 +777,7 @@ If EXTERNAL is double prefix, browse in new buffer."
   (spacemacs/set-leader-keys "ar" 'mu4e-alert-view-unread-mails)
   (spacemacs/set-leader-keys "ai" 'mu4e-alert-view-unread-mails)
   (spacemacs/set-leader-keys "os" 'my/store-the-default-buffer)
-  (spacemacs/set-leader-keys "<SPC>" 'helm-buffers-list)
+  (spacemacs/set-leader-keys "<SPC>" 'helm-imenu)
   (spacemacs/set-leader-keys "oo" 'my/go-to-the-default-buffer)
   (spacemacs/set-leader-keys "sR" 'my/helm-ag-recentf)
   (spacemacs/set-leader-keys "bl" 'my/list-repls)
@@ -875,7 +858,14 @@ in the other window."
   (defun my/helm-ag-recentf ()
     "Search through the recent file."
     (interactive)
-    (helm-do-ag "~/" recentf-list))
+    (recentf-cleanup)
+    (helm-do-ag "~/" (-filter
+                      'file-exists-p
+                      (-remove
+                       (lambda (s)
+                         (or (s-starts-with-p "/ssh:" s)
+                             (s-starts-with-p "/sudo:" s)))
+                       recentf-list))))
 
   (defun my/helm-ag-recentf-only-matches ()
     "Search through the recent file."
@@ -953,11 +943,19 @@ in the other window."
   (define-key evil-outer-text-objects-map "e" 'my/statement-text-object)
 
   (load-file "~/.remote-config/config/my-mu4e.el")
-  (load-file "~/.remote-config/config/my-pidgin.el")
+  ;(load-file "~/.remote-config/config/my-pidgin.el")
   (load-file "~/.remote-config/config/my-cider.el")
   (load-file "~/.remote-config/config/my-java.el")
   (load-file "~/.remote-config/config/my-dired.el")
   (load-file "~/.remote-config/config/my-snippets.el")
+
+  (defun my/capitalize-first-char (&optional string)
+    "Capitalize only the first character of the input STRING."
+    (when (and string (> (length string) 0))
+      (let ((first-char (substring string nil 1))
+            (rest-str   (substring string 1)))
+        (concat (capitalize first-char) rest-str))))
+
   (customize-variable 'helm-exit-idle-delay)
   ;;
   (require 'helm)
@@ -996,7 +994,13 @@ in the other window."
 
   (add-function :before (symbol-function 'evil-yank-characters) #'my/flash-region)
   (add-function :before (symbol-function 'evil-yank-lines) #'my/flash-region)
-  (add-function :before (symbol-function 'evil-yank-rectangle) #'my/flash-region))
+  (add-function :before (symbol-function 'evil-yank-rectangle) #'my/flash-region)
+
+  (defun my/helm-find-file-in-directory ()
+    "Find file in current directory"
+    (interactive)
+    (let ((projectile-cached-project-root default-directory))
+      (projectile-find-file))))
 
 (defun dotspacemacs/emacs-custom-settings ()
   "Emacs custom settings.
@@ -1011,9 +1015,11 @@ This function is called at the very end of Spacemacs initialization."
  '(eww-search-prefix "https://www.google.com/search?q=")
  '(package-selected-packages
    (quote
-    (gradle-mode ensime sbt-mode scala-mode company-emacs-eclim eclim ecukes ansi espuds commander symon string-inflection sayid realgud test-simple loc-changes load-relative password-generator org-brain impatient-mode helm-purpose window-purpose evil-org evil-lion editorconfig dante cmake-ide levenshtein browse-at-remote zonokai-theme yapfify yaml-mode yahoo-weather xterm-color ws-butler winum which-key web-mode web-beautify w3m volatile-highlights vi-tilde-fringe uuidgen use-package unfill toc-org tide tagedit sx sr-speedbar sql-indent spaceline smeargle slim-mode skype shell-pop scss-mode sass-mode restart-emacs rainbow-mode rainbow-identifiers rainbow-delimiters racket-mode pyvenv pytest pyenv-mode py-isort pug-mode powershell pip-requirements persp-mode persistent-scratch pcre2el paradox origami orgit org-projectile org-present org-pomodoro org-jira org-download org-bullets open-junk-file neotree mwim multi-term mu4e-maildirs-extension mu4e-alert move-text mmm-mode meghanada markdown-toc magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode key-chord json-mode js2-refactor js-doc java-snippets intero info+ indent-guide imenu-list ibuffer-projectile hy-mode hungry-delete htmlize hlint-refactor hl-todo hindent highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-hoogle helm-gitignore helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-ag haskell-snippets google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md fuzzy forecast flyspell-correct-helm flycheck-pos-tip flycheck-haskell flycheck-clojure flx-ido fill-column-indicator fasd fancy-battery eyebrowse expand-region exec-path-from-shell excorporate eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-text-object-python evil-surround evil-smartparens evil-search-highlight-persist evil-numbers evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens evil-args evil-anzu eshell-z eshell-prompt-extras esh-help emms emmet-mode elisp-slime-nav elfeed-web elfeed-org elfeed-goodies easy-kill dumb-jump disaster dired-subtree dired-efap dired+ diff-hl define-word cython-mode cypher-mode csv-mode company-web company-tern company-statistics company-ghci company-ghc company-cabal company-c-headers company-anaconda command-log-mode column-enforce-mode color-identifiers-mode coffee-mode cmm-mode cmake-mode clojure-snippets clj-refactor clean-aindent-mode clang-format cider-eval-sexp-fu autopair auto-yasnippet auto-highlight-symbol auto-dictionary auto-complete-nxml auto-compile all-the-icons-dired aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell))))
+    (yapfify yaml-mode yahoo-weather xterm-color ws-butler winum which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill toc-org tide typescript-mode tagedit symon sx string-inflection stickyfunc-enhance srefactor sql-indent spaceline smeargle slim-mode skype shell-pop scss-mode sayid sass-mode restart-emacs realgud test-simple loc-changes load-relative rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyenv-mode py-isort pug-mode powershell pip-requirements persp-mode persistent-scratch pcre2el password-generator paradox origami orgit org-projectile org-category-capture org-present org-pomodoro org-jira org-download org-bullets org-brain open-junk-file neotree mwim multi-term mu4e-maildirs-extension mu4e-alert ht alert log4e gntp move-text mmm-mode meghanada markdown-toc markdown-mode magit-gitflow macrostep lsp-java lorem-ipsum livid-mode skewer-mode live-py-mode linum-relative link-hint less-css-mode json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc java-snippets jabber intero info+ indent-guide impatient-mode ibuffer-projectile hy-mode hungry-delete htmlize hlint-refactor hl-todo hindent highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-w3m w3m helm-themes helm-swoop helm-pydoc helm-purpose window-purpose imenu-list helm-projectile helm-mode-manager helm-make projectile helm-hoogle helm-gitignore request helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-ag haskell-snippets haml-mode gradle-mode google-translate golden-ratio gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md fuzzy flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flycheck-haskell flycheck-clojure flx-ido flx flash-region fill-column-indicator feature-mode fasd fancy-battery eyebrowse expand-region exec-path-from-shell excorporate url-http-ntlm soap-client fsm ntlm eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-anyblock evil-surround evil-smartparens evil-search-highlight-persist evil-org evil-numbers evil-mc evil-matchit evil-magit magit magit-popup git-commit with-editor evil-lisp-state evil-lion evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens smartparens evil-args evil-anzu anzu evil goto-chg undo-tree eshell-z eshell-prompt-extras esh-help ensime sbt-mode scala-mode emms emmet-mode elisp-slime-nav elfeed-web simple-httpd elfeed-org org-plus-contrib elfeed-goodies ace-jump-mode noflet powerline popwin elfeed editorconfig ecukes ansi espuds commander dumb-jump disaster dired-subtree dired-hacks-utils dired-efap dired+ diminish diff-hl define-word dante cython-mode cypher-mode csv-mode company-web web-completion-data company-tern dash-functional tern company-statistics company-lsp lsp-mode flycheck company-ghci company-ghc ghc haskell-mode company-emacs-eclim eclim company-cabal company-c-headers company-anaconda company command-log-mode column-enforce-mode color-identifiers-mode coffee-mode cmm-mode cmake-mode cmake-ide levenshtein clojure-snippets clj-refactor hydra inflections edn multiple-cursors paredit peg clean-aindent-mode clang-format cider-eval-sexp-fu eval-sexp-fu highlight cider seq spinner queue pkg-info clojure-mode epl browse-at-remote bind-map bind-key autopair auto-yasnippet yasnippet auto-highlight-symbol auto-dictionary auto-compile packed anaconda-mode pythonic f dash s all-the-icons-dired all-the-icons memoize font-lock+ aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core async ac-ispell auto-complete popup))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.))
+ ;; If there is more than one, they won't work right.
+ )
+)

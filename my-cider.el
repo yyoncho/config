@@ -1,5 +1,6 @@
 (eval-after-load "cider"
   '(progn
+     (flycheck-clojure-setup)
      (dolist (mode '(clojure-mode clojurescript-mode cider-mode clojurec-mode))
        (eval-after-load mode
          (font-lock-add-keywords
@@ -52,6 +53,7 @@
            cider-prompt-save-file-on-load t
            cider-use-fringe-indicators t)
 
+
      (add-hook 'cider-mode-hook 'rainbow-delimiters-mode-enable)
      (add-hook 'clojure-mode-hook (lambda () (interactive "") (flycheck-mode nil)))
 
@@ -96,6 +98,8 @@ REPL buffer.  This is controlled via
          ";" 'sp-comment
          "fp" 'my/find-project-file
          "ej" 'cider-pprint-eval-last-sexp))
+
+     (spacemacs/set-leader-keys-for-major-mode 'cider-repl-mode "gu" 'cider-jump-to-locref-at-point)
 
      (evil-define-operator evil-operator-clojure (beg end)
        "Evil operator for evaluating code."
