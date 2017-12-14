@@ -23,6 +23,7 @@ values."
      spacemacs-base
      spacemacs-bootstrap
      version-control
+     tabbar
      haskell
      csv
      windows-scripts
@@ -52,7 +53,6 @@ values."
      clojure
      w3m
      command-log
-     my-layer
      elfeed
      semantic)
    dotspacemacs-additional-packages
@@ -62,6 +62,7 @@ values."
      autopair
      company-lsp
      lsp-java
+     tabbar
      ecukes
      feature-mode
      emms
@@ -302,7 +303,8 @@ values."
 
   (global-subword-mode t)
 
-  (my/init)
+  (custom-set-variables
+   '(evil-want-C-i-jump t))
 
   (defun my/switch-to-compilation-buffer (arg)
     "Switch to compilation buffer"
@@ -333,6 +335,8 @@ values."
   (global-evil-surround-mode 1)
   (setq imenu-list-auto-resize nil)
   (setq imenu-list-position 'right)
+
+  (flyspell-mode-off)
 
   (setq clojure-indent-style :align-arguments
         clojure-align-forms-automatically t)
@@ -589,7 +593,7 @@ PREFIX - whether to switch to the other window."
   (spacemacs/toggle-evil-cleverparens-on)
   (add-hook 'clojure-mode-hook #'evil-cleverparens-mode)
   (add-hook 'emacs-lisp-mode-hook #'evil-cleverparens-mode)
-  (add-hook 'emacs-lisp-mode-hook (lambda () (semantic-mode nil)))
+  (add-hook 'emacs-lisp-mode-hook (lambda () (global-semantic-stickyfunc-mode -1)))
 
   ;; set frame name to emacs
   (defun my/set-frame-name (frame)
@@ -749,12 +753,12 @@ If EXTERNAL is double prefix, browse in new buffer."
     (emms-toggle-random-playlist)
     (evil-evilified-state))
 
-  ;; global leader key configuration
   (spacemacs/set-leader-keys "bb" 'helm-buffers-list)
   (spacemacs/set-leader-keys "cb" 'my/switch-to-compilation-buffer)
   (spacemacs/set-leader-keys "d" 'evil-operator-duplicate)
   (spacemacs/set-leader-keys "op" 'my/evil-replace-with-kill-ring)
   (spacemacs/set-leader-keys "ga" 'my/magit-stage-modified)
+  (spacemacs/set-leader-keys "gC" 'magit-commit-extend)
   (spacemacs/set-leader-keys "gc" 'magit-commit)
   (spacemacs/set-leader-keys "gwc" 'magit-wip-commit)
   (spacemacs/set-leader-keys "gwl" 'magit-wip-log)
@@ -943,9 +947,11 @@ in the other window."
   (define-key evil-outer-text-objects-map "e" 'my/statement-text-object)
 
   (load-file "~/.remote-config/config/my-mu4e.el")
-  ;(load-file "~/.remote-config/config/my-pidgin.el")
+  (load-file "~/.remote-config/config/my-pidgin.el")
+  (load-file "~/.remote-config/config/my-tabbar.el")
   (load-file "~/.remote-config/config/my-cider.el")
-  (load-file "~/.remote-config/config/my-java.el")
+  (load-file "~/.remote-config/config/my-java-lsp.el")
+  ;; (load-file "~/.remote-config/config/my-java.el")
   (load-file "~/.remote-config/config/my-dired.el")
   (load-file "~/.remote-config/config/my-snippets.el")
 
@@ -956,7 +962,7 @@ in the other window."
             (rest-str   (substring string 1)))
         (concat (capitalize first-char) rest-str))))
 
-  (customize-variable 'helm-exit-idle-delay)
+  ;;(customize-variable 'helm-exit-idle-delay 1)
   ;;
   (require 'helm)
   (setq-default helm-display-function 'helm-default-display-buffer)
@@ -965,6 +971,10 @@ in the other window."
   (require 'feature-mode)
 
   (add-to-list 'auto-mode-alist '("\.feature$" . feature-mode))
+
+
+  ;; (require 'tabbar-ruler)
+  ;; (tabbar-ruler-group-by-projectile-project)
 
   (setq feature-step-search-path "features/steps/*steps.el")
 
@@ -1000,7 +1010,39 @@ in the other window."
     "Find file in current directory"
     (interactive)
     (let ((projectile-cached-project-root default-directory))
-      (projectile-find-file))))
+      (projectile-find-file)))
+    (setenv "PATH" (concat (getenv "PATH") ":~/.bin"))
+
+  (require 'browse-url)
+  (setq browse-url-browser-function 'eww-browse-url
+        browse-url-generic-program "google-chrome")
+
+  (require 'magit)
+
+  (add-hook 'hack-local-variables-hook (lambda () (setq truncate-lines t)))
+  (global-set-key [remap eww-follow-link] 'my/eww-follow-link)
+
+  (setq url-user-agent (concat
+                        "User-Agent: Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) "
+                        "AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7\n"))
+
+  (setq w3m-user-agent nil)
+  (setq w3m-use-cookies t)
+
+  (require 'persistent-scratch)
+  (persistent-scratch-setup-default)
+
+  (require 'cc-mode)
+
+  (custom-set-variables
+   '(evil-cross-lines t)
+   '(evil-move-beyond-eol t)
+   '(projectile-globally-ignored-files
+     (quote ("TAGS" ".lein-repl-history")))
+   '(projectile-globally-ignored-directories
+     (quote (".idea" ".ensime_cache" ".eunit" "target" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "target" ))))
+
+  (global-subword-mode t))
 
 (defun dotspacemacs/emacs-custom-settings ()
   "Emacs custom settings.

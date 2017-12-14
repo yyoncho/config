@@ -42,6 +42,8 @@
         smtpmail-smtp-service 587
         message-kill-buffer-on-exit t)
 
+  (setq mu4e-hide-index-messages t)
+
   (mu4e)
 
   (use-package mu4e-alert
