@@ -23,6 +23,7 @@ values."
      spacemacs-base
      spacemacs-bootstrap
      version-control
+     tabbar
      haskell
      csv
      windows-scripts
@@ -62,6 +63,8 @@ values."
      autopair
      company-lsp
      lsp-java
+     tabbar
+     tabbar-ruler
      ecukes
      feature-mode
      emms
@@ -333,6 +336,8 @@ values."
   (global-evil-surround-mode 1)
   (setq imenu-list-auto-resize nil)
   (setq imenu-list-position 'right)
+
+  (flyspell-mode-off)
 
   (setq clojure-indent-style :align-arguments
         clojure-align-forms-automatically t)
@@ -749,7 +754,11 @@ If EXTERNAL is double prefix, browse in new buffer."
     (emms-toggle-random-playlist)
     (evil-evilified-state))
 
+  (bind-key (kbd "C-<next>") 'tabbar-ruler-tabbar-forward-tab)
+  (bind-key (kbd "C-<prior>") 'tabbar-ruler-tabbar-backward-tab)
   ;; global leader key configuration
+  (spacemacs/set-leader-keys "bn" 'tabbar-ruler-tabbar-forward-tab)
+  (spacemacs/set-leader-keys "bp" 'tabbar-ruler-tabbar-backward-tab)
   (spacemacs/set-leader-keys "bb" 'helm-buffers-list)
   (spacemacs/set-leader-keys "cb" 'my/switch-to-compilation-buffer)
   (spacemacs/set-leader-keys "d" 'evil-operator-duplicate)
@@ -943,7 +952,8 @@ in the other window."
   (define-key evil-outer-text-objects-map "e" 'my/statement-text-object)
 
   (load-file "~/.remote-config/config/my-mu4e.el")
-  ;(load-file "~/.remote-config/config/my-pidgin.el")
+  (load-file "~/.remote-config/config/my-pidgin.el")
+  (load-file "~/.remote-config/config/my-tabbar.el")
   (load-file "~/.remote-config/config/my-cider.el")
   (load-file "~/.remote-config/config/my-java.el")
   (load-file "~/.remote-config/config/my-dired.el")
@@ -965,6 +975,10 @@ in the other window."
   (require 'feature-mode)
 
   (add-to-list 'auto-mode-alist '("\.feature$" . feature-mode))
+
+
+  (require 'tabbar-ruler)
+  (tabbar-ruler-group-by-projectile-project)
 
   (setq feature-step-search-path "features/steps/*steps.el")
 
