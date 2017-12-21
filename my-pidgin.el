@@ -9,7 +9,7 @@
 (require 'pidgin)
 (pidgin-connect)
 
-(defun buffer-mode (buffer-or-string)
+(defun my/buffer-mode (buffer-or-string)
   "Returns the major mode associated with a buffer."
   (with-current-buffer buffer-or-string
     major-mode))
@@ -21,7 +21,7 @@
                    :candidates (-map 'buffer-name
                                      (-filter (lambda (buffer)
                                                 (s-equals?
-                                                 (buffer-mode buffer) "pidgin-chat-mode"))
+                                                 (my/buffer-mode buffer) "pidgin-chat-mode"))
                                               (buffer-list)))
                    :action '(("Switch to chat" . switch-to-buffer)
                              ("Delete buffer" . kill-buffer)

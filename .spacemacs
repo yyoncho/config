@@ -18,12 +18,11 @@ values."
      imenu-list
      evil-cleverparens
      spacemacs
-     (java :variables java-backend 'meghanada)
-
+     ;; (java :variables java-backend 'meghanada)
+     java
      spacemacs-base
      spacemacs-bootstrap
      version-control
-     tabbar
      haskell
      csv
      windows-scripts
@@ -54,7 +53,9 @@ values."
      w3m
      command-log
      elfeed
-     semantic)
+     semantic
+     restclient
+     bm)
    dotspacemacs-additional-packages
    '(java-snippets
      flash-region
@@ -82,7 +83,8 @@ values."
      flycheck-clojure
      all-the-icons
      all-the-icons-dired
-     yahoo-weather)
+     yahoo-weather
+     helm-bm)
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -591,7 +593,7 @@ PREFIX - whether to switch to the other window."
 
   ;; cleverparens configuration
   (spacemacs/toggle-evil-cleverparens-on)
-  (add-hook 'clojure-mode-hook #'evil-cleverparens-mode)
+
   (add-hook 'emacs-lisp-mode-hook #'evil-cleverparens-mode)
   (add-hook 'emacs-lisp-mode-hook (lambda () (global-semantic-stickyfunc-mode -1)))
 
@@ -614,8 +616,6 @@ PREFIX - whether to switch to the other window."
 
   (require 'sx-interaction)
   (setq sx-question-mode-display-buffer-function #'pop-to-buffer-same-window)
-
-
 
   (define-key evil-motion-state-map (kbd "C-f") 'forward-char)
   (define-key evil-motion-state-map (kbd "C-e") 'end-of-line)
@@ -754,6 +754,11 @@ If EXTERNAL is double prefix, browse in new buffer."
     (evil-evilified-state))
 
   (spacemacs/set-leader-keys "bb" 'helm-buffers-list)
+  (spacemacs/set-leader-keys "it" 'bm-toggle)
+  (spacemacs/set-leader-keys "in" 'bm-next)
+  (spacemacs/set-leader-keys "ii" 'helm-bm)
+  (spacemacs/set-leader-keys "iN" 'bm-previous)
+  (spacemacs/set-leader-keys "bb" 'helm-buffers-list)
   (spacemacs/set-leader-keys "cb" 'my/switch-to-compilation-buffer)
   (spacemacs/set-leader-keys "d" 'evil-operator-duplicate)
   (spacemacs/set-leader-keys "op" 'my/evil-replace-with-kill-ring)
@@ -788,7 +793,6 @@ If EXTERNAL is double prefix, browse in new buffer."
   (spacemacs/set-leader-keys "mm" (lambda () (interactive)
                                     (mu4e~headers-jump-to-maildir "/Inbox")))
 
-
   (spacemacs/toggle-evil-visual-mark-mode-off)
   (spacemacs/toggle-mode-line-on)
 
@@ -798,7 +802,6 @@ If EXTERNAL is double prefix, browse in new buffer."
     "Returns the major mode associated with a buffer."
     (with-current-buffer buffer-or-string
       major-mode))
-
 
   (defun my/find-symbol-at-point ()
     "Find the function, face, or variable definition for the symbol at point
@@ -917,7 +920,6 @@ in the other window."
   (bind-key "C-h" 'backward-delete-char)
   (bind-key "M-/" 'hippie-expand)
   (bind-key "M-j" 'evil-join)
-  (bind-key "C-x k" 'kill-current-buffer)
   (bind-key "C-M-h" 'backward-kill-word)
   (bind-key "C-j" 'newline-and-indent)
 
@@ -947,7 +949,7 @@ in the other window."
   (define-key evil-outer-text-objects-map "e" 'my/statement-text-object)
 
   (load-file "~/.remote-config/config/my-mu4e.el")
-  (load-file "~/.remote-config/config/my-pidgin.el")
+
   (load-file "~/.remote-config/config/my-tabbar.el")
   (load-file "~/.remote-config/config/my-cider.el")
   (load-file "~/.remote-config/config/my-java-lsp.el")
@@ -971,10 +973,6 @@ in the other window."
   (require 'feature-mode)
 
   (add-to-list 'auto-mode-alist '("\.feature$" . feature-mode))
-
-
-  ;; (require 'tabbar-ruler)
-  ;; (tabbar-ruler-group-by-projectile-project)
 
   (setq feature-step-search-path "features/steps/*steps.el")
 
@@ -1024,10 +1022,10 @@ in the other window."
 
   (setq url-user-agent (concat
                         "User-Agent: Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) "
-                        "AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7\n"))
+                        "AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7\n")
 
-  (setq w3m-user-agent nil)
-  (setq w3m-use-cookies t)
+        w3m-user-agent nil
+        w3m-use-cookies t)
 
   (require 'persistent-scratch)
   (persistent-scratch-setup-default)
@@ -1042,7 +1040,11 @@ in the other window."
    '(projectile-globally-ignored-directories
      (quote (".idea" ".ensime_cache" ".eunit" "target" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "target" ))))
 
-  (global-subword-mode t))
+  (setq xref-prompt-for-identifier nil)
+  (global-subword-mode t)
+  (which-function-mode t)
+  ;; (load-file "~/.remote-config/config/my-pidgin.el")
+  )
 
 (defun dotspacemacs/emacs-custom-settings ()
   "Emacs custom settings.
@@ -1057,7 +1059,7 @@ This function is called at the very end of Spacemacs initialization."
  '(eww-search-prefix "https://www.google.com/search?q=")
  '(package-selected-packages
    (quote
-    (yapfify yaml-mode yahoo-weather xterm-color ws-butler winum which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill toc-org tide typescript-mode tagedit symon sx string-inflection stickyfunc-enhance srefactor sql-indent spaceline smeargle slim-mode skype shell-pop scss-mode sayid sass-mode restart-emacs realgud test-simple loc-changes load-relative rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyenv-mode py-isort pug-mode powershell pip-requirements persp-mode persistent-scratch pcre2el password-generator paradox origami orgit org-projectile org-category-capture org-present org-pomodoro org-jira org-download org-bullets org-brain open-junk-file neotree mwim multi-term mu4e-maildirs-extension mu4e-alert ht alert log4e gntp move-text mmm-mode meghanada markdown-toc markdown-mode magit-gitflow macrostep lsp-java lorem-ipsum livid-mode skewer-mode live-py-mode linum-relative link-hint less-css-mode json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc java-snippets jabber intero info+ indent-guide impatient-mode ibuffer-projectile hy-mode hungry-delete htmlize hlint-refactor hl-todo hindent highlight-parentheses highlight-numbers parent-mode highlight-indentation hide-comnt help-fns+ helm-w3m w3m helm-themes helm-swoop helm-pydoc helm-purpose window-purpose imenu-list helm-projectile helm-mode-manager helm-make projectile helm-hoogle helm-gitignore request helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-ag haskell-snippets haml-mode gradle-mode google-translate golden-ratio gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md fuzzy flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flycheck-haskell flycheck-clojure flx-ido flx flash-region fill-column-indicator feature-mode fasd fancy-battery eyebrowse expand-region exec-path-from-shell excorporate url-http-ntlm soap-client fsm ntlm eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-anyblock evil-surround evil-smartparens evil-search-highlight-persist evil-org evil-numbers evil-mc evil-matchit evil-magit magit magit-popup git-commit with-editor evil-lisp-state evil-lion evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens smartparens evil-args evil-anzu anzu evil goto-chg undo-tree eshell-z eshell-prompt-extras esh-help ensime sbt-mode scala-mode emms emmet-mode elisp-slime-nav elfeed-web simple-httpd elfeed-org org-plus-contrib elfeed-goodies ace-jump-mode noflet powerline popwin elfeed editorconfig ecukes ansi espuds commander dumb-jump disaster dired-subtree dired-hacks-utils dired-efap dired+ diminish diff-hl define-word dante cython-mode cypher-mode csv-mode company-web web-completion-data company-tern dash-functional tern company-statistics company-lsp lsp-mode flycheck company-ghci company-ghc ghc haskell-mode company-emacs-eclim eclim company-cabal company-c-headers company-anaconda company command-log-mode column-enforce-mode color-identifiers-mode coffee-mode cmm-mode cmake-mode cmake-ide levenshtein clojure-snippets clj-refactor hydra inflections edn multiple-cursors paredit peg clean-aindent-mode clang-format cider-eval-sexp-fu eval-sexp-fu highlight cider seq spinner queue pkg-info clojure-mode epl browse-at-remote bind-map bind-key autopair auto-yasnippet yasnippet auto-highlight-symbol auto-dictionary auto-compile packed anaconda-mode pythonic f dash s all-the-icons-dired all-the-icons memoize font-lock+ aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core async ac-ispell auto-complete popup))))
+    (overseer nameless mvn maven-test-mode groovy-mode groovy-imports pcache google-c-style clojure-cheatsheet yapfify yaml-mode yahoo-weather xterm-color ws-butler winum which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill toc-org tide tagedit tabbar symon sx string-inflection stickyfunc-enhance srefactor sql-indent spaceline smeargle slim-mode skype shell-pop scss-mode sayid sass-mode restart-emacs realgud rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyenv-mode py-isort pug-mode powershell pip-requirements persp-mode persistent-scratch pcre2el password-generator paradox origami orgit org-projectile org-present org-pomodoro org-jira org-download org-bullets org-brain open-junk-file neotree mwim multi-term mu4e-maildirs-extension mu4e-alert move-text mmm-mode meghanada markdown-toc magit-gitflow macrostep lsp-java lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc java-snippets jabber intero info+ indent-guide impatient-mode ibuffer-projectile hy-mode hungry-delete hlint-refactor hl-todo hindent highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-w3m helm-themes helm-swoop helm-pydoc helm-purpose helm-projectile helm-mode-manager helm-make helm-hoogle helm-gitignore helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-ag haskell-snippets gradle-mode google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md fuzzy flyspell-correct-helm flycheck-pos-tip flycheck-haskell flycheck-clojure flx-ido flash-region fill-column-indicator feature-mode fasd fancy-battery eyebrowse expand-region exec-path-from-shell excorporate eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-anyblock evil-surround evil-smartparens evil-search-highlight-persist evil-org evil-numbers evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens evil-args evil-anzu eshell-z eshell-prompt-extras esh-help ensime emms emmet-mode elisp-slime-nav elfeed-web elfeed-org elfeed-goodies editorconfig ecukes dumb-jump disaster dired-subtree dired-efap dired+ diminish diff-hl define-word dante cython-mode cypher-mode csv-mode company-web company-tern company-statistics company-lsp company-ghci company-ghc company-emacs-eclim company-cabal company-c-headers company-anaconda command-log-mode column-enforce-mode color-identifiers-mode coffee-mode cmm-mode cmake-mode cmake-ide clojure-snippets clj-refactor clean-aindent-mode clang-format cider-eval-sexp-fu browse-at-remote autopair auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile all-the-icons-dired aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

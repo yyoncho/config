@@ -163,8 +163,6 @@ REPL buffer.  This is controlled via
                                   (interactive)
                                   (flycheck-mode nil)))
 
-     (provide 'sayid)
-
      (setq sayid-version '1)
      (setq cider-jack-in-nrepl-middlewares (-remove-item "com.billpiel.sayid.nrepl-middleware/wrap-sayid" cider-jack-in-nrepl-middlewares))
      (setq cider-jack-in-lein-plugins (-remove-item `("com.billpiel/sayid" ,sayid-version) cider-jack-in-lein-plugins))
@@ -182,4 +180,5 @@ REPL buffer.  This is controlled via
                               "project.clj")
                              "project.clj"))))
            (find-file pf)
-         (message "Unable to find project.clj")))))
+         (message "Unable to find project.clj")))
+     (add-hook 'clojure-mode-hook #'evil-cleverparens-mode)))
