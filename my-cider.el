@@ -64,7 +64,15 @@ REPL buffer.  This is controlled via
 `cider-interactive-eval-output-destination'."
        (my/show-error output)
        (cider--emit-interactive-eval-output output 'cider-repl-emit-interactive-stderr))
-
+     (defun my/cycle-log-level ()
+       (interactive)
+       (save-mark-and-excursion
+        (forward-word)
+        (re-search-backward "debug\\|info")
+        (replace-match
+         (pcase (thing-at-point 'word)
+           ("debug" "info")
+           ("info"  "debug")))))
      (dolist (m '(clojure-mode
                   clojurec-mode
                   clojurescript-mode
@@ -80,6 +88,7 @@ REPL buffer.  This is controlled via
          "ea" 'cider-load-all-project-ns
          "ep" 'cider-pprint-eval-defun-at-point
          "qr" 'cider-restart
+         "rcl" 'my/cycle-log-level
          "tv" 'cider-toggle-trace-var
          "tg" 'cider-test-rerun-test
          "te" 'cider-visit-error-buffer

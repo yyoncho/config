@@ -84,7 +84,9 @@ values."
      all-the-icons
      all-the-icons-dired
      yahoo-weather
-     helm-bm)
+     helm-bm
+     helm-xref
+     dired-sidebar)
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -333,7 +335,6 @@ values."
       (message "Unable to find pom.xml")))
 
   (require 'semantic)
-  (global-semantic-idle-summary-mode -1)
   (global-evil-surround-mode 1)
   (setq imenu-list-auto-resize nil)
   (setq imenu-list-position 'right)
@@ -372,7 +373,6 @@ With a prefix ARG invokes `projectile-commander' instead of
 
   ;; projectile
   (require 'projectile)
-  (add-to-list 'projectile-globally-ignored-directories ".cask")
   (setq projectile-create-missing-test-files t)
 
   (evil-define-command my/goto-end-of-form (count)
@@ -593,9 +593,9 @@ PREFIX - whether to switch to the other window."
 
   ;; cleverparens configuration
   (spacemacs/toggle-evil-cleverparens-on)
-
+  (add-hook 'clojure-mode-hook #'evil-cleverparens-mode)
   (add-hook 'emacs-lisp-mode-hook #'evil-cleverparens-mode)
-  (add-hook 'emacs-lisp-mode-hook (lambda () (global-semantic-stickyfunc-mode -1)))
+  (remove-hook 'emacs-lisp-mode-hook (lambda () (global-semantic-stickyfunc-mode -1)))
 
   ;; set frame name to emacs
   (defun my/set-frame-name (frame)
@@ -758,7 +758,6 @@ If EXTERNAL is double prefix, browse in new buffer."
   (spacemacs/set-leader-keys "in" 'bm-next)
   (spacemacs/set-leader-keys "ii" 'helm-bm)
   (spacemacs/set-leader-keys "iN" 'bm-previous)
-  (spacemacs/set-leader-keys "bb" 'helm-buffers-list)
   (spacemacs/set-leader-keys "cb" 'my/switch-to-compilation-buffer)
   (spacemacs/set-leader-keys "d" 'evil-operator-duplicate)
   (spacemacs/set-leader-keys "op" 'my/evil-replace-with-kill-ring)
@@ -952,8 +951,8 @@ in the other window."
 
   (load-file "~/.remote-config/config/my-tabbar.el")
   (load-file "~/.remote-config/config/my-cider.el")
-  (load-file "~/.remote-config/config/my-java-lsp.el")
-  ;; (load-file "~/.remote-config/config/my-java.el")
+  ;;(load-file "~/.remote-config/config/my-java-lsp.el")
+   (load-file "~/.remote-config/config/my-java.el")
   (load-file "~/.remote-config/config/my-dired.el")
   (load-file "~/.remote-config/config/my-snippets.el")
 
@@ -964,6 +963,7 @@ in the other window."
             (rest-str   (substring string 1)))
         (concat (capitalize first-char) rest-str))))
 
+  (setq imenu-auto-rescan t)
   ;;(customize-variable 'helm-exit-idle-delay 1)
   ;;
   (require 'helm)
@@ -1027,24 +1027,27 @@ in the other window."
         w3m-user-agent nil
         w3m-use-cookies t)
 
-  (require 'persistent-scratch)
-  (persistent-scratch-setup-default)
+
+  (use-package persistent-scratch
+    :init
+    (persistent-scratch-setup-default))
 
   (require 'cc-mode)
 
   (custom-set-variables
-   '(evil-cross-lines t)
-   '(evil-move-beyond-eol t)
    '(projectile-globally-ignored-files
      (quote ("TAGS" ".lein-repl-history")))
    '(projectile-globally-ignored-directories
-     (quote (".idea" ".ensime_cache" ".eunit" "target" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "target" ))))
+     (quote (".idea" ".ensime_cache" ".eunit" "target" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "target" ".cask"))))
 
   (setq xref-prompt-for-identifier nil)
   (global-subword-mode t)
   (which-function-mode t)
-  ;; (load-file "~/.remote-config/config/my-pidgin.el")
-  )
+  (load-file "~/.remote-config/config/my-pidgin.el")
+
+  (require 'helm-xref)
+
+  (setq xref-show-xrefs-function 'helm-xref-show-xrefs))
 
 (defun dotspacemacs/emacs-custom-settings ()
   "Emacs custom settings.

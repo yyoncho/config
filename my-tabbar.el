@@ -1,9 +1,6 @@
 ;;; my-tabbar.el --- ta                              -*- lexical-binding: t; -*-
-
 ;; Copyright (C) 2017  Ivan Yonchovski
-
 ;; Author: Ivan Yonchovski <ivan.yonchovski@tick42.com>
-;; Keywords: abbrev,
 
 (require 'tabbar)
 (tabbar-mode t)
@@ -39,6 +36,8 @@
 
 (setq tabbar-buffer-groups-function 'my/buffer-groups)
 
+(spacemacs/set-leader-keys "bn" 'tabbar-forward-tab)
+(spacemacs/set-leader-keys "bp" 'tabbar-backward-tab)
 (bind-key (kbd "C-<next>") 'tabbar-forward-tab)
 (bind-key (kbd "C-<prior>") 'tabbar-backward-tab)
 

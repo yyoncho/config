@@ -15,6 +15,7 @@ fi
 
 eval "$(fasd --init auto)"
 setopt histignorealldups sharehistory
+setopt no_hist_verify
 
 # Use emacs keybindings even if our EDITOR is set to vi
 bindkey -e
