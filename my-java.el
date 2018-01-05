@@ -101,6 +101,7 @@
   "rtf" 'jr-convert-to-field
   "xm" 'meghanada-exec-main
   "raf" 'jr-add-field
+  "rcl" 'my/cycle-log-level
   "rC" 'jr-create-constructor-from-fields
                                         ;"rai" 'meghanada-import-all
   "rfu" 'meghanada-reference

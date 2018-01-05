@@ -595,7 +595,6 @@ PREFIX - whether to switch to the other window."
   (spacemacs/toggle-evil-cleverparens-on)
   (add-hook 'clojure-mode-hook #'evil-cleverparens-mode)
   (add-hook 'emacs-lisp-mode-hook #'evil-cleverparens-mode)
-  (remove-hook 'emacs-lisp-mode-hook (lambda () (global-semantic-stickyfunc-mode -1)))
 
   ;; set frame name to emacs
   (defun my/set-frame-name (frame)
@@ -776,12 +775,13 @@ If EXTERNAL is double prefix, browse in new buffer."
   (spacemacs/set-leader-keys "ghk" 'diff-hl-revert-hunk)
   (spacemacs/set-leader-keys "ghv" 'diff-hl-mark-hunk)
   (spacemacs/set-leader-keys "ghp" 'diff-hl-previous-hunk)
-  (spacemacs/set-leader-keys "pT" 'neotree-find-project-root)
+  ;; (spacemacs/set-leader-keys "pT" 'neotree-find-project-root)
   (spacemacs/set-leader-keys "so" 'helm-do-grep-ag)
   (spacemacs/set-leader-keys "xts" 'transpose-sexps)
   (spacemacs/set-leader-keys "gd" 'magit-diff-buffer-file)
   (spacemacs/set-leader-keys "pp" 'my/projectile-switch-project-dired)
   (spacemacs/set-leader-keys "pt" 'projectile-test-project)
+  (spacemacs/set-leader-keys "pT" 'dired-sidebar-toggle-with-current-directory)
   (spacemacs/set-leader-keys "ar" 'mu4e-alert-view-unread-mails)
   (spacemacs/set-leader-keys "ai" 'mu4e-alert-view-unread-mails)
   (spacemacs/set-leader-keys "os" 'my/store-the-default-buffer)
@@ -1047,8 +1047,14 @@ in the other window."
 
   (require 'helm-xref)
 
-  (setq xref-show-xrefs-function 'helm-xref-show-xrefs))
+  (setq xref-show-xrefs-function 'helm-xref-show-xrefs)
+  (require 'dired-sidebar)
+  (setq dired-sidebar-stale-buffer-time-idle-delay 2
+        dired-sidebar-follow-file-idle-delay 0.5
+        dired-sidebar-should-follow-file t)
 
+
+  (setq semantic-default-submodes '()))
 (defun dotspacemacs/emacs-custom-settings ()
   "Emacs custom settings.
 This is an auto-generated function, do not modify its content directly, use
