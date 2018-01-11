@@ -19,6 +19,7 @@
           ((memq major-mode '(pidgin-chat-mode)) '("Chat"))
           ((memq major-mode '(mu4e-view-mode mu4e-compose-mode mu4e-headers-mode mu4e-main-mode)) '("Mail"))
           ((memq major-mode '(helm-major-mode)) '("Helm"))
+          ((memq major-mode '(term-mode)) '("Terminals"))
           ((memq major-mode '(magit-log-mode
                               magit-file-mode
                               magit-diff-mode

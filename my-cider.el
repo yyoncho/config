@@ -190,4 +190,6 @@ REPL buffer.  This is controlled via
                              "project.clj"))))
            (find-file pf)
          (message "Unable to find project.clj")))
-     (add-hook 'clojure-mode-hook #'evil-cleverparens-mode)))
+     (add-hook 'clojure-mode-hook #'evil-cleverparens-mode)
+     (spacemacs/set-leader-keys "bl" 'my/list-repls)
+     ))

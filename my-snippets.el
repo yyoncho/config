@@ -4,7 +4,6 @@
 
 ;; Author: Ivan Yonchovski <ivan.yonchovski@tick42.com>
 
-
 (setq auto-insert-query nil)
 
 (setq auto-insert-directory "~/.remote-config/config/templates/")

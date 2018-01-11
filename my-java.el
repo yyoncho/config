@@ -71,7 +71,9 @@
 (setq meghanada-javac-xlint "-Xlint:-processing")
 (spacemacs|define-jump-handlers java-mode (meghanada-jump-declaration :async t))
 
+(require 'flycheck-meghanada)
 
+(meghanada-flycheck-enable)
 (defun my/meghanada-local-variable ()
   (interactive)
   (save-buffer)
@@ -97,6 +99,7 @@
 
 (spacemacs/set-leader-keys-for-major-mode 'java-mode
   "tt" 'meghanada-run-junit-test-case
+  "ed" 'meghanada-debug-junit-class
   "," 'meghanada-run-junit-test-case
   "rtf" 'jr-convert-to-field
   "xm" 'meghanada-exec-main
@@ -169,4 +172,5 @@
 (add-hook 'java-mode-hook #'spacemacs/toggle-evil-cleverparens-on)
 (add-hook 'java-mode-hook #'my/configure-java)
 (add-hook 'java-mode-hook #'meghanada-mode)
+(add-hook 'java-mode-hook #'meghanada-flycheck-enable)
 (add-hook 'java-mode-hook #'flycheck-mode)
