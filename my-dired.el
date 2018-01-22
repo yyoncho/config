@@ -1,4 +1,3 @@
-
 (require 'dired)
 (require 'dired+)
 (require 'dired-x)
@@ -7,9 +6,13 @@
 
 (define-key dired-mode-map (kbd "TAB") (lambda ()
                                          (interactive)
-                                         (dired-subtree-toggle)))
+                                         (dired-subtree-toggle)
+                                         (dired-revert)))
 
 (define-key dired-mode-map (kbd "E") 'dired-view-file)
+(define-key dired-mode-map (kbd "<f5>") (lambda ()
+                                          (interactive)
+                                          (dired-revert)))
 
 (eval-after-load "dired-x"
   '(defun dired-clean-up-after-deletion (fn)
@@ -45,4 +48,23 @@ Remove expanded subdir of deleted dir, if any."
 (diredp-toggle-find-file-reuse-dir 1)
 
 (setq-default dired-listing-switches "-aBhl  --group-directories-first"
-              dired-omit-files-p nil)
+              dired-omit-files-p t)
+(remove-hook 'dired-subtree-after-insert-hook (lambda () (dired-revert)))
+
+;; (require 'savehist)
+;; (add-to-list 'savehist-additional-variables 'helm-dired-history-variable)
+;; (savehist-mode 1)
+
+;; (with-eval-after-load 'dired
+;;   (require 'helm-dired-history)
+;;   ;; if you are using ido,you'd better disable ido for dired
+;;   (define-key (cdr ido-minor-mode-map-entry) [remap dired] nil) ;in ido-setup-hook
+;;   (require 'savehist)
+;;   (add-to-list 'savehist-additional-variables 'helm-dired-history-variable)
+;;   (savehist-mode 1)
+
+;;   (with-eval-after-load 'dired
+;;     (require 'helm-dired-history)
+;;     ;; if you are using ido,you'd better disable ido for dired
+;;     ;; (define-key (cdr ido-minor-mode-map-entry) [remap dired] nil) ;in ido-setup-hook
+;;     (define-key dired-mode-map (kbd "<f6>") 'dired)))
