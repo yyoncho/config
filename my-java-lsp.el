@@ -1,16 +1,21 @@
-;;; my-java-lsp.el --- s                             -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2017  Ivan Yonchovski
 
-;; Author: Ivan Yonchovski <ivan.yonchovski@tick42.com>
-;; Keywords:
+(add-to-load-path "~/Sources/lsp-java")
+(add-to-load-path "~/Sources/lsp-ui")
+(add-to-load-path "~/Sources/lsp-mode")
+
 
 (require 'lsp-java)
 (require 'lsp-mode)
+(require 'lsp-flycheck)
 
 (add-hook 'java-mode-hook #'lsp-java-enable)
 
-(require 'company-lsp)
+(require 'lsp-ui)
+(add-hook 'lsp-mode-hook 'lsp-ui-mode)
 
-(push 'company-lsp company-backends)
+
+;; (require 'company-lsp)
+
+;; (push 'company-lsp company-backends)
 (setq lsp-java-server-install-dir "~/.jdt/")
