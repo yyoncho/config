@@ -48,6 +48,7 @@
 
 (spacemacs/set-leader-keys "bn" 'tabbar-forward-tab)
 (spacemacs/set-leader-keys "bp" 'tabbar-backward-tab)
+
 (bind-key (kbd "C-<next>") 'tabbar-forward-tab)
 (bind-key (kbd "C-<prior>") 'tabbar-backward-tab)
 
@@ -70,5 +71,3 @@
    (ztl-modification-state-change))
 
 (remove-hook 'post-command-hook #'tabbar-display-update)
- ;; This doesn't work for revert, I don't know.
- ;;(add-hook 'after-revert-hook 'ztl-modification-state-change)

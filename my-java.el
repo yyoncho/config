@@ -119,6 +119,9 @@
          (projectile-save-project-buffers)
          (meghanada-compile-project))
   "eb" 'meghanada-compile-file
+  "ab" 'java-ide-add-breakpoint
+  "dc" 'java-ide-debug-class
+  "dt" 'java-ide-debug-test
   "fp" 'my/find-pom-file
   "qr" 'meghanada-restart
   "tn" 'meghanada-run-junit-class)
@@ -165,12 +168,17 @@
 ;;         (rename-buffer (s-concat "compilation" (number-to-string (setq my/compilation-index (1+ my/compilation-index)))))))))
 
 ;; (add-hook 'file-save-hook 'my/java-save-buffer)
+(require 'flycheck-meghanada)
 
 (remove-hook 'java-mode-hook #'aggressive-indent-mode)
 (add-hook 'java-mode-hook #'yas-minor-mode)
 (add-hook 'java-mode-hook (lambda () (auto-complete-mode -1)))
-(add-hook 'java-mode-hook #'spacemacs/toggle-evil-cleverparens-on)
+(add-hook 'java-mode-hook #'evil-cleverparens-mode)
 (add-hook 'java-mode-hook #'my/configure-java)
 (add-hook 'java-mode-hook #'meghanada-mode)
+
 (add-hook 'java-mode-hook #'meghanada-flycheck-enable)
 (add-hook 'java-mode-hook #'flycheck-mode)
+
+(require 'cc-mode)
+(define-key java-mode-map (kbd "C-M-i") 'company-manual-begin)
