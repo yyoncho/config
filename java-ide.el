@@ -29,6 +29,14 @@
 ;;     (split-string (buffer-string) "\n" t)))
 (require 'realgud)
 
+(defun java-ide--remove-regexp (regexp file)
+  "Remove all matching for REGEXP in FILE."
+  (with-temp-buffer
+    (insert-file-contents file)
+    (while (re-search-forward regexp nil t)
+      (replace-match ""))
+    (write-region (point-min) (point-max) file)))
+
 (defun java-ide--add-line (string file)
   "Add STRING as a line to FILE."
   (with-temp-buffer
@@ -41,30 +49,32 @@
 (defun java-ide-add-breakpoint ()
   "docstring"
   (interactive)
-  (java-ide--add-line
-   (if (and meghanada--server-process (process-live-p meghanada--server-process))
-       (let ((sym (meghanada--what-symbol))
-             (buf (buffer-file-name))
-             (line (meghanada--what-line))
-             (col (meghanada--what-column)))
 
-         (concat
-          "stop at "
-          (first (meghanada--send-request-sync "ti"
-                                               buf
-                                               line
-                                               col
-                                               (format "\"%s\"" sym)))
-          ":"
-          line))
-     (error "client connection not established"))
-   "~/.jdbrc")
-  (bm-bookmark-add))
+  (let ((command-to-run (if (and meghanada--server-process (process-live-p meghanada--server-process))
+                            (let ((sym (meghanada--what-symbol))
+                                  (buf (buffer-file-name))
+                                  (line (meghanada--what-line))
+                                  (col (meghanada--what-column)))
+
+                              (concat
+                               "stop at "
+                               (first (meghanada--send-request-sync "ti"
+                                                                    buf
+                                                                    line
+                                                                    col
+                                                                    (format "\"%s\"" sym)))
+                               ":"
+                               line))
+                          (error "client connection not established"))))
+    ;; (realgud-send-command command-to-run)
+    (java-ide--add-line command-to-run "~/.jdbrc")
+    (bm-bookmark-add)))
 
 (defun java-ide-debug-class ()
   "docstring"
   (interactive )
   (meghanada-debug-junit-class)
+  (sleep-for 0.2)
   (ignore-errors (realgud:jdb "jdb -attach 6006"))
   (sleep-for 0.2)
   (realgud-cmdbuf-toggle-in-debugger?)
@@ -81,16 +91,6 @@
 
   (realgud-send-command "run"))
 
-
-
-(with-current-buffer "CachingProvider.java"
-  (if (and meghanada--server-process (process-live-p meghanada--server-process))
-      (meghanada--send-request "jd" #'meghanada--jump-callback
-                               (buffer-file-name)
-                               10
-                               0
-                               (format "\"%s\"" "java.lang.String"))
-    (message "client connection not established")))
 
 (provide 'java-ide)
 ;;; java-ide.el ends here
