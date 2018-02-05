@@ -56,7 +56,9 @@
 
      (add-hook 'cider-mode-hook 'rainbow-delimiters-mode-enable)
      (add-hook 'clojure-mode-hook (lambda () (interactive "") (flycheck-mode nil)))
-
+     (spacemacs/set-leader-keys-for-major-mode 'cider-repl-mode
+       "sc" 'cider-repl-clear-buffer
+       )
      (defun cider-emit-interactive-eval-err-output (output)
        "Emit err OUTPUT resulting from interactive code evaluation.
 The output can be send to either a dedicated output buffer or the current
@@ -96,6 +98,7 @@ REPL buffer.  This is controlled via
          "j"  'evil-operator-clojure
          "es" 'my/mount-restart
          "ld" 'my/timbre-debug
+         "sc" (lambda () (cider-find-and-clear-repl-output t))
          "li" 'my/timbre-info
          "lt" 'my/timbre-trace
          "," 'cider-eval-defun-at-point
@@ -109,6 +112,7 @@ REPL buffer.  This is controlled via
          "ej" 'cider-pprint-eval-last-sexp))
 
      (spacemacs/set-leader-keys-for-major-mode 'cider-repl-mode "gu" 'cider-jump-to-locref-at-point)
+
 
      (evil-define-operator evil-operator-clojure (beg end)
        "Evil operator for evaluating code."
@@ -140,6 +144,13 @@ REPL buffer.  This is controlled via
        "Change level to debug"
        (interactive )
        (my/exec-clj-code "(taoensso.timbre/set-level! :debug)"))
+
+     (defun my/cider-run-tests-in-current-ns ()
+       "docstring"
+       (interactive)
+       (my/exec-clj-code "(cljs.test/run-tests *ns*)"))
+
+     (spacemacs/set-leader-keys-for-major-mode 'clojurescript-mode "tn" 'my/cider-run-tests-in-current-ns)
 
      (defun my/timbre-info ()
        "Change level to info"
@@ -176,7 +187,7 @@ REPL buffer.  This is controlled via
      (setq cider-jack-in-nrepl-middlewares (-remove-item "com.billpiel.sayid.nrepl-middleware/wrap-sayid" cider-jack-in-nrepl-middlewares))
      (setq cider-jack-in-lein-plugins (-remove-item `("com.billpiel/sayid" ,sayid-version) cider-jack-in-lein-plugins))
      (setq cljr-warn-on-eval nil)
-
+     (setq  nrepl-prompt-to-kill-server-buffer-on-quit nil)
      (defun my/find-project-file (args)
        "Find file in upper dirs"
        (interactive "P")
@@ -192,4 +203,12 @@ REPL buffer.  This is controlled via
          (message "Unable to find project.clj")))
      (add-hook 'clojure-mode-hook #'evil-cleverparens-mode)
      (spacemacs/set-leader-keys "bl" 'my/list-repls)
-     ))
+
+     (defun my/kill-all-repls ()
+       "Kill all repl buffers"
+       (interactive)
+       (-map 'kill-buffer
+             (-filter (lambda (buffer)
+                        (s-equals?
+                         (buffer-mode buffer) "cider-repl-mode"))
+                      (buffer-list))))))

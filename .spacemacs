@@ -14,12 +14,13 @@ values."
    dotspacemacs-configuration-layers
    '(javascript
      vinegar
+     (treemacs :variables treemacs-use-follow-mode t)
      slack
      jabber
      imenu-list
      ;; evil-cleverparens
      spacemacs
-     (java :variables java-backend 'meghanada)
+     ;; (java :variables java-backend 'meghanada)
      java
      spacemacs-base
      spacemacs-evil
@@ -48,7 +49,7 @@ values."
      git
      markdown
      org
-     (spell-checking :variables spell-checking-enable-by-default nil)
+     (spell-checking :variables spell-checking-enable-by-desault nil)
      syntax-checking
      ibuffer
      clojure
@@ -56,7 +57,9 @@ values."
      elfeed
      semantic
      restclient
-     bm)
+     bm
+     spacemacs-purpose
+     lsp)
    dotspacemacs-additional-packages
    '(java-snippets
      flash-region
@@ -69,13 +72,12 @@ values."
      ecukes
      feature-mode
      emms
-     skype
      evil-smartparens
      excorporate
      cypher-mode
      org-jira
      dired-efap
-     dired+
+     ;; dired+
      sx
      eww
      persistent-scratch
@@ -85,11 +87,13 @@ values."
      flycheck-clojure
      all-the-icons-dired
      yahoo-weather
+     weather-metno
      helm-bm
      helm-xref
      dired-sidebar
      realgud
-     unicode-fonts)
+     unicode-fonts
+     w3m)
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -142,7 +146,7 @@ values."
    dotspacemacs-helm-position 'bottom
    dotspacemacs-helm-use-fuzzy 'source
    dotspacemacs-enable-paste-transient-state nil
-   dotspacemacs-which-key-delay 0.1
+   dotspacemacs-which-key-delay 1.0
    dotspacemacs-which-key-position 'bottom
    dotspacemacs-loading-progress-bar t
    ;; If non nil the frame is fullscreen when Emacs starts up. (default nil)
@@ -220,17 +224,13 @@ values."
     :defer t
     :init
     (progn
-      (spacemacs|diminish ggtags-mode "")))
+      (spacemacs|diminish ggtags-mode "GT" "")))
 
-  (require 'helm-bookmark)
   (require 'eww)
   ;; eww configuration
   (add-hook 'eww-mode-hook #'evil-evilified-state)
 
   (setq w3m-user-agent "Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC_Pyramid Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.")
-
-  ;; (spaceline-toggle-all-the-icons-position-off)
-  ;; (spaceline-toggle-all-the-icons-buffer-path-off)
 
   (define-key eww-mode-map "f" 'ace-link-eww)
   (define-key eww-mode-map "g" 'eww)
@@ -270,7 +270,6 @@ values."
 
   ;; org jira key bindings
   (spacemacs/set-leader-keys-for-major-mode 'org-mode "jp" 'org-jira-progress-issue)
-  (spacemacs/set-leader-keys-for-major-mode 'org-mode "ja" 'org-jira-assign-issue)
   (spacemacs/set-leader-keys-for-major-mode 'org-mode "jg" 'org-jira-get-issue)
   (spacemacs/set-leader-keys-for-major-mode 'org-mode "ji" 'org-jira-update-issue)
   (spacemacs/set-leader-keys-for-major-mode 'org-mode "jG" 'org-jira-get-issues)
@@ -280,27 +279,25 @@ values."
   (spacemacs/set-leader-keys-for-major-mode 'org-mode "jd" 'org-jira-download-attachment)
   (spacemacs/set-leader-keys-for-major-mode 'org-mode "jt" 'org-jira-todo-to-jira)
   (spacemacs/set-leader-keys-for-major-mode 'org-mode "jl" 'org-jira-update-worklogs-from-org-clocks)
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "=" 'org-timestamp-up)
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "-" 'org-timestamp-down)
 
   ;; Emacs lisp
   (spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "," 'eval-defun)
 
   (c-set-offset 'substatement-open 0)
+  ;; equkes
   (setenv "EMACS" (expand-file-name "~/.bin/emacs/bin/emacs-25.2"))
-  (require 'evil-smartparens)
+
   (setq emmet-self-closing-tag-style "")
+
+  (require 'evil-smartparens)
   (sp-pair "(" ")" :wrap "M-(")
   (sp-pair "{" "}" :wrap "M-{")
   (sp-pair "[" "]" :wrap "M-[")
 
-  ;; (setq-default grep-find-ignored-directories (add-to-list 'grep-find-ignored-directories "target"))
-  ;; (setq-default helm-grep-ignored-directories (add-to-list 'grep-find-ignored-directories "target"))
-
   ;; evil-mc configuration
   (global-evil-mc-mode t)
-
-  ;; which key configuration
-  (setq-default which-key-idle-delay 1.0
-                which-key-idle-secondary-delay 0.1)
 
   (evil-define-operator evil-operator-duplicate (beg end)
     "Duplicate action."
@@ -436,8 +433,9 @@ With a prefix ARG invokes `projectile-commander' instead of
     (magit-with-toplevel
       (magit-stage-1 "--all")))
 
-
-  (magit-wip-after-apply-mode t)
+  (use-package magit
+    :init)
+  ;; (magit-wip-after-apply-mode nil)
 
   (setq evil-want-fine-undo nil
         evil-cross-lines t)
@@ -518,7 +516,6 @@ With a prefix ARG invokes `projectile-commander' instead of
   (eval-after-load 'flycheck
     '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
   (display-time-mode t)
-  (setq helm-exit-idle-delay 0)
 
   (fset 'my/duplicate-2
         (lambda (&optional arg) "Keyboard macro."
@@ -730,7 +727,7 @@ PREFIX - whether to switch to the other window."
 
   (require 'calendar)
   (define-key calendar-mode-map (kbd "<f2>") #'exco-calendar-show-day)
-
+  (setq helm-locate-fuzzy-match nil)
   (setq browse-url-browser-function 'my/browse-url)
 
   (defun my/browse-url (url new-window)
@@ -782,18 +779,21 @@ If EXTERNAL is double prefix, browse in new buffer."
     (evil-evilified-state))
 
   (spacemacs/set-leader-keys "bb" 'helm-buffers-list)
+  (spacemacs/set-leader-keys "ae" 'emms)
   (spacemacs/set-leader-keys "it" 'bm-toggle)
   (spacemacs/set-leader-keys "in" 'bm-next)
   (spacemacs/set-leader-keys "ii" 'helm-bm)
   (spacemacs/set-leader-keys "iN" 'bm-previous)
   (spacemacs/set-leader-keys "cb" 'my/switch-to-compilation-buffer)
   (spacemacs/set-leader-keys "dd" 'evil-operator-duplicate)
+  (spacemacs/set-leader-keys "JPM" 'my/send-to-jpm)
   (spacemacs/set-leader-keys "op" 'my/evil-replace-with-kill-ring)
   (spacemacs/set-leader-keys "ga" 'my/magit-stage-modified)
   (spacemacs/set-leader-keys "gC" 'magit-commit-extend)
   (spacemacs/set-leader-keys "gc" 'magit-commit)
-  (spacemacs/set-leader-keys "gwc" 'magit-wip-commit)
-  (spacemacs/set-leader-keys "gwl" 'magit-wip-log)
+  ;; (spacemacs/set-leader-keys "gwl" 'magit-wip-log)
+  ;; (spacemacs/set-leader-keys "gwc" 'magit-wip-commit)
+  (spacemacs/set-leader-keys "wT" 'my/toggle-window-split)
   (spacemacs/set-leader-keys "od" 'my/duplicate-2)
   (spacemacs/set-leader-keys "oj" 'my/jump-to-definition)
   (spacemacs/set-leader-keys "of" 'my/helm-find-file-in-directory)
@@ -939,7 +939,6 @@ in the other window."
 
   (setq-default default-input-method 'bulgarian-phonetic)
 
-  ;; Make movement keys work like they should
   (define-key evil-normal-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
   (define-key evil-normal-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
   (define-key evil-motion-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
@@ -978,11 +977,10 @@ in the other window."
   (define-key evil-outer-text-objects-map "e" 'my/statement-text-object)
 
   (load-file "~/.remote-config/config/my-mu4e.el")
-
   (load-file "~/.remote-config/config/my-tabbar.el")
   (load-file "~/.remote-config/config/my-cider.el")
-  ;;(load-file "~/.remote-config/config/my-java-lsp.el")
-  (load-file "~/.remote-config/config/my-java.el")
+  (load-file "~/.remote-config/config/my-java-lsp.el")
+  ;; (load-file "~/.remote-config/config/my-java.el")
   (load-file "~/.remote-config/config/my-dired.el")
   (load-file "~/.remote-config/config/my-snippets.el")
 
@@ -994,14 +992,13 @@ in the other window."
         (concat (capitalize first-char) rest-str))))
 
   (setq imenu-auto-rescan t)
-  ;;(customize-variable 'helm-exit-idle-delay 1)
+  (setq-default helm-exit-idle-delay 0)
   ;;
   (require 'helm)
   (setq-default helm-display-function 'helm-default-display-buffer)
 
   ;; cucumber
   (require 'feature-mode)
-
   (add-to-list 'auto-mode-alist '("\.feature$" . feature-mode))
 
   (setq feature-step-search-path "features/steps/*steps.el")
@@ -1012,19 +1009,13 @@ in the other window."
   (evil-define-key 'visual evil-mc-key-map (kbd "C-p") 'evil-paste-pop)
 
   (setq w3m-default-display-inline-images t)
-  ;; w3m mode
   (setq w3m-home-page "https://www.google.com")
-  ;; W3M Home Page
   (setq w3m-default-display-inline-images t)
   (setq w3m-default-toggle-inline-images t)
-  ;; W3M default display images
   (setq w3m-command-arguments '("-cookie" "-F"))
   (setq w3m-use-cookies t)
-  ;; W3M use cookies
   (setq browse-url-browser-function 'w3m-browse-url)
-  ;; Browse url function use w3m
   (setq w3m-view-this-url-new-session-in-background t)
-  ;; W3M view url new session in background
 
   (require 'flash-region)
   (defun my/flash-region (beg end &optional register yank-handler)
@@ -1057,7 +1048,6 @@ in the other window."
         w3m-user-agent nil
         w3m-use-cookies t)
 
-
   (use-package persistent-scratch
     :init
     (persistent-scratch-setup-default))
@@ -1073,10 +1063,10 @@ in the other window."
   (setq xref-prompt-for-identifier nil)
   (global-subword-mode t)
   (which-function-mode t)
-  (load-file "~/.remote-config/config/my-pidgin.el")
+  ;; (load-file "~/.remote-config/config/my-pidgin.el")
   (add-hook 'edebug-mode-hook 'evil-normalize-keymaps)
-  (require 'helm-xref)
 
+  ;; (require 'helm-xref)
   ;; (setq xref-show-xrefs-function 'helm-xref-show-xrefs)
   ;; (setq xref-show-xrefs-function 'xref--show-xref-buffer)
 
@@ -1085,14 +1075,15 @@ in the other window."
   (spaceline-toggle-buffer-id-on)
   (setq powerline-default-separator 'arrow)
 
+  (setq weather-metno-location-name "Sofia, Bulgaria"
+        weather-metno-location-latitude 42.698334
+        weather-metno-location-longitude 23.319941)
+
   (require 'semantic)
   (setq-default semantic-default-submodes nil)
   (semantic-mode t)
 
   (setq evil-lisp-safe-structural-editing-modes (add-to-list 'evil-lisp-safe-structural-editing-modes 'java-mode))
-  (setq helm-display-function 'helm-default-display-buffer)
-  ;; (setq helm-display-buffer-width 120)
-  ;; (setq helm-display-buffer-reuse-frame t)
   (setq helm-display-buffer-default-height 15)
 
   (defun my/jump-to-definition ()
@@ -1100,7 +1091,65 @@ in the other window."
     (interactive)
     (save-excursion
       (evil-avy-goto-subword-1)
-      (spacemacs/jump-to-definition))))
+      (spacemacs/jump-to-definition)))
+
+  (setq helm-buffer-max-length 60)
+
+  (defun my/insert-eval-last-sexp ()
+    (interactive)
+    (let ((beg (point)))
+      (let ((current-prefix-arg '(4)))
+        (call-interactively 'eval-last-sexp))
+      (goto-char beg)
+      (when (looking-back ")")
+        (insert "\n"))
+      (insert ";; ⇒ ")
+      (move-end-of-line 1)))
+
+  (defun my/toggle-window-split ()
+    (interactive)
+    (if (= (count-windows) 2)
+        (let* ((this-win-buffer (window-buffer))
+               (next-win-buffer (window-buffer (next-window)))
+               (this-win-edges (window-edges (selected-window)))
+               (next-win-edges (window-edges (next-window)))
+               (this-win-2nd (not (and (<= (car this-win-edges)
+                                           (car next-win-edges))
+                                       (<= (cadr this-win-edges)
+                                           (cadr next-win-edges)))))
+               (splitter
+                (if (= (car this-win-edges)
+                       (car (window-edges (next-window))))
+                    'split-window-horizontally
+                  'split-window-vertically)))
+          (delete-other-windows)
+          (let ((first-win (selected-window)))
+            (funcall splitter)
+            (if this-win-2nd (other-window 1))
+            (set-window-buffer (selected-window) this-win-buffer)
+            (set-window-buffer (next-window) next-win-buffer)
+            (select-window first-win)
+            (if this-win-2nd (other-window 1))))))
+  (setq org-agenda-files (directory-files "~/.org-jira" t "^[[:alpha:])_]+.org"))
+
+  (spacemacs|use-package-add-hook semantic
+    :post-config (semantic-stickyfunc-mode -1))
+
+  (spacemacs|use-package-add-hook semantic
+    :post-init (setq semantic-default-submodes ()))
+
+  (setq which-key-idle-delay 1.0)
+
+  (setq excorporate-configuration
+        '("ivan.yonchovski@tick42.com" . "https://pod51036.outlook.com/ews/Exchange.asmx"))
+
+
+  (defun spacemacs/alternate-buffer (&optional window)
+    "Switch back and forth between current and last buffer in the
+current window."
+    (interactive)
+    (switch-to-buffer (other-buffer))))
+
 (defun dotspacemacs/emacs-custom-settings ()
   "Emacs custom settings.
 This is an auto-generated function, do not modify its content directly, use
@@ -1114,7 +1163,8 @@ This function is called at the very end of Spacemacs initialization."
  '(eww-search-prefix "https://www.google.com/search?q=")
  '(package-selected-packages
    (quote
-    (slack oauth2 websocket emoji-cheat-sheet-plus company-emoji yasnippet-snippets yapfify yaml-mode yahoo-weather xterm-color ws-butler winum which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unicode-fonts unfill toc-org tide tagedit tabbar symon sx string-inflection stickyfunc-enhance srefactor sql-indent spaceline-all-the-icons smeargle slim-mode skype shell-pop scss-mode sayid sass-mode restclient-helm restart-emacs realgud rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyenv-mode py-isort pug-mode powershell pippel pip-requirements persp-mode persistent-scratch pcre2el password-generator paradox overseer origami orgit org-projectile org-present org-pomodoro org-mime org-jira org-download org-bullets org-brain open-junk-file ob-restclient ob-http neotree nameless mwim mvn multi-term mu4e-maildirs-extension mu4e-alert move-text mmm-mode meghanada maven-test-mode markdown-toc magit-gitflow macrostep lsp-java lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc java-snippets jabber intero indent-guide importmagic impatient-mode ibuffer-projectile hy-mode hungry-delete hlint-refactor hl-todo hindent highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-pydoc helm-purpose helm-projectile helm-mu helm-mode-manager helm-make helm-hoogle helm-gtags helm-gitignore helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-bm helm-ag haskell-snippets groovy-mode groovy-imports gradle-mode google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md ggtags fuzzy flyspell-correct-helm flycheck-pos-tip flycheck-haskell flycheck-clojure flx-ido flash-region fill-column-indicator feature-mode fasd fancy-battery eyebrowse expand-region exec-path-from-shell excorporate eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-anyblock evil-surround evil-smartparens evil-search-highlight-persist evil-org evil-numbers evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens evil-args evil-anzu eshell-z eshell-prompt-extras esh-help ensime emojify emms emmet-mode elisp-slime-nav elfeed-web elfeed-org elfeed-goodies editorconfig ecukes dumb-jump drag-stuff dired-sidebar dired-efap dired+ diminish diff-hl define-word dante cython-mode cypher-mode csv-mode counsel-projectile company-web company-tern company-statistics company-restclient company-lsp company-ghci company-ghc company-emacs-eclim company-cabal company-anaconda command-log-mode column-enforce-mode color-identifiers-mode coffee-mode cmm-mode clojure-snippets clojure-cheatsheet clj-refactor clean-aindent-mode circe cider-eval-sexp-fu browse-at-remote autopair auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile all-the-icons-dired aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell))))
+    (org-present org-brain elfeed-org yasnippet-snippets yapfify yaml-mode yahoo-weather xterm-color ws-butler winum which-key web-mode web-beautify weather-metno w3m volatile-highlights vi-tilde-fringe uuidgen use-package unicode-fonts unfill toc-org tide tagedit tabbar symon sx string-inflection stickyfunc-enhance srefactor sql-indent spaceline-all-the-icons smeargle slim-mode slack skype shell-pop scss-mode sayid sass-mode restclient-helm restart-emacs realgud rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyenv-mode py-isort pug-mode powershell pippel pipenv pip-requirements persp-mode persistent-scratch pcre2el password-generator paradox overseer origami orgit org-projectile org-pomodoro org-mime org-jira org-download org-bullets open-junk-file ob-restclient ob-http neotree nameless mwim mvn multi-term mu4e-maildirs-extension mu4e-alert move-text mmm-mode meghanada maven-test-mode markdown-toc magit-gitflow macrostep lsp-ui lsp-python lsp-java lorem-ipsum livid-mode live-py-mode linum-relative link-hint json-mode js2-refactor js-doc java-snippets jabber intero indent-guide importmagic impatient-mode ibuffer-projectile hy-mode hungry-delete hlint-refactor hl-todo hindent highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-pydoc helm-purpose helm-projectile helm-mu helm-mode-manager helm-make helm-hoogle helm-gtags helm-gitignore helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-bm helm-ag haskell-snippets groovy-mode groovy-imports gradle-mode google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md ggtags fuzzy font-lock+ flyspell-correct-helm flycheck-pos-tip flycheck-haskell flycheck-clojure flx-ido flash-region fill-column-indicator feature-mode fasd fancy-battery eyebrowse expand-region exec-path-from-shell excorporate eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-anyblock evil-surround evil-smartparens evil-search-highlight-persist evil-org evil-numbers evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens evil-args evil-anzu eshell-z eshell-prompt-extras esh-help ensime emoji-cheat-sheet-plus emms emmet-mode elisp-slime-nav elfeed-web elfeed-goodies editorconfig ecukes dumb-jump dired-sidebar dired-efap diminish diff-hl define-word dante cython-mode cypher-mode csv-mode counsel-projectile company-web company-tern company-statistics company-restclient company-lsp company-ghci company-ghc company-emoji company-emacs-eclim company-cabal company-anaconda command-log-mode column-enforce-mode color-identifiers-mode coffee-mode cmm-mode clojure-snippets clojure-cheatsheet clj-refactor clean-aindent-mode cider-eval-sexp-fu centered-cursor-mode browse-at-remote autopair auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile all-the-icons-dired aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell)))
+ '(tramp-syntax (quote default) nil (tramp)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

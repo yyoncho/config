@@ -5,7 +5,7 @@
 ;; Author: Ivan Yonchovski <ivan.yonchovski@tick42.com>
 ;; Keywords: abbrev, abbrev, abbrev,
 
-(add-to-list 'load-path "~/Sources/yy/pindgin/")
+(add-to-list 'load-path "~/.remote-config/config/pidgin/")
 (require 'pidgin)
 (pidgin-connect)
 
@@ -42,5 +42,6 @@
 (defun my/chat-with-petya ()
   (interactive)
   (let* ((user "Петя Радева|facebook")
-         (curr-buf (or (get-buffer (pidgin-chat-get-buffer user)) (pidgin-chat-create-buffer user))))
+         (curr-buf (or (get-buffer (pidgin-chat-get-buffer user))
+                       (pidgin-chat-create-buffer user))))
     (switch-to-buffer curr-buf)))
