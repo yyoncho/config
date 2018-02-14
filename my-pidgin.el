@@ -5,7 +5,7 @@
 ;; Author: Ivan Yonchovski <ivan.yonchovski@tick42.com>
 ;; Keywords: abbrev, abbrev, abbrev,
 
-(add-to-list 'load-path "~/Sources/yy/pindgin/")
+(add-to-list 'load-path "~/.remote-config/config/pidgin/")
 (require 'pidgin)
 (pidgin-connect)
 

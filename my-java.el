@@ -1,79 +1,10 @@
-(defun my/goto-imports-start ()
-  (goto-char (point-min))
-  (let ((package-point (re-search-forward "package .*;" nil t))
-        (import-point (re-search-forward "import .*;" nil t)))
-    (cond (import-point (goto-char import-point)
-                        (beginning-of-line))
-          (package-point (goto-char package-point)
-                         (forward-line)
-                         (open-line 2)
-                         (forward-line))
-          (t (goto-char (point-min))
-             (open-line 1)))))
-
-(defun my/import-name (imp)
-  (let ((case-fold-search nil))
-    (let ((imp (when (string-match "\\([a-z0-9_]+\\.\\)+[A-Za-z0-9_]+" imp)
-                 (match-string 0 imp))))
-      (prog1
-          imp))))
-
-(defun my/import-exists-p (imp)
-  (save-excursion
-    (goto-char (point-min))
-    (re-search-forward (concat "^import\\s-+" imp "\\s-*;") nil t)))
-
-(defun my/add-import (import-name)
-  (save-mark-and-excursion
-   (unless (or (string-prefix-p "java.lang." import-name)
-               (meghanada--import-exists-p import-name))
-     (let ((start t))
-       (my/goto-imports-start)
-       (while (and start (re-search-forward "^import .+;" nil t))
-         (forward-line)
-         (setq start (/= (point-at-bol) (point-at-eol))))
-       (insert (format "import %s;\n" import-name))))))
-
-(defun my/get-class-fields ()
-  (-map
-   (lambda (item) (list (plist-get (third item) :type) (first item) ))
-   (-filter
-    (lambda (item) (eq (second item) 'variable))
-    (plist-get (third sem-scope) :members))))
-
-(defun my/create-constructor-from-fields ()
-  "Create constructor from fields"
-  (interactive)
-  (semantic-force-refresh)
-  (let* ((sem-scope (semantic-current-tag))
-         (p (point))
-         (fields (my/get-class-fields)))
-    (newline-and-indent)
-    (insert-string
-     "public "
-     (first sem-scope)
-     "("
-     (s-join ", "
-             (-map (lambda (i) (s-concat (first i) " " (second i)))
-                   fields))
-     ")")
-    (newline-and-indent)
-    (insert-string "{")
-    (-each fields
-      (lambda (f)
-        (newline-and-indent)
-        (insert-string "this." (second f) " = " (second f) ";")))
-    (newline-and-indent)
-    (insert-string "}")
-    (indent-region p (point)))
-  )
 
 (setq meghanada-javac-xlint "-Xlint:-processing")
 (spacemacs|define-jump-handlers java-mode (meghanada-jump-declaration :async t))
 
 (require 'flycheck-meghanada)
-
 (meghanada-flycheck-enable)
+
 (defun my/meghanada-local-variable ()
   (interactive)
   (save-buffer)
@@ -132,23 +63,6 @@
   (newline-and-indent)
   (insert-string "private " (plist-get (third var-data) :type ) " " (first var-data) ";"))
 
-(defun my/convert-to-field ()
-  (interactive)
-
-  (save-mark-and-excursion
-   (semantic-force-refresh)
-   (if-let ((variable (thing-at-point 'symbol t))
-            (var-data (-first
-                       (lambda (it)
-                         (s-equals? (first it) variable))
-                       (semantic-get-all-local-variables))))
-       (semantic-go-to-tag var-data)
-     (let ((start (point)))
-       (re-search-forward (plist-get (third var-data) :type))
-       (delete-region start (point))
-       (indent-according-to-mode))
-     (my/add--field-to-current-class var-data))))
-
 
 (defun my/meghanada-restart ()
   (with-current-buffer
@@ -170,13 +84,12 @@
 ;; (add-hook 'file-save-hook 'my/java-save-buffer)
 (require 'flycheck-meghanada)
 
-(remove-hook 'java-mode-hook #'aggressive-indent-mode)
+;; (remove-hook 'java-mode-hook #'aggressive-indent-mode)
 (add-hook 'java-mode-hook #'yas-minor-mode)
 (add-hook 'java-mode-hook (lambda () (auto-complete-mode -1)))
 (add-hook 'java-mode-hook #'evil-cleverparens-mode)
 (add-hook 'java-mode-hook #'my/configure-java)
 (add-hook 'java-mode-hook #'meghanada-mode)
-
 (add-hook 'java-mode-hook #'meghanada-flycheck-enable)
 (add-hook 'java-mode-hook #'flycheck-mode)
 

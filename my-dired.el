@@ -51,6 +51,9 @@ Remove expanded subdir of deleted dir, if any."
               dired-omit-files-p t)
 (remove-hook 'dired-subtree-after-insert-hook (lambda () (dired-revert)))
 
+
+(setq dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.$\\|GPATH\\|GTAGS\\|GSYMS\\|GRTAGS")
+
 ;; (require 'savehist)
 ;; (add-to-list 'savehist-additional-variables 'helm-dired-history-variable)
 ;; (savehist-mode 1)

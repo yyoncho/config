@@ -56,7 +56,9 @@
 
      (add-hook 'cider-mode-hook 'rainbow-delimiters-mode-enable)
      (add-hook 'clojure-mode-hook (lambda () (interactive "") (flycheck-mode nil)))
-
+     (spacemacs/set-leader-keys-for-major-mode 'cider-repl-mode
+       "sc" 'cider-repl-clear-buffer
+       )
      (defun cider-emit-interactive-eval-err-output (output)
        "Emit err OUTPUT resulting from interactive code evaluation.
 The output can be send to either a dedicated output buffer or the current
@@ -96,6 +98,7 @@ REPL buffer.  This is controlled via
          "j"  'evil-operator-clojure
          "es" 'my/mount-restart
          "ld" 'my/timbre-debug
+         "sc" (lambda () (cider-find-and-clear-repl-output t))
          "li" 'my/timbre-info
          "lt" 'my/timbre-trace
          "," 'cider-eval-defun-at-point
