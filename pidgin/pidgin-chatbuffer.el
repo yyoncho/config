@@ -54,8 +54,6 @@
       (funcall pidgin-chat-send-function body))))
 
 (defun pidgin-chat-buffer-display (prompt-function prompt-data output-functions output-data tail)
- ;  (if (not pidgin-chat-point-insert)
- ;     (setq pidgin-chat-point-insert (point-max)))
   (let ((at-insert-point (eq (point) pidgin-chat-point-insert))
         outputp)
     (save-excursion
