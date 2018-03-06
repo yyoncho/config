@@ -114,4 +114,14 @@
                   (pidgin-dbus-purple-call-method "PurpleBuddyGetName"  :int32 buddy)))
           (pidgin-dbus-purple-call-method "PurpleFindBuddies" :int32 account "")))
 
+;; (mapcar (lambda (buddy)
+;;           (list (pidgin-dbus-purple-call-method "PurpleBuddyGetAlias" :int32 buddy)
+;;                 (pidgin-dbus-purple-call-method "PurpleBuddyGetName"  :int32 buddy)))
+;;         )
+;; (seq-map (lambda (id) (pidgin-dbus-purple-call-method "PurpleBuddyGetIcon" :int32 id))
+;;          (pidgin-dbus-purple-call-method "PurpleFindBuddies" :int32  2343 ""))
+
+;; (pidgin-dbus-purple-call-method "PurpleConvIm"
+;;                                 :int32 (nth 5 (pidgin-dbus-purple-call-method "PurpleGetIms")))
+
 (provide 'pidgin-dbus)

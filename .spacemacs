@@ -144,7 +144,7 @@ values."
    dotspacemacs-helm-position 'bottom
    dotspacemacs-helm-use-fuzzy 'source
    dotspacemacs-enable-paste-transient-state nil
-   dotspacemacs-which-key-delay 0.1
+   dotspacemacs-which-key-delay 1.0
    dotspacemacs-which-key-position 'bottom
    dotspacemacs-loading-progress-bar t
    ;; If non nil the frame is fullscreen when Emacs starts up. (default nil)
@@ -514,7 +514,6 @@ With a prefix ARG invokes `projectile-commander' instead of
   (eval-after-load 'flycheck
     '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
   (display-time-mode t)
-  (setq helm-exit-idle-delay 0)
 
   (fset 'my/duplicate-2
         (lambda (&optional arg) "Keyboard macro."
@@ -726,7 +725,7 @@ PREFIX - whether to switch to the other window."
 
   (require 'calendar)
   (define-key calendar-mode-map (kbd "<f2>") #'exco-calendar-show-day)
-
+  (setq helm-locate-fuzzy-match nil)
   (setq browse-url-browser-function 'my/browse-url)
 
   (defun my/browse-url (url new-window)
@@ -937,7 +936,6 @@ in the other window."
 
   (setq-default default-input-method 'bulgarian-phonetic)
 
-  ;; Make movement keys work like they should
   (define-key evil-normal-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
   (define-key evil-normal-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
   (define-key evil-motion-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
@@ -991,14 +989,13 @@ in the other window."
         (concat (capitalize first-char) rest-str))))
 
   (setq imenu-auto-rescan t)
-  (setq-default helm-exit-idle-delay 1)
+  (setq-default helm-exit-idle-delay 0)
   ;;
   (require 'helm)
   (setq-default helm-display-function 'helm-default-display-buffer)
 
   ;; cucumber
   (require 'feature-mode)
-
   (add-to-list 'auto-mode-alist '("\.feature$" . feature-mode))
 
   (setq feature-step-search-path "features/steps/*steps.el")
@@ -1016,7 +1013,6 @@ in the other window."
   (setq w3m-use-cookies t)
   (setq browse-url-browser-function 'w3m-browse-url)
   (setq w3m-view-this-url-new-session-in-background t)
-  ;; W3M view url new session in background
 
   (require 'flash-region)
   (defun my/flash-region (beg end &optional register yank-handler)
@@ -1085,7 +1081,7 @@ in the other window."
   (semantic-mode t)
 
   (setq evil-lisp-safe-structural-editing-modes (add-to-list 'evil-lisp-safe-structural-editing-modes 'java-mode))
-  (setq helm-display-buffer-default-height 7)
+  (setq helm-display-buffer-default-height 15)
 
   (defun my/jump-to-definition ()
     "Jump to definition."
@@ -1095,6 +1091,17 @@ in the other window."
       (spacemacs/jump-to-definition)))
 
   (setq helm-buffer-max-length 60)
+
+  (defun my/insert-eval-last-sexp ()
+    (interactive)
+    (let ((beg (point)))
+      (let ((current-prefix-arg '(4)))
+        (call-interactively 'eval-last-sexp))
+      (goto-char beg)
+      (when (looking-back ")")
+        (insert "\n"))
+      (insert ";; ⇒ ")
+      (move-end-of-line 1)))
 
   (defun my/toggle-window-split ()
     (interactive)
@@ -1119,4 +1126,36 @@ in the other window."
             (set-window-buffer (selected-window) this-win-buffer)
             (set-window-buffer (next-window) next-win-buffer)
             (select-window first-win)
-            (if this-win-2nd (other-window 1)))))))
+            (if this-win-2nd (other-window 1))))))
+  (setq org-agenda-files (directory-files "~/.org-jira" t "^[[:alpha:])_]+.org"))
+
+  (spacemacs|use-package-add-hook semantic
+    :post-config (semantic-stickyfunc-mode -1))
+
+  (spacemacs|use-package-add-hook semantic
+    :post-init (setq semantic-default-submodes ()))
+
+  (setq which-key-idle-delay 1.0)
+
+  (setq excorporate-configuration
+        '("ivan.yonchovski@tick42.com" . "https://pod51036.outlook.com/ews/Exchange.asmx")))
+(defun dotspacemacs/emacs-custom-settings ()
+  "Emacs custom settings.
+This is an auto-generated function, do not modify its content directly, use
+Emacs customize menu instead.
+This function is called at the very end of Spacemacs initialization."
+  (custom-set-variables
+   ;; custom-set-variables was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   '(package-selected-packages
+     (quote
+      (ws-butler winum volatile-highlights vi-tilde-fringe uuidgen toc-org symon string-inflection spaceline-all-the-icons all-the-icons memoize spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el password-generator paradox spinner overseer org-bullets open-junk-file neotree nameless move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-purpose window-purpose imenu-list helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-cleverparens smartparens paredit evil-args evil-anzu anzu eval-sexp-fu highlight elisp-slime-nav editorconfig dumb-jump f dash s define-word counsel-projectile projectile counsel swiper ivy pkg-info epl column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup which-key use-package org-plus-contrib hydra font-lock+ exec-path-from-shell evil goto-chg undo-tree diminish bind-map bind-key async))))
+  (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   )
+  )
