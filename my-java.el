@@ -89,7 +89,7 @@
 (add-hook 'java-mode-hook (lambda () (auto-complete-mode -1)))
 (add-hook 'java-mode-hook #'evil-cleverparens-mode)
 (add-hook 'java-mode-hook #'my/configure-java)
-(add-hook 'java-mode-hook #'meghanada-mode)
+;; (add-hook 'java-mode-hook #'meghanada-mode)
 (add-hook 'java-mode-hook #'meghanada-flycheck-enable)
 (add-hook 'java-mode-hook #'flycheck-mode)
 

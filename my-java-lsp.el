@@ -1,21 +1,16 @@
 
+(setq lsp-java-server-install-dir "~/.jdt/")
 
-(add-to-load-path "~/Sources/lsp-java")
-(add-to-load-path "~/Sources/lsp-ui")
-(add-to-load-path "~/Sources/lsp-mode")
-
-
-(require 'lsp-java)
 (require 'lsp-mode)
-(require 'lsp-flycheck)
+(require 'lsp-ui-flycheck)
+(require 'lsp-java)
 
+(add-hook 'java-mode-hook #'lsp-mode)
 (add-hook 'java-mode-hook #'lsp-java-enable)
 
 (require 'lsp-ui)
 (add-hook 'lsp-mode-hook 'lsp-ui-mode)
 
+(require 'company-lsp)
 
-;; (require 'company-lsp)
-
-;; (push 'company-lsp company-backends)
-(setq lsp-java-server-install-dir "~/.jdt/")
+(push 'company-lsp company-backends)
