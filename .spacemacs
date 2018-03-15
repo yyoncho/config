@@ -14,6 +14,7 @@ values."
    dotspacemacs-configuration-layers
    '(javascript
      vinegar
+     (treemacs :variables treemacs-use-follow-mode t)
      slack
      jabber
      imenu-list
@@ -214,11 +215,11 @@ values."
     (progn
       (spacemacs|diminish evil-cleverparens-mode)))
 
-  ;; (use-package meghanada
-  ;;   :defer t
-  ;;   :init
-  ;;   (progn
-  ;;     (spacemacs|diminish meghanada-mode "M")))
+  (use-package meghanada
+    :defer t
+    :init
+    (progn
+      (spacemacs|diminish meghanada-mode "M")))
 
   (use-package ggtags
     :defer t
@@ -979,7 +980,7 @@ in the other window."
   (load-file "~/.remote-config/config/my-tabbar.el")
   (load-file "~/.remote-config/config/my-cider.el")
   ;; (load-file "~/.remote-config/config/my-java-lsp.el")
-  ;; (load-file "~/.remote-config/config/my-java.el")
+  (load-file "~/.remote-config/config/my-java.el")
   (load-file "~/.remote-config/config/my-dired.el")
   (load-file "~/.remote-config/config/my-snippets.el")
 
@@ -1140,7 +1141,15 @@ in the other window."
   (setq which-key-idle-delay 1.0)
 
   (setq excorporate-configuration
-        '("ivan.yonchovski@tick42.com" . "https://pod51036.outlook.com/ews/Exchange.asmx")))
+        '("ivan.yonchovski@tick42.com" . "https://pod51036.outlook.com/ews/Exchange.asmx"))
+
+
+  (defun spacemacs/alternate-buffer (&optional window)
+    "Switch back and forth between current and last buffer in the
+current window."
+    (interactive)
+    (switch-to-buffer (other-buffer))))
+
 (defun dotspacemacs/emacs-custom-settings ()
   "Emacs custom settings.
 This is an auto-generated function, do not modify its content directly, use
