@@ -42,5 +42,6 @@
 (defun my/chat-with-petya ()
   (interactive)
   (let* ((user "Петя Радева|facebook")
-         (curr-buf (or (get-buffer (pidgin-chat-get-buffer user)) (pidgin-chat-create-buffer user))))
+         (curr-buf (or (get-buffer (pidgin-chat-get-buffer user))
+                       (pidgin-chat-create-buffer user))))
     (switch-to-buffer curr-buf)))

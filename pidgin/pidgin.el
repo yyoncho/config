@@ -12,10 +12,7 @@
 (defvar pidgin-messenger-directory "~/.messenger/")
 
 (defun pidgin-connect ()
-  (when (and (fboundp 'ido-completing-read)
-             ido-mode)
-    (setq pidgin-completing-read 'ido-completing-read)))
-  (pidgin-init)
+  (pidgin-init))
 
 (defun pidgin-replace-regexp (regexp to-string)
   (while (re-search-forward regexp nil t)

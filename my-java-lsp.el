@@ -5,8 +5,8 @@
 (require 'lsp-ui-flycheck)
 (require 'lsp-java)
 
-(add-hook 'java-mode-hook #'lsp-mode)
-(add-hook 'java-mode-hook #'lsp-java-enable)
+;; (remove-hook 'java-mode-hook #'lsp-mode)
+(remove-hook 'java-mode-hook #'lsp-java-enable)
 
 (require 'lsp-ui)
 (add-hook 'lsp-mode-hook 'lsp-ui-mode)
