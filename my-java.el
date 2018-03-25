@@ -13,7 +13,7 @@
 (defun my/run-test ()
   (interactive)
   (save-buffer)
-  (meghanada-compile-file)
+  (meghanada-compile-project)
   (meghanada-run-junit-test-case))
 
 (defun my/run-test-class ()

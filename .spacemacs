@@ -787,6 +787,7 @@ If EXTERNAL is double prefix, browse in new buffer."
   (spacemacs/set-leader-keys "iN" 'bm-previous)
   (spacemacs/set-leader-keys "cb" 'my/switch-to-compilation-buffer)
   (spacemacs/set-leader-keys "dd" 'evil-operator-duplicate)
+  (spacemacs/set-leader-keys "JPM" 'my/send-to-jpm)
   (spacemacs/set-leader-keys "op" 'my/evil-replace-with-kill-ring)
   (spacemacs/set-leader-keys "ga" 'my/magit-stage-modified)
   (spacemacs/set-leader-keys "gC" 'magit-commit-extend)
