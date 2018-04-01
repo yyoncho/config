@@ -55,7 +55,6 @@ values."
      clojure
      command-log
      elfeed
-     semantic
      restclient
      bm
      spacemacs-purpose
@@ -202,11 +201,14 @@ values."
    dotspacemacs-default-package-repository nil
    dotspacemacs-whitespace-cleanup 'trailing))
 
-(defun dotspacemacs/user-init ())
+(defun dotspacemacs/user-init ()
+  "User init.")
 
 (defun dotspacemacs/user-config ()
   (interactive)
 
+
+  (require 'helm-projectile)
   (setq helm-projectile-fuzzy-match nil)
 
   (use-package evil-cleverparens
@@ -214,12 +216,6 @@ values."
     :init
     (progn
       (spacemacs|diminish evil-cleverparens-mode)))
-
-  (use-package meghanada
-    :defer t
-    :init
-    (progn
-      (spacemacs|diminish meghanada-mode "M")))
 
   (use-package ggtags
     :defer t
@@ -358,7 +354,6 @@ values."
         (find-file pf)
       (message "Unable to find pom.xml")))
 
-  (require 'semantic)
   (global-evil-surround-mode 1)
   (setq imenu-list-auto-resize nil)
   (setq imenu-list-position 'right)
@@ -1083,10 +1078,6 @@ in the other window."
         weather-metno-location-latitude 42.698334
         weather-metno-location-longitude 23.319941)
 
-  (require 'semantic)
-  (setq-default semantic-default-submodes nil)
-  (semantic-mode t)
-
   (setq evil-lisp-safe-structural-editing-modes (add-to-list 'evil-lisp-safe-structural-editing-modes 'java-mode))
   (setq helm-display-buffer-default-height 15)
 
@@ -1136,51 +1127,20 @@ in the other window."
             (if this-win-2nd (other-window 1))))))
   (setq org-agenda-files (directory-files "~/.org-jira" t "^[[:alpha:])_]+.org"))
 
-  (spacemacs|use-package-add-hook semantic
-    :post-config (semantic-stickyfunc-mode -1))
-
-  (spacemacs|use-package-add-hook semantic
-    :post-init (setq semantic-default-submodes ()))
-
-  (setq which-key-idle-delay 1.0)
+  (spacemacs|use-package-add-hook which-key
+    :post-init (setq which-key-idle-delay 1.0))
 
   (setq excorporate-configuration
         '("ivan.yonchovski@tick42.com" . "https://pod51036.outlook.com/ews/Exchange.asmx"))
-
-
-  (defun spacemacs/alternate-buffer (&optional window)
-    "Switch back and forth between current and last buffer in the
-current window."
-    (interactive)
-    (switch-to-buffer (other-buffer)))
-
 
   (defun hide-ctrl-M ()
     "Hides the disturbing '^M' showing up in files containing mixed UNIX and DOS line endings."
     (interactive)
     (setq buffer-display-table (make-display-table))
     (aset buffer-display-table ?\^M []))
-)
 
-(defun dotspacemacs/emacs-custom-settings ()
-  "Emacs custom settings.
-This is an auto-generated function, do not modify its content directly, use
-Emacs customize menu instead.
-This function is called at the very end of Spacemacs initialization."
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(eww-search-prefix "https://www.google.com/search?q=")
- '(package-selected-packages
-   (quote
-    (lsp-mode yasnippet-snippets yapfify yaml-mode yahoo-weather xterm-color ws-butler winum which-key web-mode web-beautify weather-metno w3m volatile-highlights vi-tilde-fringe uuidgen use-package unicode-fonts unfill treemacs-projectile treemacs-evil toc-org tide tagedit tabbar symon sx string-inflection stickyfunc-enhance srefactor sql-indent spaceline-all-the-icons smeargle slim-mode slack shell-pop scss-mode sayid sass-mode restclient-helm restart-emacs realgud rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyenv-mode py-isort pug-mode powershell pippel pipenv pip-requirements persp-mode persistent-scratch pcre2el password-generator paradox overseer origami orgit org-projectile org-present org-pomodoro org-mime org-jira org-download org-bullets org-brain open-junk-file ob-restclient ob-http nameless mwim mvn multi-term mu4e-maildirs-extension mu4e-alert move-text mmm-mode meghanada maven-test-mode markdown-toc magit-gitflow macrostep lsp-ui lsp-python lsp-java lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc java-snippets jabber intero indent-guide importmagic impatient-mode ibuffer-projectile hy-mode hungry-delete hlint-refactor hl-todo hindent highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-pydoc helm-purpose helm-projectile helm-mu helm-mode-manager helm-make helm-hoogle helm-gtags helm-gitignore helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-bm helm-ag haskell-snippets groovy-mode groovy-imports gradle-mode google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md ggtags fuzzy font-lock+ flyspell-correct-helm flycheck-pos-tip flycheck-haskell flycheck-clojure flx-ido flash-region fill-column-indicator feature-mode fasd fancy-battery eyebrowse expand-region exec-path-from-shell excorporate eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-anyblock evil-surround evil-smartparens evil-search-highlight-persist evil-org evil-numbers evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens evil-args evil-anzu eshell-z eshell-prompt-extras esh-help ensime emoji-cheat-sheet-plus emms emmet-mode elisp-slime-nav elfeed-web elfeed-org elfeed-goodies editorconfig ecukes dumb-jump dired-sidebar dired-efap diminish diff-hl define-word dante cython-mode cypher-mode csv-mode counsel-projectile company-web company-tern company-statistics company-restclient company-lsp company-ghci company-ghc company-emoji company-emacs-eclim company-cabal company-anaconda command-log-mode column-enforce-mode color-identifiers-mode coffee-mode cmm-mode clojure-snippets clojure-cheatsheet clj-refactor clean-aindent-mode cider-eval-sexp-fu centered-cursor-mode browse-at-remote autopair auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile all-the-icons-dired aggressive-indent adaptive-wrap ace-link ace-jump-helm-line ac-ispell)))
- '(tramp-syntax (quote default) nil (tramp)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-)
+  (defun spacemacs/alternate-buffer (&optional window)
+    "Switch back and forth between current and last buffer in the
+current window."
+    (interactive)
+    (switch-to-buffer (other-buffer))))
