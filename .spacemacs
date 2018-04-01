@@ -93,7 +93,8 @@ values."
      dired-sidebar
      realgud
      unicode-fonts
-     w3m)
+     w3m
+     emr)
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -346,14 +347,14 @@ values."
   (defun my/find-pom-file ()
     "Find file in upper dirs"
     (interactive)
-    (if-let ((pf (expand-file-name
-                  (concat (locate-dominating-file
-                           (if (string= (file-name-nondirectory (buffer-file-name)) "pom.xml")
-                               (file-name-directory
-                                (directory-file-name (file-name-directory (buffer-file-name))))
-                             (buffer-file-name))
-                           "pom.xml")
-                          "pom.xml"))))
+    (if-let* ((pf (expand-file-name
+                   (concat (locate-dominating-file
+                            (if (string= (file-name-nondirectory (buffer-file-name)) "pom.xml")
+                                (file-name-directory
+                                 (directory-file-name (file-name-directory (buffer-file-name))))
+                              (buffer-file-name))
+                            "pom.xml")
+                           "pom.xml"))))
         (find-file pf)
       (message "Unable to find pom.xml")))
 
@@ -364,8 +365,7 @@ values."
 
   (flyspell-mode-off)
 
-  (setq clojure-indent-style :align-arguments
-        clojure-align-forms-automatically t)
+
 
   (global-flycheck-mode -1)
 
@@ -972,11 +972,13 @@ in the other window."
        (c-end-of-statement count)
        (list point-start (point)))))
 
+  (require 'evil)
   (define-key evil-inner-text-objects-map "m" 'my/function-text-object)
   (define-key evil-outer-text-objects-map "m" 'my/function-text-object)
   (define-key evil-outer-text-objects-map "e" 'my/statement-text-object)
 
   (load-file "~/.remote-config/config/my-mu4e.el")
+  (load-file "~/.remote-config/config/my-emacs-lisp.el")
   (load-file "~/.remote-config/config/my-tabbar.el")
   (load-file "~/.remote-config/config/my-cider.el")
   (load-file "~/.remote-config/config/my-java-lsp.el")
@@ -991,7 +993,9 @@ in the other window."
             (rest-str   (substring string 1)))
         (concat (capitalize first-char) rest-str))))
 
+  (require 'imenu)
   (setq imenu-auto-rescan t)
+
   (setq-default helm-exit-idle-delay 0)
   ;;
   (require 'helm)
@@ -1171,7 +1175,7 @@ This function is called at the very end of Spacemacs initialization."
  '(eww-search-prefix "https://www.google.com/search?q=")
  '(package-selected-packages
    (quote
-    (orgit org-brain yasnippet-snippets yapfify yaml-mode yahoo-weather xterm-color ws-butler winum which-key web-mode web-beautify weather-metno w3m volatile-highlights vi-tilde-fringe uuidgen use-package unicode-fonts unfill treemacs-projectile treemacs-evil toc-org tide tagedit tabbar symon sx string-inflection stickyfunc-enhance srefactor sql-indent spaceline-all-the-icons smeargle slim-mode slack shell-pop scss-mode sayid sass-mode restclient-helm restart-emacs realgud rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyenv-mode py-isort pug-mode powershell pippel pipenv pip-requirements persp-mode persistent-scratch pcre2el password-generator paradox overseer origami org-projectile org-present org-pomodoro org-mime org-jira org-download org-bullets open-junk-file ob-restclient ob-http nameless mwim mvn multi-term mu4e-maildirs-extension mu4e-alert move-text mmm-mode meghanada maven-test-mode markdown-toc magit-gitflow macrostep lsp-ui lsp-python lsp-java lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc java-snippets jabber intero indent-guide importmagic impatient-mode ibuffer-projectile hy-mode hungry-delete hlint-refactor hl-todo hindent highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-pydoc helm-purpose helm-projectile helm-mu helm-mode-manager helm-make helm-hoogle helm-gtags helm-gitignore helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-bm helm-ag haskell-snippets groovy-mode groovy-imports gradle-mode google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md ggtags fuzzy font-lock+ flyspell-correct-helm flycheck-pos-tip flycheck-haskell flycheck-clojure flx-ido flash-region fill-column-indicator feature-mode fasd fancy-battery eyebrowse expand-region exec-path-from-shell excorporate eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-anyblock evil-surround evil-smartparens evil-search-highlight-persist evil-org evil-numbers evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens evil-args evil-anzu eshell-z eshell-prompt-extras esh-help ensime emoji-cheat-sheet-plus emms emmet-mode elisp-slime-nav elfeed-web elfeed-org elfeed-goodies editorconfig ecukes dumb-jump dired-sidebar dired-efap diminish diff-hl define-word dante cython-mode cypher-mode csv-mode counsel-projectile company-web company-tern company-statistics company-restclient company-lsp company-ghci company-ghc company-emoji company-emacs-eclim company-cabal company-anaconda command-log-mode column-enforce-mode color-identifiers-mode coffee-mode cmm-mode clojure-snippets clojure-cheatsheet clj-refactor clean-aindent-mode cider-eval-sexp-fu centered-cursor-mode browse-at-remote autopair auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile all-the-icons-dired aggressive-indent adaptive-wrap ace-link ace-jump-helm-line ac-ispell)))
+    (lsp-mode yasnippet-snippets yapfify yaml-mode yahoo-weather xterm-color ws-butler winum which-key web-mode web-beautify weather-metno w3m volatile-highlights vi-tilde-fringe uuidgen use-package unicode-fonts unfill treemacs-projectile treemacs-evil toc-org tide tagedit tabbar symon sx string-inflection stickyfunc-enhance srefactor sql-indent spaceline-all-the-icons smeargle slim-mode slack shell-pop scss-mode sayid sass-mode restclient-helm restart-emacs realgud rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyenv-mode py-isort pug-mode powershell pippel pipenv pip-requirements persp-mode persistent-scratch pcre2el password-generator paradox overseer origami orgit org-projectile org-present org-pomodoro org-mime org-jira org-download org-bullets org-brain open-junk-file ob-restclient ob-http nameless mwim mvn multi-term mu4e-maildirs-extension mu4e-alert move-text mmm-mode meghanada maven-test-mode markdown-toc magit-gitflow macrostep lsp-ui lsp-python lsp-java lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc java-snippets jabber intero indent-guide importmagic impatient-mode ibuffer-projectile hy-mode hungry-delete hlint-refactor hl-todo hindent highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-pydoc helm-purpose helm-projectile helm-mu helm-mode-manager helm-make helm-hoogle helm-gtags helm-gitignore helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-bm helm-ag haskell-snippets groovy-mode groovy-imports gradle-mode google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md ggtags fuzzy font-lock+ flyspell-correct-helm flycheck-pos-tip flycheck-haskell flycheck-clojure flx-ido flash-region fill-column-indicator feature-mode fasd fancy-battery eyebrowse expand-region exec-path-from-shell excorporate eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-anyblock evil-surround evil-smartparens evil-search-highlight-persist evil-org evil-numbers evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens evil-args evil-anzu eshell-z eshell-prompt-extras esh-help ensime emoji-cheat-sheet-plus emms emmet-mode elisp-slime-nav elfeed-web elfeed-org elfeed-goodies editorconfig ecukes dumb-jump dired-sidebar dired-efap diminish diff-hl define-word dante cython-mode cypher-mode csv-mode counsel-projectile company-web company-tern company-statistics company-restclient company-lsp company-ghci company-ghc company-emoji company-emacs-eclim company-cabal company-anaconda command-log-mode column-enforce-mode color-identifiers-mode coffee-mode cmm-mode clojure-snippets clojure-cheatsheet clj-refactor clean-aindent-mode cider-eval-sexp-fu centered-cursor-mode browse-at-remote autopair auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile all-the-icons-dired aggressive-indent adaptive-wrap ace-link ace-jump-helm-line ac-ispell)))
  '(tramp-syntax (quote default) nil (tramp)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
