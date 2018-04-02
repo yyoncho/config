@@ -211,7 +211,10 @@ REPL buffer.  This is controlled via
              (-filter (lambda (buffer)
                         (s-equals?
                          (buffer-mode buffer) "cider-repl-mode"))
-                      (buffer-list)))))
-  (require 'clojure-mode)
-  (setq clojure-indent-style :align-arguments
-        clojure-align-forms-automatically t))
+                      (buffer-list))))
+
+     (require 'clojure-mode)
+     (setq clojure-indent-style :align-arguments
+           clojure-align-forms-automatically t)
+     )
+)

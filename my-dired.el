@@ -1,5 +1,6 @@
 (require 'dired)
-;; (require 'dired+)
+(require 'dired+)
+(require 'dired-collapse)
 (require 'dired-x)
 (require 'dired-subtree)
 (require 'dired-sidebar)
@@ -36,6 +37,11 @@ Remove expanded subdir of deleted dir, if any."
                     (setq buf-list (cdr buf-list)))))))))
 
 (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+(add-hook 'dired-mode-hook 'dired-collapse)
+
+(define-key dired-mode-map (kbd "g f") dired-filter-map)
+(define-key dired-mode-map (kbd "C-c /") 'dired-narrow)
+
 
 (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$")
       delete-by-moving-to-trash t
@@ -45,14 +51,17 @@ Remove expanded subdir of deleted dir, if any."
       dired-sidebar-follow-file-idle-delay 0.5
       dired-sidebar-should-follow-file t)
 
-;; (diredp-toggle-find-file-reuse-dir 1)
+
+(diredp-toggle-find-file-reuse-dir 1)
 
 (setq-default dired-listing-switches "-aBhl  --group-directories-first"
               dired-omit-files-p t)
 (remove-hook 'dired-subtree-after-insert-hook (lambda () (dired-revert)))
 
+(evilified-state-evilify dired-mode dired-mode-map
+      "f" dired-filter-map)
 
-(setq dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.$\\|GPATH\\|GTAGS\\|GSYMS\\|GRTAGS")
+(setq dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.$\\|GPATH\\|GTAGS\\|GSYMS\\|GRTAGS\\|.git")
 
 ;; (require 'savehist)
 ;; (add-to-list 'savehist-additional-variables 'helm-dired-history-variable)
