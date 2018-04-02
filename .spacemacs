@@ -55,7 +55,6 @@ values."
      clojure
      command-log
      elfeed
-     semantic
      restclient
      bm
      spacemacs-purpose
@@ -72,13 +71,12 @@ values."
      ecukes
      feature-mode
      emms
-     skype
      evil-smartparens
      excorporate
      cypher-mode
      org-jira
      dired-efap
-     dired+
+     ;; dired+
      sx
      eww
      persistent-scratch
@@ -94,7 +92,8 @@ values."
      dired-sidebar
      realgud
      unicode-fonts
-     w3m)
+     w3m
+     emr)
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -202,11 +201,14 @@ values."
    dotspacemacs-default-package-repository nil
    dotspacemacs-whitespace-cleanup 'trailing))
 
-(defun dotspacemacs/user-init ())
+(defun dotspacemacs/user-init ()
+  "User init.")
 
 (defun dotspacemacs/user-config ()
   (interactive)
 
+
+  (require 'helm-projectile)
   (setq helm-projectile-fuzzy-match nil)
 
   (use-package evil-cleverparens
@@ -214,12 +216,6 @@ values."
     :init
     (progn
       (spacemacs|diminish evil-cleverparens-mode)))
-
-  (use-package meghanada
-    :defer t
-    :init
-    (progn
-      (spacemacs|diminish meghanada-mode "M")))
 
   (use-package ggtags
     :defer t
@@ -347,26 +343,24 @@ values."
   (defun my/find-pom-file ()
     "Find file in upper dirs"
     (interactive)
-    (if-let ((pf (expand-file-name
-                  (concat (locate-dominating-file
-                           (if (string= (file-name-nondirectory (buffer-file-name)) "pom.xml")
-                               (file-name-directory
-                                (directory-file-name (file-name-directory (buffer-file-name))))
-                             (buffer-file-name))
-                           "pom.xml")
-                          "pom.xml"))))
+    (if-let* ((pf (expand-file-name
+                   (concat (locate-dominating-file
+                            (if (string= (file-name-nondirectory (buffer-file-name)) "pom.xml")
+                                (file-name-directory
+                                 (directory-file-name (file-name-directory (buffer-file-name))))
+                              (buffer-file-name))
+                            "pom.xml")
+                           "pom.xml"))))
         (find-file pf)
       (message "Unable to find pom.xml")))
 
-  (require 'semantic)
   (global-evil-surround-mode 1)
   (setq imenu-list-auto-resize nil)
   (setq imenu-list-position 'right)
 
   (flyspell-mode-off)
 
-  (setq clojure-indent-style :align-arguments
-        clojure-align-forms-automatically t)
+
 
   (global-flycheck-mode -1)
 
@@ -973,15 +967,17 @@ in the other window."
        (c-end-of-statement count)
        (list point-start (point)))))
 
+  (require 'evil)
   (define-key evil-inner-text-objects-map "m" 'my/function-text-object)
   (define-key evil-outer-text-objects-map "m" 'my/function-text-object)
   (define-key evil-outer-text-objects-map "e" 'my/statement-text-object)
 
   (load-file "~/.remote-config/config/my-mu4e.el")
+  (load-file "~/.remote-config/config/my-emacs-lisp.el")
   (load-file "~/.remote-config/config/my-tabbar.el")
   (load-file "~/.remote-config/config/my-cider.el")
-  ;; (load-file "~/.remote-config/config/my-java-lsp.el")
-  (load-file "~/.remote-config/config/my-java.el")
+  (load-file "~/.remote-config/config/my-java-lsp.el")
+  ;; (load-file "~/.remote-config/config/my-java.el")
   (load-file "~/.remote-config/config/my-dired.el")
   (load-file "~/.remote-config/config/my-snippets.el")
 
@@ -992,7 +988,9 @@ in the other window."
             (rest-str   (substring string 1)))
         (concat (capitalize first-char) rest-str))))
 
+  (require 'imenu)
   (setq imenu-auto-rescan t)
+
   (setq-default helm-exit-idle-delay 0)
   ;;
   (require 'helm)
@@ -1064,7 +1062,7 @@ in the other window."
   (setq xref-prompt-for-identifier nil)
   (global-subword-mode t)
   (which-function-mode t)
-  (load-file "~/.remote-config/config/my-pidgin.el")
+  ;; (load-file "~/.remote-config/config/my-pidgin.el")
   (add-hook 'edebug-mode-hook 'evil-normalize-keymaps)
 
   ;; (require 'helm-xref)
@@ -1079,10 +1077,6 @@ in the other window."
   (setq weather-metno-location-name "Sofia, Bulgaria"
         weather-metno-location-latitude 42.698334
         weather-metno-location-longitude 23.319941)
-
-  (require 'semantic)
-  (setq-default semantic-default-submodes nil)
-  (semantic-mode t)
 
   (setq evil-lisp-safe-structural-editing-modes (add-to-list 'evil-lisp-safe-structural-editing-modes 'java-mode))
   (setq helm-display-buffer-default-height 15)
@@ -1133,42 +1127,20 @@ in the other window."
             (if this-win-2nd (other-window 1))))))
   (setq org-agenda-files (directory-files "~/.org-jira" t "^[[:alpha:])_]+.org"))
 
-  (spacemacs|use-package-add-hook semantic
-    :post-config (semantic-stickyfunc-mode -1))
-
-  (spacemacs|use-package-add-hook semantic
-    :post-init (setq semantic-default-submodes ()))
-
-  (setq which-key-idle-delay 1.0)
+  (spacemacs|use-package-add-hook which-key
+    :post-init (setq which-key-idle-delay 1.0))
 
   (setq excorporate-configuration
         '("ivan.yonchovski@tick42.com" . "https://pod51036.outlook.com/ews/Exchange.asmx"))
 
+  (defun hide-ctrl-M ()
+    "Hides the disturbing '^M' showing up in files containing mixed UNIX and DOS line endings."
+    (interactive)
+    (setq buffer-display-table (make-display-table))
+    (aset buffer-display-table ?\^M []))
 
   (defun spacemacs/alternate-buffer (&optional window)
     "Switch back and forth between current and last buffer in the
 current window."
     (interactive)
     (switch-to-buffer (other-buffer))))
-
-(defun dotspacemacs/emacs-custom-settings ()
-  "Emacs custom settings.
-This is an auto-generated function, do not modify its content directly, use
-Emacs customize menu instead.
-This function is called at the very end of Spacemacs initialization."
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(eww-search-prefix "https://www.google.com/search?q=")
- '(package-selected-packages
-   (quote
-    (yasnippet-snippets yapfify yaml-mode yahoo-weather xterm-color ws-butler winum web-mode web-beautify weather-metno w3m volatile-highlights vi-tilde-fringe uuidgen unicode-fonts ucs-utils font-utils persistent-soft list-utils unfill treemacs-projectile treemacs-evil treemacs pfuture toc-org tide typescript-mode tagedit tabbar symon sx string-inflection stickyfunc-enhance srefactor sql-indent spaceline-all-the-icons spaceline smeargle slim-mode slack circe oauth2 websocket skype shell-pop scss-mode sayid sass-mode restclient-helm restart-emacs realgud test-simple loc-changes load-relative rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyenv-mode py-isort pug-mode powershell pippel pipenv pip-requirements persp-mode persistent-scratch pcre2el password-generator paradox overseer origami orgit org-projectile org-category-capture org-present org-pomodoro org-mime org-jira org-download org-bullets org-brain open-junk-file ob-restclient ob-http nameless mwim mvn multi-term mu4e-maildirs-extension mu4e-alert move-text mmm-mode meghanada maven-test-mode markdown-toc magit-gitflow macrostep lsp-ui markdown-mode lsp-python lsp-java lorem-ipsum livid-mode skewer-mode live-py-mode linum-relative link-hint less-css-mode json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc java-snippets jabber intero indent-guide importmagic epc ctable concurrent deferred impatient-mode ibuffer-projectile hy-mode hungry-delete htmlize hlint-refactor hl-todo hindent highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-xref helm-themes helm-swoop helm-pydoc helm-purpose window-purpose imenu-list helm-projectile helm-mu helm-mode-manager helm-make helm-hoogle helm-gtags helm-gitignore request helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-bm helm-ag haskell-snippets haml-mode groovy-mode groovy-imports pcache gradle-mode google-translate golden-ratio gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md ggtags fuzzy flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flycheck-haskell flycheck-clojure flx-ido flx flash-region fill-column-indicator feature-mode fasd fancy-battery eyebrowse expand-region excorporate url-http-ntlm soap-client fsm ntlm eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-anyblock evil-surround evil-smartparens evil-search-highlight-persist evil-org evil-numbers evil-mc evil-matchit evil-magit magit magit-popup git-commit ghub let-alist with-editor evil-lisp-state evil-lion evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens smartparens evil-args evil-anzu anzu eshell-z eshell-prompt-extras esh-help ensime sbt-mode scala-mode emojify ht emoji-cheat-sheet-plus emms emmet-mode elisp-slime-nav elfeed-web simple-httpd elfeed-org elfeed-goodies ace-jump-mode noflet powerline popwin elfeed editorconfig ecukes ansi espuds commander dumb-jump dired-sidebar dired-subtree dired-hacks-utils dired-efap diff-hl define-word dante lcr flycheck cython-mode cypher-mode csv-mode counsel-projectile projectile counsel swiper ivy company-web web-completion-data company-tern dash-functional tern company-statistics company-restclient restclient know-your-http-well company-lsp lsp-mode company-ghci company-ghc ghc haskell-mode company-emoji company-emacs-eclim eclim company-cabal company-anaconda company command-log-mode column-enforce-mode color-identifiers-mode coffee-mode cmm-mode clojure-snippets clojure-cheatsheet clj-refactor inflections edn multiple-cursors paredit peg clean-aindent-mode cider-eval-sexp-fu eval-sexp-fu highlight cider seq spinner queue pkg-info clojure-mode epl centered-cursor-mode browse-at-remote bm autopair auto-yasnippet yasnippet auto-highlight-symbol auto-dictionary auto-compile packed anaconda-mode pythonic f dash s all-the-icons-dired all-the-icons memoize alert log4e gntp aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core ac-ispell auto-complete popup which-key use-package exec-path-from-shell evil goto-chg undo-tree diminish bind-map bind-key org-plus-contrib hydra font-lock+ async))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-)

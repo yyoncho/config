@@ -1,5 +1,5 @@
 (require 'dired)
-(require 'dired+)
+;; (require 'dired+)
 (require 'dired-x)
 (require 'dired-subtree)
 (require 'dired-sidebar)
@@ -45,7 +45,7 @@ Remove expanded subdir of deleted dir, if any."
       dired-sidebar-follow-file-idle-delay 0.5
       dired-sidebar-should-follow-file t)
 
-(diredp-toggle-find-file-reuse-dir 1)
+;; (diredp-toggle-find-file-reuse-dir 1)
 
 (setq-default dired-listing-switches "-aBhl  --group-directories-first"
               dired-omit-files-p t)

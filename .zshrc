@@ -7,6 +7,7 @@ autoload -Uz promptinit
 promptinit
 #prompt adam1
 
+export EMACS=~/.bin/emacs-26/bin/emacs
 
 if [ -f .local_zshrc ] ;
 then
