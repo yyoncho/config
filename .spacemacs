@@ -15,10 +15,7 @@ values."
    '(javascript
      vinegar
      (treemacs :variables treemacs-use-follow-mode t)
-     slack
-     jabber
      imenu-list
-     ;; evil-cleverparens
      spacemacs
      ;; (java :variables java-backend 'meghanada)
      java
@@ -26,11 +23,8 @@ values."
      spacemacs-evil
      spacemacs-bootstrap
      version-control
-     haskell
      csv
      windows-scripts
-     sql
-     gtags
      yaml
      html
      typescript
@@ -43,7 +37,6 @@ values."
      helm
      auto-completion
      spacemacs-layouts
-     better-defaults
      evil-commentary
      emacs-lisp
      git
@@ -801,7 +794,8 @@ If EXTERNAL is double prefix, browse in new buffer."
   (spacemacs/set-leader-keys "ghv" 'diff-hl-mark-hunk)
   (spacemacs/set-leader-keys "ghp" 'diff-hl-previous-hunk)
   ;; (spacemacs/set-leader-keys "pT" 'neotree-find-project-root)
-  (spacemacs/set-leader-keys "so" 'helm-do-grep-ag)
+  (spacemacs/set-leader-keys "so" (lambda () (interactive)
+                                    (helm-do-ag default-directory)))
   (spacemacs/set-leader-keys "xts" 'transpose-sexps)
   (spacemacs/set-leader-keys "gd" 'magit-diff-buffer-file)
   (spacemacs/set-leader-keys "ag" 'browse-url-chrome)
@@ -814,9 +808,13 @@ If EXTERNAL is double prefix, browse in new buffer."
   (spacemacs/set-leader-keys "ai" 'mu4e-alert-view-unread-mails)
   (spacemacs/set-leader-keys "os" 'my/store-the-default-buffer)
   (spacemacs/set-leader-keys "oo" 'my/go-to-the-default-buffer)
+  (spacemacs/set-leader-keys "sm" 'helm-mu)
   (spacemacs/set-leader-keys "sR" 'my/helm-ag-recentf)
   (spacemacs/set-leader-keys "mm" (lambda () (interactive)
                                     (mu4e~headers-jump-to-maildir "/Inbox")))
+
+  (setq imenu-create-index-function 'imenu-default-create-index-function)
+  (remove-hook 'org-mode-hook 'spacemacs/delay-emoji-cheat-sheet-hook)
 
   (spacemacs/toggle-evil-visual-mark-mode-off)
 

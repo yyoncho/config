@@ -57,13 +57,6 @@
   "qr" 'meghanada-restart
   "tn" 'meghanada-run-junit-class)
 
-(defun my/add--field-to-current-class (var-data)
-  (semantic-go-to-tag (semantic-current-tag-of-class 'type))
-  (re-search-forward "{")
-  (newline-and-indent)
-  (insert-string "private " (plist-get (third var-data) :type ) " " (first var-data) ";"))
-
-
 (defun my/meghanada-restart ()
   (with-current-buffer
       (first (-filter (lambda (b) (s-ends-with? "java" (buffer-name b)))
