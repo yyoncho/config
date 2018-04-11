@@ -45,3 +45,12 @@
 
 (provide 'my-helpers)
 ;;; my-helpers.el ends here
+(defun my/select-action-by-name (regex)
+  (when-let* ((action
+               (first
+                (-filter
+                 (lambda (action)
+                   (string= (lsp--command-get-title action) "Extract to method"))
+                 lsp-code-actions))))
+
+    (lsp-execute-code-action action)))

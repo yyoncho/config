@@ -1,5 +1,5 @@
 (require 'dired)
-(require 'dired+)
+;; (require 'dired+)
 (require 'dired-collapse)
 (require 'dired-x)
 (require 'dired-subtree)
@@ -39,7 +39,7 @@ Remove expanded subdir of deleted dir, if any."
 (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
 (add-hook 'dired-mode-hook 'dired-collapse)
 
-(define-key dired-mode-map (kbd "g f") dired-filter-map)
+;; (define-key dired-mode-map (kbd "g f") dired-filter-map)
 (define-key dired-mode-map (kbd "C-c /") 'dired-narrow)
 
 
@@ -52,7 +52,7 @@ Remove expanded subdir of deleted dir, if any."
       dired-sidebar-should-follow-file t)
 
 
-(diredp-toggle-find-file-reuse-dir 1)
+;; (diredp-toggle-find-file-reuse-dir 1)
 
 (setq-default dired-listing-switches "-aBhl  --group-directories-first"
               dired-omit-files-p t)

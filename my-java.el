@@ -1,6 +1,7 @@
 
 (setq meghanada-javac-xlint "-Xlint:-processing")
-(spacemacs|define-jump-handlers java-mode (meghanada-jump-declaration :async t))
+;; (spacemacs|define-jump-handlers java-mode (meghanada-jump-declaration :async t))
+(spacemacs|define-jump-handlers java-mode (xref-find-definitions :async t))
 
 (require 'flycheck-meghanada)
 (meghanada-flycheck-enable)
@@ -41,7 +42,7 @@
   "rfu" 'meghanada-reference
   "rlv" 'my/meghanada-local-variable
   "rat" 'my/add-throws
-  "rrm" 'my/rename-current-method
+  ;; "rrm" 'my/rename-current-method
                                         ; "rl" 'meghanada-local-variable
   "tg" 'meghanada-run-junit-recent
                                         ; "rcf" 'my/create-constructor-from-fields

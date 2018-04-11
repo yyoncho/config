@@ -14,8 +14,6 @@ alias tx='tidy -xml'
 alias sweep='find . \( -name "*~" -or -name "*.bak" -or -name "#*#" \) -exec rm -vfr {} \;'
 alias ssh="TERM=xterm ssh"
 
-alias emacs-daemon="/usr/local/bin/emacs-24.5 --daemon"
-
 alias reload-config=". ~/.zshrc"
 
 alias gst="git status"

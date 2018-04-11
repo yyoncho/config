@@ -17,7 +17,6 @@ values."
      (treemacs :variables treemacs-use-follow-mode t)
      imenu-list
      spacemacs
-     ;; (java :variables java-backend 'meghanada)
      java
      spacemacs-base
      spacemacs-evil
@@ -42,7 +41,7 @@ values."
      git
      markdown
      org
-     (spell-checking :variables spell-checking-enable-by-desault nil)
+     (spell-checking :variables spell-checking-enable-by-default nil)
      syntax-checking
      ibuffer
      clojure
@@ -53,14 +52,11 @@ values."
      spacemacs-purpose
      lsp)
    dotspacemacs-additional-packages
-   '(
-     java-snippets
+   '(java-snippets
      flash-region
      evil-textobj-anyblock
-     realgud
      autopair
      company-lsp
-     lsp-java
      tabbar
      ecukes
      feature-mode
@@ -70,7 +66,6 @@ values."
      cypher-mode
      org-jira
      dired-efap
-     ;; dired+
      sx
      eww
      persistent-scratch
@@ -79,13 +74,9 @@ values."
      dired-subtree
      flycheck-clojure
      all-the-icons-dired
-     yahoo-weather
-     weather-metno
      helm-bm
      helm-xref
      dired-sidebar
-     realgud
-     unicode-fonts
      w3m
      emr
      dired-collapse
@@ -145,56 +136,23 @@ values."
    dotspacemacs-enable-paste-transient-state nil
    dotspacemacs-which-key-delay 1.0
    dotspacemacs-which-key-position 'bottom
-   dotspacemacs-loading-progress-bar t
-   ;; If non nil the frame is fullscreen when Emacs starts up. (default nil)
-   ;; (Emacs 24.4+ only)
-   dotspacemacs-fullscreen-at-startup nil
-   ;; If non nil `spacemacs/toggle-fullscreen' will not use native fullscreen.
-   ;; Use to disable fullscreen animations in OSX. (default nil)
+   dotspacemacs-loading-progress-bar nil
+   dotspacemacs-fullscreen-at-startup t
    dotspacemacs-fullscreen-use-non-native nil
-   ;; If non nil the frame is maximized when Emacs starts up.
-   ;; Takes effect only if `dotspacemacs-fullscreen-at-startup' is nil.
-   ;; (default nil) (Emacs 24.4+ only)
    dotspacemacs-maximized-at-startup t
-   ;; A value from the range (0..100), in increasing opacity, which describes
-   ;; the transparency level of a frame when it's active or selected.
-   ;; Transparency can be toggled through `toggle-transparency'. (default 90)
    dotspacemacs-active-transparency 100
-   ;; A value from the range (0..100), in increasing opacity, which describes
-   ;; the transparency level of a frame when it's inactive or deselected.
-   ;; Transparency can be toggled through `toggle-transparency'. (default 90)
    dotspacemacs-inactive-transparency 100
-   ;; If non nil show the titles of transient states. (default t)
    dotspacemacs-show-transient-state-title t
-   ;; If non nil show the color guide hint for transient state keys. (default t)
    dotspacemacs-show-transient-state-color-guide t
-   ;; If non nil unicode symbols are displayed in the mode line. (default t)
    dotspacemacs-mode-line-unicode-symbols t
-   ;; If non nil smooth scrolling (native-scrolling) is enabled. Smooth
-   ;; scrolling overrides the default behavior of Emacs which recenters;; jira
-   ;; when it reaches the top or bottom of the screen. (default t)
    dotspacemacs-smooth-scrolling t
-   ;; If non nil line numbers are turned on in all `prog-mode' and `text-mode'
-   ;; derivatives. If set to `relative', also turns on relative line numbers.
-   ;; (default nil)
    dotspacemacs-line-numbers nil
-   ;; Code folding method. Possible values are `evil' and `origami'.
-   ;; (default 'evil)
    dotspacemacs-folding-method 'origami
    dotspacemacs-smartparens-strict-mode t
    dotspacemacs-smart-closing-parenthesis 'all
-   ;; emphasis the current one). (default 'all)
    dotspacemacs-highlight-delimiters 'current
-   ;; If non nil, advise quit functions to keep server open when quitting.
-   ;; (default nil)
-   dotspacemacs-persistent-server nil
-   ;; List of search tool executable names. Spacemacs uses the first installed
-   ;; tool of the list. Supported tools are `ag', `pt', `ack' and `grep'.
-   ;; (default '("ag" "pt" "ack" "grep"))
+   dotspacemacs-persistent-server t
    dotspacemacs-search-tools '("ag" "ack" "grep")
-   ;; The default package repository used if no explicit repository has been
-   ;; specified with an installed package.
-   ;; Not used  for now. (default nil)
    dotspacemacs-default-package-repository nil
    dotspacemacs-whitespace-cleanup 'trailing))
 
@@ -770,7 +728,7 @@ If EXTERNAL is double prefix, browse in new buffer."
     (emms-toggle-random-playlist)
     (evil-evilified-state))
 
-  (spacemacs/set-leader-keys "bb" 'helm-buffers-list)
+  (spacemacs/set-leader-keys "bb" 'purpose-switch-buffer)
   (spacemacs/set-leader-keys "ae" 'emms)
   (spacemacs/set-leader-keys "it" 'bm-toggle)
   (spacemacs/set-leader-keys "in" 'bm-next)
@@ -783,22 +741,17 @@ If EXTERNAL is double prefix, browse in new buffer."
   (spacemacs/set-leader-keys "ga" 'my/magit-stage-modified)
   (spacemacs/set-leader-keys "gC" 'magit-commit-extend)
   (spacemacs/set-leader-keys "gc" 'magit-commit)
-  ;; (spacemacs/set-leader-keys "gwl" 'magit-wip-log)
-  ;; (spacemacs/set-leader-keys "gwc" 'magit-wip-commit)
   (spacemacs/set-leader-keys "wT" 'my/toggle-window-split)
   (spacemacs/set-leader-keys "od" 'my/duplicate-2)
-  (spacemacs/set-leader-keys "oj" 'my/jump-to-definition)
   (spacemacs/set-leader-keys "of" 'my/helm-find-file-in-directory)
   (spacemacs/set-leader-keys "or" 'recentf-open-most-recent-file)
   (spacemacs/set-leader-keys "o=" 'my/format-defun)
   (spacemacs/set-leader-keys "ot" 'projectile-find-test-file)
-  (spacemacs/set-leader-keys "ghn" 'diff-hl-next-hunk)
-  (spacemacs/set-leader-keys "jr" 'jump-to-register)
   (spacemacs/set-leader-keys "ghk" 'diff-hl-revert-hunk)
   (spacemacs/set-leader-keys "ghv" 'diff-hl-mark-hunk)
   (spacemacs/set-leader-keys "ghp" 'diff-hl-previous-hunk)
-  ;; (spacemacs/set-leader-keys "pT" 'neotree-find-project-root)
-  (spacemacs/set-leader-keys "so" (lambda () (interactive)
+  (spacemacs/set-leader-keys "so" (lambda ()
+                                    (interactive)
                                     (helm-do-ag default-directory)))
   (spacemacs/set-leader-keys "xts" 'transpose-sexps)
   (spacemacs/set-leader-keys "gd" 'magit-diff-buffer-file)
@@ -978,10 +931,12 @@ in the other window."
   (load-file "~/.remote-config/config/my-emacs-lisp.el")
   (load-file "~/.remote-config/config/my-tabbar.el")
   (load-file "~/.remote-config/config/my-cider.el")
-  (load-file "~/.remote-config/config/my-java-lsp.el")
+  (load-file "~/.remote-config/config/my-lsp.el")
   ;; (load-file "~/.remote-config/config/my-java.el")
   (load-file "~/.remote-config/config/my-dired.el")
   (load-file "~/.remote-config/config/my-snippets.el")
+
+  (semantic-mode -1)
 
   (defun my/capitalize-first-char (&optional string)
     "Capitalize only the first character of the input STRING."
@@ -1009,7 +964,7 @@ in the other window."
   (evil-define-key 'normal evil-mc-key-map (kbd "C-p") 'evil-paste-pop)
   (evil-define-key 'visual evil-mc-key-map (kbd "C-p") 'evil-paste-pop)
 
-  (setq w3m-default-display-inline-images t)
+  (require 'w3m)
   (setq w3m-home-page "https://www.google.com")
   (setq w3m-default-display-inline-images t)
   (setq w3m-default-toggle-inline-images t)
@@ -1064,12 +1019,11 @@ in the other window."
   (setq xref-prompt-for-identifier nil)
   (global-subword-mode t)
   (which-function-mode t)
-  ;; (load-file "~/.remote-config/config/my-pidgin.el")
+  (condition-case nil
+      (load-file "~/.remote-config/config/my-pidgin.el")
+    (error
+     (message "Error loading pidgin...")))
   (add-hook 'edebug-mode-hook 'evil-normalize-keymaps)
-
-  ;; (require 'helm-xref)
-  ;; (setq xref-show-xrefs-function 'helm-xref-show-xrefs)
-  ;; (setq xref-show-xrefs-function 'xref--show-xref-buffer)
 
   (setq company-idle-delay 10)
 
@@ -1082,13 +1036,6 @@ in the other window."
 
   (setq evil-lisp-safe-structural-editing-modes (add-to-list 'evil-lisp-safe-structural-editing-modes 'java-mode))
   (setq helm-display-buffer-default-height 15)
-
-  (defun my/jump-to-definition ()
-    "Jump to definition."
-    (interactive)
-    (save-excursion
-      (evil-avy-goto-subword-1)
-      (spacemacs/jump-to-definition)))
 
   (setq helm-buffer-max-length 60)
 
@@ -1127,6 +1074,7 @@ in the other window."
             (set-window-buffer (next-window) next-win-buffer)
             (select-window first-win)
             (if this-win-2nd (other-window 1))))))
+  (require 'org-agenda)
   (setq org-agenda-files (directory-files "~/.org-jira" t "^[[:alpha:])_]+.org"))
 
   (spacemacs|use-package-add-hook which-key
@@ -1145,7 +1093,15 @@ in the other window."
     "Switch back and forth between current and last buffer in the
 current window."
     (interactive)
-    (switch-to-buffer (other-buffer))))
+    (switch-to-buffer (other-buffer)))
+  (require 'window-purpose-x)
+  (purpose-x-kill-setup)
+
+  (setq magit-display-buffer-function 'magit-display-buffer-traditional)
+
+  (helm-flx-mode -1)
+  (pupo-mode -1)
+  (semantic-mode -1))
 (defun dotspacemacs/emacs-custom-settings ()
   "Emacs custom settings.
 This is an auto-generated function, do not modify its content directly, use
