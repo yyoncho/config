@@ -1,6 +1,8 @@
 (eval-after-load "cider"
   '(progn
+
      (flycheck-clojure-setup)
+
      (dolist (mode '(clojure-mode clojurescript-mode cider-mode clojurec-mode))
        (eval-after-load mode
          (font-lock-add-keywords
@@ -51,14 +53,16 @@
            cider-show-error-buffer nil
            cider-lein-command "~/.bin/lein"
            cider-prompt-save-file-on-load t
-           cider-use-fringe-indicators t)
+           cider-use-fringe-indicators t
+           clojure-enable-fancify-symbols t
+           clojure-indent-style :align-arguments
+           clojure-align-forms-automatically t)
 
 
      (add-hook 'cider-mode-hook 'rainbow-delimiters-mode-enable)
      (add-hook 'clojure-mode-hook (lambda () (interactive "") (flycheck-mode nil)))
      (spacemacs/set-leader-keys-for-major-mode 'cider-repl-mode
-       "sc" 'cider-repl-clear-buffer
-       )
+       "sc" 'cider-repl-clear-buffer)
      (defun cider-emit-interactive-eval-err-output (output)
        "Emit err OUTPUT resulting from interactive code evaluation.
 The output can be send to either a dedicated output buffer or the current
@@ -66,15 +70,17 @@ REPL buffer.  This is controlled via
 `cider-interactive-eval-output-destination'."
        (my/show-error output)
        (cider--emit-interactive-eval-output output 'cider-repl-emit-interactive-stderr))
+
      (defun my/cycle-log-level ()
        (interactive)
        (save-mark-and-excursion
-        (forward-word)
-        (re-search-backward "debug\\|info")
-        (replace-match
-         (pcase (thing-at-point 'word)
-           ("debug" "info")
-           ("info"  "debug")))))
+         (forward-word)
+         (re-search-backward "debug\\|info")
+         (replace-match
+          (pcase (thing-at-point 'word)
+            ("debug" "info")
+            ("info"  "debug")))))
+
      (dolist (m '(clojure-mode
                   clojurec-mode
                   clojurescript-mode
@@ -133,6 +139,7 @@ REPL buffer.  This is controlled via
            (let ((cider-interactive-eval-override override))
              (cider-interactive-eval form)))))
 
+     (require 'sayid)
      (setq sayid-inject-dependencies-at-jack-in nil)
 
      (defun my/mount-restart ()
@@ -145,12 +152,14 @@ REPL buffer.  This is controlled via
        (interactive )
        (my/exec-clj-code "(taoensso.timbre/set-level! :debug)"))
 
+     ;; clojurescript-mode
      (defun my/cider-run-tests-in-current-ns ()
        "docstring"
        (interactive)
        (my/exec-clj-code "(cljs.test/run-tests *ns*)"))
 
-     (spacemacs/set-leader-keys-for-major-mode 'clojurescript-mode "tn" 'my/cider-run-tests-in-current-ns)
+     (spacemacs/set-leader-keys-for-major-mode
+       'clojurescript-mode "tn" 'my/cider-run-tests-in-current-ns)
 
      (defun my/timbre-info ()
        "Change level to info"
@@ -186,20 +195,24 @@ REPL buffer.  This is controlled via
      (setq sayid-version '1)
      (setq cider-jack-in-nrepl-middlewares (-remove-item "com.billpiel.sayid.nrepl-middleware/wrap-sayid" cider-jack-in-nrepl-middlewares))
      (setq cider-jack-in-lein-plugins (-remove-item `("com.billpiel/sayid" ,sayid-version) cider-jack-in-lein-plugins))
+
+     (require 'clj-refactor)
      (setq cljr-warn-on-eval nil)
+
      (setq  nrepl-prompt-to-kill-server-buffer-on-quit nil)
      (defun my/find-project-file (args)
        "Find file in upper dirs"
        (interactive "P")
-       (if-let ((pf (expand-file-name
-                     (concat (locate-dominating-file
-                              (if (string= (file-name-nondirectory (buffer-file-name)) "project.clj")
-                                  (file-name-directory
-                                   (directory-file-name (file-name-directory (buffer-file-name))))
-                                (buffer-file-name))
-                              "project.clj")
-                             "project.clj"))))
+       (if-let* ((pf (expand-file-name
+                      (concat (locate-dominating-file
+                               (if (string= (file-name-nondirectory (buffer-file-name)) "project.clj")
+                                   (file-name-directory
+                                    (directory-file-name (file-name-directory (buffer-file-name))))
+                                 (buffer-file-name))
+                               "project.clj")
+                              "project.clj"))))
            (find-file pf)
+
          (message "Unable to find project.clj")))
      (add-hook 'clojure-mode-hook #'evil-cleverparens-mode)
      (spacemacs/set-leader-keys "bl" 'my/list-repls)
@@ -211,10 +224,4 @@ REPL buffer.  This is controlled via
              (-filter (lambda (buffer)
                         (s-equals?
                          (buffer-mode buffer) "cider-repl-mode"))
-                      (buffer-list))))
-
-     (require 'clojure-mode)
-     (setq clojure-indent-style :align-arguments
-           clojure-align-forms-automatically t)
-     )
-)
+                      (buffer-list))))))

@@ -67,7 +67,6 @@ values."
      org-jira
      dired-efap
      sx
-     eww
      persistent-scratch
      diff-hl
      helm-dash
@@ -162,7 +161,6 @@ values."
 (defun dotspacemacs/user-config ()
   (interactive)
 
-
   (require 'helm-projectile)
   (setq helm-projectile-fuzzy-match nil)
 
@@ -193,8 +191,6 @@ values."
   (define-key eww-mode-map "h" 'helm-eww-history)
   (define-key eww-mode-map "l" 'helm-eww-links)
 
-  (spacemacs/toggle-spelling-checking-off)
-
   (setq helm-ff-guess-ffap-filenames t)
 
   ;; do not ask when deleting buffers
@@ -215,10 +211,6 @@ values."
   (sp-use-paredit-bindings)
   (spacemacs/toggle-highlight-current-line-globally-off)
   (spacemacs/toggle-automatic-symbol-highlight-on)
-  ;; (setq powerline-default-separator 'alternate)
-  (setf confluence-url "https://confluence.tick42.com:8443/rpc/xmlrpc")
-
-  (spacemacs/toggle-spelling-checking-off)
 
   ;; org jira key bindings
   (spacemacs/set-leader-keys-for-major-mode 'org-mode "jp" 'org-jira-progress-issue)
@@ -240,8 +232,6 @@ values."
   (c-set-offset 'substatement-open 0)
   ;; equkes
   (setenv "EMACS" (expand-file-name "~/.bin/emacs/bin/emacs-25.2"))
-
-  (setq emmet-self-closing-tag-style "")
 
   (require 'evil-smartparens)
   (sp-pair "(" ")" :wrap "M-(")
@@ -272,13 +262,8 @@ values."
       (goto-char beg)
       (call-interactively 'evil-paste-before 1)))
 
-  (setq git-commit-summary-max-length 999
-        kill-do-not-save-duplicates t
-
-        ;; disable backup files
+  (setq kill-do-not-save-duplicates t
         make-backup-files nil)
-
-  ;; (global-diff-hl-mode t)
 
   (global-subword-mode t)
 
@@ -292,7 +277,6 @@ values."
 
   (global-flycheck-mode t)
 
-  (setq clojure-enable-fancify-symbols t)
   (add-hook 'custom-mode-hook 'evil-evilified-state)
 
   (defun my/find-pom-file ()
@@ -310,14 +294,6 @@ values."
       (message "Unable to find pom.xml")))
 
   (global-evil-surround-mode 1)
-  (setq imenu-list-auto-resize nil)
-  (setq imenu-list-position 'right)
-
-  (flyspell-mode-off)
-
-
-
-  (global-flycheck-mode -1)
 
   (add-hook 'emacs-lisp-mode-hook
             (lambda ()
@@ -342,9 +318,6 @@ With a prefix ARG invokes `projectile-commander' instead of
   (define-key evil-normal-state-map "P" 'evil-paste-after)
   (define-key evil-normal-state-map "go" 'my/evil-replace-with-kill-ring)
 
-  (require 'company)
-  (setq company-backends (-remove-item 'company-capf company-backends))
-
   ;; projectile
   (require 'projectile)
   (setq projectile-create-missing-test-files t)
@@ -364,8 +337,6 @@ With a prefix ARG invokes `projectile-commander' instead of
 
   (global-set-key [remap evil-cp-end-of-defun] 'my/goto-end-of-form)
 
-  ;; general emacs configuration
-
   ;; Also auto refresh dired, but be quiet about it
   (setq global-auto-revert-non-file-buffers t)
   (setq auto-revert-verbose nil)
@@ -383,21 +354,11 @@ With a prefix ARG invokes `projectile-commander' instead of
     (magit-with-toplevel
       (magit-stage-1 "--all")))
 
-  (use-package magit
-    :init)
-  ;; (magit-wip-after-apply-mode nil)
-
-  (setq evil-want-fine-undo nil
-        evil-cross-lines t)
+  (setq evil-cross-lines t)
 
   ;; jira configuration
   (setq jiralib-url "https://jira.tick42.com"
         jiralib-user-login-name "iyonchovski")
-  (setq-default dotspacemacs-configuration-layers
-                '((clojure :variables clojure-enable-fancify-symbols t)))
-
-  (setq evil-lisp-state-enter-lisp-state-on-command nil)
-
 
   (require 'auto-complete)
   (define-key ac-complete-mode-map "\C-n" 'ac-next)
@@ -406,7 +367,9 @@ With a prefix ARG invokes `projectile-commander' instead of
   (require 'company)
   (define-key company-active-map (kbd "<escape>") 'company-abort)
   (define-key ac-complete-mode-map (kbd "<escape>") 'ac-abort)
+
   (setq magit-diff-arguments '("--stat" "--no-ext-diff" "--ignore-all-space"))
+
   (defun eval-and-replace ()
     "Replace the preceding sexp with its value."
     (interactive)
@@ -416,33 +379,11 @@ With a prefix ARG invokes `projectile-commander' instead of
                (current-buffer))
       (error (message "Invalid expression")
              (insert (current-kill 0)))))
-  (add-to-list 'warning-suppress-types '(yasnippet backquote-change))
+
   (persistent-scratch-setup-default)
 
   (setq evil-move-cursor-back nil
         evil-move-beyond-eol t)
-
-  (defun my/add-throws ()
-    (interactive)
-    (save-mark-and-excursion
-     (c-beginning-of-defun)
-     (re-search-forward "{")
-     (re-search-backward ")")
-     (forward-char)
-     (insert-string " throws Exception ")))
-
-  (defun my/rename-current-method ()
-    (interactive)
-    (c-beginning-of-defun)
-    (re-search-forward "{")
-    (re-search-backward "(")
-    (backward-sexp))
-
-  (defun my/find-function-bound-to-key ()
-    "Find function bound to key."
-    (interactive)
-    (find-function (lookup-key (current-global-map)
-                               (read-key-sequence "Enter key sequence:"))))
 
   (setq recentf-exclude '("/tmp/meghanada-*"))
 
@@ -461,28 +402,15 @@ With a prefix ARG invokes `projectile-commander' instead of
   (add-hook 'view-mode-hook 'evil-evilified-state)
 
   (eval-after-load 'flycheck '(flycheck-clojure-setup))
-  (remove-hook 'clojure-mode-hook 'flycheck-mode)
+  (add-hook 'clojure-mode-hook 'flycheck-mode)
   (add-hook 'clojure-mode-hook (lambda () (eval-sexp-fu-flash-mode -1)))
   (eval-after-load 'flycheck
     '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
   (display-time-mode t)
 
-  (fset 'my/duplicate-2
-        (lambda (&optional arg) "Keyboard macro."
-          (interactive "p")
-          (kmacro-exec-ring-item (quote (" d2L" 0 "%d")) arg)))
-
-
-                                        ;(setq company-frontends (list 'helm-company))
-  (setq company-auto-complete nil)
   (setq company-tooltip-idle-delay 2)
   (setq company-auto-complete-chars nil)
   (setq-default company-auto-complete nil)
-
-  (fset 'my/format-defun
-        (lambda (&optional arg) "Keyboard macro." (interactive "p")
-          (save-mark-and-excursion
-           (kmacro-exec-ring-item (quote ("vad j=" 0 "%d")) arg))))
 
   (defun my/show-error (text)
     "Shows error message"
@@ -490,11 +418,6 @@ With a prefix ARG invokes `projectile-commander' instead of
     (message (propertize (s-replace "\n" "" text) 'face 'cider-error-highlight-face)))
 
   (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
-
-  ;; weather
-  ;;(yahoo-weather-mode t)
-  (setq yahoo-weather-location "Sofia")
-  (setq yahoo-weather-format "|%(weather) %(temperature)C|")
 
   ;; indent mode
   (indent-guide-global-mode t)
