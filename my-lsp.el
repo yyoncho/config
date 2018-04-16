@@ -29,8 +29,7 @@
 (add-hook 'java-mode-hook #'lsp-java-enable)
 (add-hook 'java-mode-hook (lambda ()
                             (add-to-list 'spacemacs-jump-handlers
-                                         '(xref-find-definitions :async true)))
-          )
+                                         '(xref-find-definitions :async true))))
 
 ;; (require 'lsp-ui)
 ;; (add-hook 'lsp-mode-hook (lambda () (lsp-ui-flycheck-enable '_)))
@@ -39,6 +38,9 @@
 
 ;; g(addlsp-ui-flycheck lsp-ui-peek lsp-ui-sideline lsp-ui-doc lsp-ui-imenu)
 (require 'company-lsp)
+(require 'company-lsp)
+(push 'company-lsp company-backends)
+
 (setq lsp-print-io nil)
 
 (defun lsp-update-and-run ()
@@ -51,12 +53,14 @@ the diagnostics."
                             (lsp--text-document-code-action-params))
                            (lambda (actions)
                              (setq lsp-code-actions actions)
-                             (call-interactively 'lsp-execute-code-action))))
+                             (condition-case nil
+                                 (call-interactively 'lsp-execute-code-action)
+                               (quit "Quit")))))
 
 (spacemacs/set-leader-keys-for-major-mode 'java-mode
   "rr" 'lsp-update-and-run
-  "roi" 'lsp-java-organize-imports
-)
+  "rs" 'lsp-rename
+  "roi" 'lsp-java-organize-imports)
 
 (push 'company-lsp company-backends)
 

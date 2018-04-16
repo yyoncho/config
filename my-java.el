@@ -4,7 +4,7 @@
 (spacemacs|define-jump-handlers java-mode (xref-find-definitions :async t))
 
 (require 'flycheck-meghanada)
-(meghanada-flycheck-enable)
+;; (meghanada-flycheck-enable)
 
 (defun my/meghanada-local-variable ()
   (interactive)

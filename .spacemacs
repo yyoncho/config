@@ -180,6 +180,10 @@ values."
   ;; eww configuration
   (add-hook 'eww-mode-hook #'evil-evilified-state)
 
+
+  (setq treemacs-change-root-without-asking t
+        treemacs-collapse-dirs 0)
+
   (setq w3m-user-agent "Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC_Pyramid Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.")
 
   (define-key eww-mode-map "f" 'ace-link-eww)
@@ -207,7 +211,6 @@ values."
   (setq custom-file "~/.remote-config/config/.custom.el")
   ;; (load custom-file)
 
-
   (sp-use-paredit-bindings)
   (spacemacs/toggle-highlight-current-line-globally-off)
   (spacemacs/toggle-automatic-symbol-highlight-on)
@@ -230,8 +233,9 @@ values."
   (spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "," 'eval-defun)
 
   (c-set-offset 'substatement-open 0)
-  ;; equkes
-  (setenv "EMACS" (expand-file-name "~/.bin/emacs/bin/emacs-25.2"))
+
+  ;; needed for equkes
+  (setenv "EMACS" (expand-file-name "~/.bin/emacs/bin/emacs26"))
 
   (require 'evil-smartparens)
   (sp-pair "(" ")" :wrap "M-(")
@@ -241,7 +245,7 @@ values."
   ;; evil-mc configuration
   (global-evil-mc-mode t)
 
-  (evil-define-operator evil-operator-duplicate (beg end)
+  (evil-define-operator my/evil-operator-duplicate (beg end)
     "Duplicate action."
     :move-point nil
     (interactive "<r>")
@@ -658,7 +662,7 @@ If EXTERNAL is double prefix, browse in new buffer."
   (spacemacs/set-leader-keys "ii" 'helm-bm)
   (spacemacs/set-leader-keys "iN" 'bm-previous)
   (spacemacs/set-leader-keys "cb" 'my/switch-to-compilation-buffer)
-  (spacemacs/set-leader-keys "dd" 'evil-operator-duplicate)
+  (spacemacs/set-leader-keys "dd" 'my/evil-operator-duplicate)
   (spacemacs/set-leader-keys "JPM" 'my/send-to-jpm)
   (spacemacs/set-leader-keys "op" 'my/evil-replace-with-kill-ring)
   (spacemacs/set-leader-keys "ga" 'my/magit-stage-modified)
@@ -1017,8 +1021,15 @@ in the other window."
 current window."
     (interactive)
     (switch-to-buffer (other-buffer)))
-  (require 'window-purpose-x)
-  (purpose-x-kill-setup)
+
+  (defun my/treemacs-ignored-predicates (file _)
+    "Ignored predicates."
+    (s-matches? (rx bol
+                    (or ".git" ".project" ".settings" ".classpath" ".meghanada")
+                    eol)
+                file))
+
+  (setq treemacs-ignored-file-predicates '(treemacs--std-ignore-file-predicate my/treemacs-ignored-predicates))
 
   (setq magit-display-buffer-function 'magit-display-buffer-traditional)
 
