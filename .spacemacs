@@ -14,7 +14,10 @@ values."
    dotspacemacs-configuration-layers
    '(javascript
      vinegar
-     (treemacs :variables treemacs-use-follow-mode t)
+     (treemacs :variables
+               treemacs-use-follow-mode t
+               treemacs-use-filewatch-mode t
+               treemacs-use-collapsed-directories 0)
      imenu-list
      spacemacs
      java
@@ -596,7 +599,7 @@ PREFIX - whether to switch to the other window."
   (require 'elfeed)
   (setq elfeed-feeds
         '("http://sachachua.com/blog/feed/"
-          "http://feeds.feedburner.com/cyclingnews/news?format=xml"))
+          "http://nullprogram.com/feed/"))
 
   (require 'calendar)
   (define-key calendar-mode-map (kbd "<f2>") #'exco-calendar-show-day)
@@ -1018,38 +1021,27 @@ current window."
     (interactive)
     (switch-to-buffer (other-buffer)))
 
-  (defun my/treemacs-ignored-predicates (file _)
-    "Ignored predicates."
-    (s-matches? (rx bol
-                    (or ".git" ".project" ".settings" ".classpath" ".meghanada")
-                    eol)
-                file))
 
-  (setq treemacs-ignored-file-predicates '(treemacs--std-ignore-file-predicate my/treemacs-ignored-predicates))
+  (use-package treemacs
+    :init
+    (progn
+      (defun my/treemacs-ignored-predicates (file _)
+        "Ignored predicates."
+        (s-matches? (rx bol
+                        (or ".git" ".project" ".settings" ".classpath" ".meghanada")
+                        eol)
+                    file))
+
+      (setq treemacs-ignored-file-predicates
+            '(treemacs--std-ignore-file-predicate my/treemacs-ignored-predicates))
+
+      (treemacs-follow-mode t)
+      (treemacs-filewatch-mode t)))
+
+
 
   (setq magit-display-buffer-function 'magit-display-buffer-traditional)
 
   (helm-flx-mode -1)
   (pupo-mode -1)
   (semantic-mode -1))
-(defun dotspacemacs/emacs-custom-settings ()
-  "Emacs custom settings.
-This is an auto-generated function, do not modify its content directly, use
-Emacs customize menu instead.
-This function is called at the very end of Spacemacs initialization."
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(eww-search-prefix "https://www.google.com/search?q=")
- '(package-selected-packages
-   (quote
-    (yasnippet-snippets yapfify yaml-mode xterm-color ws-butler winum web-mode web-beautify w3m volatile-highlights vi-tilde-fringe uuidgen treemacs-projectile treemacs-evil treemacs pfuture toc-org tide typescript-mode tagedit tabbar symon sx string-inflection spaceline-all-the-icons spaceline smeargle slim-mode shell-pop scss-mode sayid sass-mode restclient-helm restart-emacs rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyenv-mode py-isort pug-mode powershell pippel pipenv pip-requirements persp-mode persistent-scratch pcre2el password-generator paradox overseer origami orgit org-projectile org-category-capture org-present org-pomodoro org-mime org-jira org-download org-bullets org-brain open-junk-file ob-restclient ob-http nameless mvn multi-term mu4e-maildirs-extension mu4e-alert ht alert log4e gntp move-text mmm-mode meghanada maven-test-mode markdown-toc magit-gitflow macrostep lsp-ui markdown-mode lsp-python lorem-ipsum livid-mode skewer-mode live-py-mode linum-relative link-hint json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc java-snippets indent-guide importmagic epc ctable concurrent deferred impatient-mode ibuffer-projectile hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-xref helm-themes helm-swoop helm-pydoc helm-purpose window-purpose imenu-list helm-projectile helm-mu helm-mode-manager helm-make helm-gitignore request helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-bm helm-ag haml-mode groovy-mode groovy-imports pcache gradle-mode google-translate golden-ratio gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md fuzzy flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flycheck-clojure flycheck flx-ido flx flash-region fill-column-indicator feature-mode fasd fancy-battery eyebrowse expand-region excorporate url-http-ntlm fsm eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-anyblock evil-surround evil-smartparens evil-search-highlight-persist evil-org evil-numbers evil-mc evil-matchit evil-magit magit magit-popup git-commit ghub with-editor evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens smartparens evil-args evil-anzu anzu eshell-z eshell-prompt-extras esh-help ensime sbt-mode scala-mode emr iedit clang-format redshank list-utils emms emmet-mode elisp-slime-nav elfeed-web simple-httpd elfeed-org elfeed-goodies ace-jump-mode noflet powerline popwin elfeed editorconfig ecukes ansi espuds commander dumb-jump dired-sidebar dired-subtree dired-ranger dired-filter dired-hacks-utils dired-efap dired-collapse diff-hl define-word cython-mode cypher-mode csv-mode counsel-projectile projectile counsel swiper ivy company-web web-completion-data company-tern dash-functional tern company-statistics company-restclient restclient know-your-http-well company-lsp lsp-mode company-emacs-eclim eclim company-anaconda company command-log-mode column-enforce-mode color-identifiers-mode coffee-mode clojure-snippets clojure-cheatsheet clj-refactor inflections edn multiple-cursors paredit peg clean-aindent-mode cider-eval-sexp-fu eval-sexp-fu highlight cider spinner queue pkg-info clojure-mode epl centered-cursor-mode browse-at-remote bm autopair auto-yasnippet yasnippet auto-highlight-symbol auto-dictionary auto-compile packed anaconda-mode pythonic f dash s all-the-icons-dired all-the-icons memoize aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core ac-ispell auto-complete popup which-key use-package org-plus-contrib hydra font-lock+ exec-path-from-shell evil diminish bind-map bind-key async))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-)
