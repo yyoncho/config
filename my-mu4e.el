@@ -4,9 +4,9 @@
 
   (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
   (require 'mu4e)
+  (require 'mu4e-vars)
 
-  (require 'mu4e-speedbar)
-  (mu4e-alert-enable-mode-line-display)
+
 
   (defun my/mu4e-go-to-inbox ()
     "Go to inbox."
@@ -28,23 +28,22 @@
         mu4e-update-interval 100
         user-mail-address "ivan.yonchovski@tick42.com"
         user-full-name  "Ivan Yonchovski"
-        mu4e-compose-signature nil)
-
-  (require 'smtpmail)
-  (define-key mu4e-main-mode-map "j" nil)
-  (define-key mu4e-main-mode-map "i" 'mu4e~headers-jump-to-maildir)
-  (setq message-send-mail-function 'smtpmail-send-it
+        mu4e-compose-signature nil
+        message-send-mail-function 'smtpmail-send-it
         starttls-use-gnutls t
         smtpmail-starttls-credentials '(("smtp.office365.com" 587 nil nil))
         smtpmail-auth-credentials
         '(("smtp.office365.com" 587 "ivan.yonchovski@tick42.com" nil))
         smtpmail-smtp-server "smtp.office365.com"
         smtpmail-smtp-service 587
-        message-kill-buffer-on-exit t)
+        message-kill-buffer-on-exit t
+        mu4e-hide-index-messages t)
 
-  (setq mu4e-hide-index-messages t)
+  (require 'smtpmail)
+  (define-key mu4e-main-mode-map "j" nil)
+  (define-key mu4e-main-mode-map "i" 'mu4e~headers-jump-to-maildir)
 
-  (mu4e)
+
 
   (use-package mu4e-alert
     :ensure t
@@ -62,6 +61,8 @@
     ;; display stuff on modeline as well as notify
     (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
     (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
-    (require 'mu4e-alert)))
+    (mu4e-alert-enable-mode-line-display)
+    (require 'mu4e-alert))
+  (mu4e t))
 
 (provide 'my-mu4e)

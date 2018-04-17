@@ -51,6 +51,8 @@
 (add-hook 'emacs-lisp-mode-hook #'flycheck-mode)
 (add-hook 'emacs-lisp-mode-hook #'emr-initialize)
 
+;; Emacs lisp
+(spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "," 'eval-defun)
 
 (provide 'my-emacs-lisp)
 ;;; my-emacs-lisp.el ends here
