@@ -164,6 +164,12 @@ values."
 (defun dotspacemacs/user-config ()
   (interactive)
 
+  ;; (add-to-list 'load-path "~/Sources/xelb/")
+  ;; (add-to-list 'load-path "~/Sources/exwm/")
+  ;; (require 'exwm-config)
+  ;; (exwm-config-default)
+
+
   (require 'helm-projectile)
   (setq helm-projectile-fuzzy-match nil)
 
