@@ -1,4 +1,3 @@
-
 (mapcar 'load-file
         (append
          (remove
@@ -7,23 +6,16 @@
          (directory-files "/home/kyoncho/Sources/lsp/lsp-java" t ".*.el")
          (directory-files "/home/kyoncho/Sources/lsp/lsp-ui" t ".*.el")))
 
-(load-file "/home/kyoncho/Sources/lsp/lsp-java/lsp-java.el")
 (setq lsp-java-server-install-dir "/home/kyoncho/Sources/lsp/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target/repository/")
+
 ;; (setq lsp-java--workspace-folders (directory-files "~/Sources/cm" t "^[[:alpha:])_]"))
 
 (setq lsp-java--workspace-folders
-      (list "/home/kyoncho/Sources/tick42-gds/"
-            "/home/kyoncho/Sources/cm/java-server-backend/"
-            "/home/kyoncho/Sources/cm/java-storage-common/"
-            "/home/kyoncho/Sources/cm/java-server-app/"
-            "/home/kyoncho/Sources/cm/java-server-core/"
-            "/home/kyoncho/Sources/cm/java-configmanager-it/"))
+      (list "/home/kyoncho/Documents/Sources/demo/2/"))
 (setq lsp-inhibit-message t)
 (require 'lsp-mode)
 (require 'lsp-ui-flycheck)
 (require 'lsp-java)
-
-
 
 (remove-hook 'java-mode-hook #'lsp-java-start)
 (add-hook 'java-mode-hook #'lsp-java-enable)
@@ -31,17 +23,15 @@
                             (add-to-list 'spacemacs-jump-handlers
                                          '(xref-find-definitions :async true))))
 
-;; (require 'lsp-ui)
-;; (add-hook 'lsp-mode-hook (lambda () (lsp-ui-flycheck-enable '_)))
+(require 'lsp-ui)
 (add-hook 'lsp-mode-hook 'lsp-ui-sideline-mode)
-(remove-hook 'lsp-mode-hook 'lsp-ui-mode)
 
-;; g(addlsp-ui-flycheck lsp-ui-peek lsp-ui-sideline lsp-ui-doc lsp-ui-imenu)
-(require 'company-lsp)
 (require 'company-lsp)
 (push 'company-lsp company-backends)
-
+(setq company-lsp-enable-snippet t)
+(setq company-lsp-enable-recompletion nil)
 (setq lsp-print-io nil)
+;; (setq lsp-print-io t)
 
 (defun lsp-update-and-run ()
   "Request code action to automatically fix issues reported by
@@ -68,7 +58,7 @@ the diagnostics."
 ;; (setq lsp-ui-sideline-ignore-duplicate nil)
 (setq lsp-ui-sideline-show-symbol nil)
 (setq lsp-ui-sideline-show-hover nil)
- (setq lsp-ui-sideline-show-flycheck t)
+(setq lsp-ui-sideline-show-flycheck t)
 (setq lsp-ui-sideline-show-code-actions t)
 (setq lsp-highlight-symbol-at-point nil)
 (setq lsp-enable-codeaction nil)

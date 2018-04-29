@@ -20,7 +20,6 @@ values."
                treemacs-use-collapsed-directories 0)
      imenu-list
      spacemacs
-     java
      spacemacs-base
      spacemacs-evil
      spacemacs-bootstrap
@@ -417,9 +416,7 @@ With a prefix ARG invokes `projectile-commander' instead of
     '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
   (display-time-mode t)
 
-  (setq company-tooltip-idle-delay 2)
-  (setq company-auto-complete-chars nil)
-  (setq-default company-auto-complete nil)
+  (setq-default company-auto-complete t)
 
   (defun my/show-error (text)
     "Shows error message"
@@ -429,7 +426,7 @@ With a prefix ARG invokes `projectile-commander' instead of
   (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 
   ;; indent mode
-  (indent-guide-global-mode t)
+  (indent-guide-global-mode nil)
 
   ;; better window splitting
   (defun my/vsplit-last-buffer (prefix)
@@ -470,10 +467,12 @@ PREFIX - whether to switch to the other window."
     (c-set-offset 'arglist-cont-nonempty '++)
     (c-set-offset 'arglist-intro '++)
     (electric-layout-mode t)
-    (auto-complete-mode t)
+    (company-mode-on)
     (rainbow-delimiters-mode-enable)
-    (indent-guide-mode t)
+    (indent-guide-mode nil)
     (setq c-basic-offset 4))
+
+  (add-hook 'java-mode-hook 'my/configure-java)
 
   (setq c-default-style
         '((java-mode . "java")
@@ -827,10 +826,11 @@ in the other window."
   (define-key evil-motion-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
 
   ;; bind key
-  (bind-key "C-h" 'backward-delete-char)
   (bind-key "M-/" 'hippie-expand)
+
+  (require 'cc-mode)
+  (bind-key "TAB" 'company-indent-or-complete-common java-mode-map)
   (bind-key "M-j" 'evil-join)
-  (bind-key "C-M-h" 'backward-kill-word)
   (bind-key "C-j" 'newline-and-indent)
 
   (evil-define-text-object my/function-text-object (count)
@@ -957,14 +957,9 @@ in the other window."
      (message "Error loading pidgin...")))
   (add-hook 'edebug-mode-hook 'evil-normalize-keymaps)
 
-  (setq company-idle-delay 10)
-
   (spaceline-toggle-buffer-id-on)
-  (setq powerline-default-separator 'arrow)
 
-  (setq weather-metno-location-name "Sofia, Bulgaria"
-        weather-metno-location-latitude 42.698334
-        weather-metno-location-longitude 23.319941)
+  (setq powerline-default-separator 'arrow)
 
   (setq evil-lisp-safe-structural-editing-modes (add-to-list 'evil-lisp-safe-structural-editing-modes 'java-mode))
   (setq helm-display-buffer-default-height 15)
@@ -1006,7 +1001,9 @@ in the other window."
             (set-window-buffer (next-window) next-win-buffer)
             (select-window first-win)
             (if this-win-2nd (other-window 1))))))
+
   (require 'org-agenda)
+
   (setq org-agenda-files (directory-files "~/.org-jira" t "^[[:alpha:])_]+.org"))
 
   (spacemacs|use-package-add-hook which-key
