@@ -1018,13 +1018,6 @@ in the other window."
     (setq buffer-display-table (make-display-table))
     (aset buffer-display-table ?\^M []))
 
-  (defun spacemacs/alternate-buffer (&optional window)
-    "Switch back and forth between current and last buffer in the
-current window."
-    (interactive)
-    (switch-to-buffer (other-buffer)))
-
-
   (use-package treemacs
     :init
     (progn
