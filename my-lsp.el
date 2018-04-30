@@ -15,15 +15,15 @@
       (list "/home/kyoncho/Sources/tick42-gds/"
             "/home/kyoncho/Sources/cm/java-server-backend/"
             "/home/kyoncho/Sources/cm/java-storage-common/"
+            "/home/kyoncho/Sources/cm/java-storage-file/"
             "/home/kyoncho/Sources/cm/java-server-app/"
             "/home/kyoncho/Sources/cm/java-server-core/"
             "/home/kyoncho/Sources/cm/java-configmanager-it/"))
+
 (setq lsp-inhibit-message t)
 (require 'lsp-mode)
 (require 'lsp-ui-flycheck)
 (require 'lsp-java)
-
-
 
 (remove-hook 'java-mode-hook #'lsp-java-start)
 (add-hook 'java-mode-hook #'lsp-java-enable)

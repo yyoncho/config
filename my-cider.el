@@ -46,6 +46,7 @@
                  ("\\(#\\){"
                   (0 (progn (compose-region (match-beginning 1)
                                             (match-end 1) "∈"))))))))
+     (require 'cider)
 
      (setq cider-save-file-on-load t
            cider-auto-jump-to-error nil
@@ -58,9 +59,9 @@
            clojure-indent-style :align-arguments
            clojure-align-forms-automatically t)
 
-
      (add-hook 'cider-mode-hook 'rainbow-delimiters-mode-enable)
-     (add-hook 'clojure-mode-hook (lambda () (interactive "") (flycheck-mode nil)))
+     (add-hook 'cider-mode-hook 'aggressive-indent-mode)
+
      (spacemacs/set-leader-keys-for-major-mode 'cider-repl-mode
        "sc" 'cider-repl-clear-buffer)
      (defun cider-emit-interactive-eval-err-output (output)
@@ -118,6 +119,7 @@ REPL buffer.  This is controlled via
          "ej" 'cider-pprint-eval-last-sexp))
 
      (spacemacs/set-leader-keys-for-major-mode 'cider-repl-mode "gu" 'cider-jump-to-locref-at-point)
+     (spacemacs/set-leader-keys-for-major-mode 'cider-repl-mode "sc" 'cider-repl-clear-buffer)
 
 
      (evil-define-operator evil-operator-clojure (beg end)
@@ -224,4 +226,5 @@ REPL buffer.  This is controlled via
              (-filter (lambda (buffer)
                         (s-equals?
                          (buffer-mode buffer) "cider-repl-mode"))
-                      (buffer-list))))))
+                      (buffer-list))))
+     (setq cider-dynamic-indentation nil)))
