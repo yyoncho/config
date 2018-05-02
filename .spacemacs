@@ -20,6 +20,7 @@ values."
                treemacs-use-collapsed-directories 0)
      imenu-list
      spacemacs
+     java
      spacemacs-base
      spacemacs-evil
      spacemacs-bootstrap
@@ -830,6 +831,8 @@ in the other window."
 
   (require 'cc-mode)
   (bind-key "TAB" 'company-indent-or-complete-common java-mode-map)
+  (bind-key "TAB" 'company-indent-or-complete-common cider-mode-map)
+  (bind-key "C-i" 'yas-expand-snippet)
   (bind-key "M-j" 'evil-join)
   (bind-key "C-j" 'newline-and-indent)
 
@@ -1040,4 +1043,14 @@ in the other window."
 
   (helm-flx-mode -1)
   (pupo-mode -1)
-  (semantic-mode -1))
+  (semantic-mode -1)
+
+  (add-hook 'projectile-after-switch-project-hook 'treemacs-projectile))
+
+
+(defun dotspacemacs/emacs-custom-settings ()
+  "Emacs custom settings.
+This is an auto-generated function, do not modify its content directly, use
+Emacs customize menu instead.
+This function is called at the very end of Spacemacs initialization."
+)
