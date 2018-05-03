@@ -25,6 +25,8 @@
 (require 'lsp-java)
 
 (add-hook 'java-mode-hook 'lsp-java-enable)
+(add-hook 'java-mode-hook 'evil-cleverparens-mode)
+(add-hook 'java-mode-hook 'evil-smartparens-mode)
 (add-hook 'java-mode-hook 'flycheck-mode)
 (add-hook 'java-mode-hook
           (lambda ()

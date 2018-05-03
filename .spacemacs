@@ -19,8 +19,7 @@ values."
                treemacs-use-filewatch-mode t
                treemacs-use-collapsed-directories 0)
      imenu-list
-     spacemacs
-     java
+     spacemacs java
      spacemacs-base
      spacemacs-evil
      spacemacs-bootstrap
@@ -427,7 +426,7 @@ With a prefix ARG invokes `projectile-commander' instead of
   (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 
   ;; indent mode
-  (indent-guide-global-mode nil)
+  (spacemacs/toggle-indent-guide-globally-off)
 
   ;; better window splitting
   (defun my/vsplit-last-buffer (prefix)
@@ -831,7 +830,6 @@ in the other window."
 
   (require 'cc-mode)
   (bind-key "TAB" 'company-indent-or-complete-common java-mode-map)
-  (bind-key "TAB" 'company-indent-or-complete-common cider-mode-map)
   (bind-key "C-i" 'yas-expand-snippet)
   (bind-key "M-j" 'evil-join)
   (bind-key "C-j" 'newline-and-indent)
@@ -840,22 +838,22 @@ in the other window."
     "Function text object"
     (interactive)
     (save-mark-and-excursion
-     (mark-defun)
-     (let ((m (mark)))
-       (if (looking-back "*/\n")
-           (progn
-             (previous-line)
-             (list m (first (sp-get-comment-bounds))))
-         (list m (point))))))
+      (mark-defun)
+      (let ((m (mark)))
+        (if (looking-back "*/\n")
+            (progn
+              (previous-line)
+              (list m (first (sp-get-comment-bounds))))
+          (list m (point))))))
 
   (evil-define-text-object my/statement-text-object (count)
     "Statement text object."
     (interactive)
     (save-mark-and-excursion
-     (call-interactively 'c-beginning-of-statement)
-     (let ((point-start (point)))
-       (c-end-of-statement count)
-       (list point-start (point)))))
+      (call-interactively 'c-beginning-of-statement)
+      (let ((point-start (point)))
+        (c-end-of-statement count)
+        (list point-start (point)))))
 
   (require 'evil)
   (define-key evil-inner-text-objects-map "m" 'my/function-text-object)
@@ -1053,4 +1051,4 @@ in the other window."
 This is an auto-generated function, do not modify its content directly, use
 Emacs customize menu instead.
 This function is called at the very end of Spacemacs initialization."
-)
+  )

@@ -61,6 +61,7 @@
 
      (add-hook 'cider-mode-hook 'rainbow-delimiters-mode-enable)
      (add-hook 'cider-mode-hook 'aggressive-indent-mode)
+     (bind-key "TAB" 'company-indent-or-complete-common cider-mode-map)
 
      (spacemacs/set-leader-keys-for-major-mode 'cider-repl-mode
        "sc" 'cider-repl-clear-buffer)
