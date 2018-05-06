@@ -426,6 +426,7 @@ With a prefix ARG invokes `projectile-commander' instead of
   (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 
   ;; indent mode
+  (indent-guide-global-mode nil)
   (spacemacs/toggle-indent-guide-globally-off)
 
   ;; better window splitting

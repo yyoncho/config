@@ -10,14 +10,15 @@
 (setq lsp-java-server-install-dir "/home/kyoncho/Sources/lsp/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target/repository/")
 
 (setq lsp-java--workspace-folders
-      (list "/home/kyoncho/Sources/tick42-gds/"
-            "/home/kyoncho/Sources/cm/java-server-backend/"
-            "/home/kyoncho/Sources/cm/java-storage-common/"
-            "/home/kyoncho/Sources/cm/java-storage-file/"
-            "/home/kyoncho/Sources/cm/java-server-app/"
-            "/home/kyoncho/Sources/cm/java-server-core/"
-            "/home/kyoncho/Sources/cm/java-configmanager-it/"
-            "/home/kyoncho/Sources/java-entitlement-system/"))
+      (list ;; "/home/kyoncho/Sources/tick42-gds/"
+            ;; "/home/kyoncho/Sources/cm/java-server-backend/"
+            ;; "/home/kyoncho/Sources/cm/java-storage-common/"
+            ;; "/home/kyoncho/Sources/cm/java-storage-file/"
+            ;; "/home/kyoncho/Sources/cm/java-server-app/"
+            ;; "/home/kyoncho/Sources/cm/java-server-core/"
+            ;; "/home/kyoncho/Sources/cm/java-configmanager-it/"
+       "/home/kyoncho/Sources/demo/2"
+            ))
 
 (setq lsp-inhibit-message t)
 (require 'lsp-mode)
@@ -28,10 +29,16 @@
 (add-hook 'java-mode-hook 'evil-cleverparens-mode)
 (add-hook 'java-mode-hook 'evil-smartparens-mode)
 (add-hook 'java-mode-hook 'flycheck-mode)
+(add-hook 'java-mode-hook #'lsp-java-enable)
+(add-hook 'java-mode-hook (lambda ()
+                            (add-to-list 'spacemacs-jump-handlers
+                                         '(xref-find-definitions :async true))))
 (add-hook 'java-mode-hook
           (lambda ()
             (add-to-list 'spacemacs-jump-handlers
                          '(xref-find-definitions :async true))))
+            (company-mode t)
+            (setq company-backends (list 'company-lsp))))
 
 (require 'lsp-ui)
 (add-hook 'lsp-mode-hook 'lsp-ui-sideline-mode)
@@ -61,7 +68,7 @@ the diagnostics."
   "roi" 'lsp-java-organize-imports
   "fp" 'my/find-pom-file)
 
-(push 'company-lsp company-backends)
+
 
 (setq lsp-ui-sideline-enable t)
 (setq lsp-ui-sideline-show-symbol nil)
