@@ -1,81 +1,70 @@
-(mapcar 'load-file
-        (append
-         (remove
-          "/home/kyoncho/Sources/lsp/lsp-mode/lsp-flycheck.el"
-          (directory-files "/home/kyoncho/Sources/lsp/lsp-mode" t ".*.el"))
-         (directory-files "/home/kyoncho/Sources/lsp/lsp-java" t ".*.el")
-         (directory-files "/home/kyoncho/Sources/lsp/company-lsp" t ".*.el")
-         (directory-files "/home/kyoncho/Sources/lsp/lsp-ui" t ".*.el")))
 
-(setq lsp-java-server-install-dir "/home/kyoncho/Sources/lsp/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target/repository/")
+(use-package lsp-mode
+  :load-path "~/Sources/lsp/lsp-mode/"
+  :init (setq lsp-inhibit-message t
+              lsp-print-io nil))
 
-(setq lsp-java--workspace-folders
-      (list ;; "/home/kyoncho/Sources/tick42-gds/"
-            ;; "/home/kyoncho/Sources/cm/java-server-backend/"
-            ;; "/home/kyoncho/Sources/cm/java-storage-common/"
-            ;; "/home/kyoncho/Sources/cm/java-storage-file/"
-            ;; "/home/kyoncho/Sources/cm/java-server-app/"
-            ;; "/home/kyoncho/Sources/cm/java-server-core/"
-            ;; "/home/kyoncho/Sources/cm/java-configmanager-it/"
-       "/home/kyoncho/Sources/demo/2"
-            ))
+(use-package company-lsp
+  :load-path "~/Sources/lsp/company-lsp/"
+  :after  company
+  :ensure nil
+  :config
+  (setq company-lsp-enable-snippet t
+        company-lsp-cache-candidates 't)
+  (push 'company-lsp company-backends)
+  (push 'java-mode company-global-modes))
 
-(setq lsp-inhibit-message t)
-(require 'lsp-mode)
-(require 'lsp-ui-flycheck)
-(require 'lsp-java)
+(use-package lsp-ui
+  :load-path "~/Sources/lsp/lsp-ui/"
+  :config
+  (setq lsp-ui-flycheck-report-all-buffers t
+        lsp-ui-sideline-enable t
+        lsp-ui-sideline-show-symbol nil
+        lsp-ui-sideline-show-hover nil
+        lsp-ui-sideline-show-flycheck t
+        lsp-ui-sideline-show-code-actions t
+        lsp-highlight-symbol-at-point nil
+        lsp-ui-doc-use-childframe t
+        lsp-ui-doc-use-window t))
 
-(add-hook 'java-mode-hook 'lsp-java-enable)
-(add-hook 'java-mode-hook 'evil-cleverparens-mode)
-(add-hook 'java-mode-hook 'evil-smartparens-mode)
-(add-hook 'java-mode-hook 'flycheck-mode)
-(add-hook 'java-mode-hook #'lsp-java-enable)
-(add-hook 'java-mode-hook (lambda ()
-                            (add-to-list 'spacemacs-jump-handlers
-                                         '(xref-find-definitions :async true))))
-(add-hook 'java-mode-hook
-          (lambda ()
-            (add-to-list 'spacemacs-jump-handlers
-                         '(xref-find-definitions :async true))))
-            (company-mode t)
-            (setq company-backends (list 'company-lsp))))
-
-(require 'lsp-ui)
-(add-hook 'lsp-mode-hook 'lsp-ui-sideline-mode)
-
-(require 'company-lsp)
-(push 'company-lsp company-backends)
-(setq lsp-print-io nil)
-;; (setq lsp-print-io t)
+(use-package lsp-java
+  :load-path "~/Sources/lsp/lsp-java/"
+  :requires (lsp-ui-flycheck lsp-ui-sideline)
+  :ensure nil
+  :hook ((java-mode . lsp-java-enable)
+         (java-mode . flycheck-mode)
+         (java-mode . smartparens-mode)
+         (java-mode . company-mode)
+         (java-mode . evil-cleverparens-mode)
+         (java-mode . evil-smartparens-mode)
+         (java-mode . (lambda () (lsp-ui-flycheck-enable 1)))
+         (java-mode . (lambda ()
+                        (add-to-list 'spacemacs-jump-handlers
+                                     '(xref-find-definitions :async true))))
+         (java-mode . lsp-ui-sideline-mode))
+  :config
+  (setq lsp-java-server-install-dir (expand-file-name "~/Sources/lsp/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target/repository/")
+        lsp-java--workspace-folders (list "/home/kyoncho/Sources/demo/2/"))
+  (spacemacs/set-leader-keys-for-major-mode 'java-mode
+    "rr" 'lsp-update-and-run
+    "rs" 'lsp-rename
+    "ft" 'helm-lsp-workspace-symbol
+    "roi" 'lsp-java-organize-imports
+    "fp" 'my/find-pom-file))
 
 (defun lsp-update-and-run ()
   "Request code action to automatically fix issues reported by
 the diagnostics."
   (interactive)
   (lsp--cur-workspace-check)
-  (lsp--send-request-async (lsp--make-request
-                            "textDocument/codeAction"
-                            (lsp--text-document-code-action-params))
-                           (lambda (actions)
-                             (setq lsp-code-actions actions)
-                             (condition-case nil
-                                 (call-interactively 'lsp-execute-code-action)
-                               (quit "Quit")))))
-
-(spacemacs/set-leader-keys-for-major-mode 'java-mode
-  "rr" 'lsp-update-and-run
-  "rs" 'lsp-rename
-  "roi" 'lsp-java-organize-imports
-  "fp" 'my/find-pom-file)
-
-
-
-(setq lsp-ui-sideline-enable t)
-(setq lsp-ui-sideline-show-symbol nil)
-(setq lsp-ui-sideline-show-hover nil)
-(setq lsp-ui-sideline-show-flycheck t)
-(setq lsp-ui-sideline-show-code-actions t)
-(setq lsp-highlight-symbol-at-point nil)
-(setq lsp-enable-codeaction nil)
-(setq lsp-ui-doc-use-childframe nil)
-(setq lsp-ui-doc-use-window t)
+  (with-demoted-errors
+      "%s"
+    (lsp--send-request-async
+     (lsp--make-request
+      "textDocument/codeAction"
+      (lsp--text-document-code-action-params))
+     (lambda (actions)
+       (setq lsp-code-actions actions)
+       (condition-case nil
+           (call-interactively 'lsp-execute-code-action)
+         (quit "Quit"))))))

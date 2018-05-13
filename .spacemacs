@@ -12,14 +12,14 @@ values."
    dotspacemacs-ask-for-lazy-installation t
    dotspacemacs-configuration-layer-path '("~/.remote-config/config/layers/")
    dotspacemacs-configuration-layers
-   '(javascript
+   '(go
+     javascript
      vinegar
      (treemacs :variables
-               treemacs-use-follow-mode t
-               treemacs-use-filewatch-mode t
-               treemacs-use-collapsed-directories 0)
+               treemacs-use-filewatch-mode t)
      imenu-list
-     spacemacs java
+     (java :variables java-backend 'lsp)
+     spacemacs
      spacemacs-base
      spacemacs-evil
      spacemacs-bootstrap
@@ -51,14 +51,12 @@ values."
      elfeed
      restclient
      bm
-     spacemacs-purpose
-     lsp)
+     spacemacs-purpose)
    dotspacemacs-additional-packages
    '(java-snippets
      flash-region
      evil-textobj-anyblock
      autopair
-     company-lsp
      tabbar
      ecukes
      feature-mode
@@ -190,7 +188,7 @@ values."
 
 
   (setq treemacs-change-root-without-asking t
-        treemacs-collapse-dirs 0)
+        treemacs-collapse-dirs 3)
 
   (setq w3m-user-agent "Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC_Pyramid Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.")
 
@@ -460,7 +458,16 @@ PREFIX - whether to switch to the other window."
 
   ;; enable shift selection mode
   (setq shift-selection-mode t)
-
+  (setq indent-guide-inhibit-modes
+    '(tabulated-list-mode
+      special-mode
+      dired-mode
+      java-mode
+      emacs-lisp-mode
+      web-mode
+      eww-mode
+      eshell-mode
+      Custom-mode))
   ;; java configuration
   (defun my/configure-java ()
     "Configure java"
@@ -470,7 +477,6 @@ PREFIX - whether to switch to the other window."
     (electric-layout-mode t)
     (company-mode-on)
     (rainbow-delimiters-mode-enable)
-    (indent-guide-mode nil)
     (setq c-basic-offset 4))
 
   (add-hook 'java-mode-hook 'my/configure-java)
@@ -660,7 +666,7 @@ If EXTERNAL is double prefix, browse in new buffer."
     (emms-toggle-random-playlist)
     (evil-evilified-state))
 
-  (spacemacs/set-leader-keys "bb" 'purpose-switch-buffer)
+  (spacemacs/set-leader-keys "bb" 'helm-mini)
   (spacemacs/set-leader-keys "ae" 'emms)
   (spacemacs/set-leader-keys "it" 'bm-toggle)
   (spacemacs/set-leader-keys "in" 'bm-next)
@@ -1026,7 +1032,7 @@ in the other window."
       (defun my/treemacs-ignored-predicates (file _)
         "Ignored predicates."
         (s-matches? (rx bol
-                        (or ".git" ".project" ".settings" ".classpath" ".meghanada")
+                        (or ".git" ".project" ".settings" ".classpath" ".meghanada" ".idea" ".vscode" ".gitignore" ".cask")
                         eol)
                     file))
 
@@ -1052,4 +1058,19 @@ in the other window."
 This is an auto-generated function, do not modify its content directly, use
 Emacs customize menu instead.
 This function is called at the very end of Spacemacs initialization."
-  )
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(eww-search-prefix "https://www.google.com/search?q=")
+ '(package-selected-packages
+   (quote
+    (org-brain yasnippet-snippets yapfify yaml-mode xterm-color ws-butler winum which-key web-mode web-beautify w3m volatile-highlights vi-tilde-fringe uuidgen use-package treemacs-projectile treemacs-evil toc-org tide tagedit tabbar symon sx string-inflection spaceline-all-the-icons smeargle slim-mode shell-pop scss-mode sayid sass-mode restclient-helm restart-emacs rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyenv-mode py-isort pug-mode powershell pippel pipenv pip-requirements persp-mode persistent-scratch pcre2el password-generator paradox overseer origami orgit org-projectile org-present org-pomodoro org-mime org-jira org-download org-bullets open-junk-file ob-restclient ob-http nameless mvn multi-term mu4e-maildirs-extension mu4e-alert move-text mmm-mode meghanada maven-test-mode markdown-toc magit-gitflow macrostep lsp-ui lsp-python lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc java-snippets indent-guide importmagic impatient-mode ibuffer-projectile hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-pydoc helm-purpose helm-projectile helm-mu helm-mode-manager helm-make helm-gitignore helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-bm helm-ag groovy-mode groovy-imports gradle-mode google-translate golden-ratio godoctor go-tag go-rename go-guru go-eldoc gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md fuzzy font-lock+ flyspell-correct-helm flycheck-pos-tip flycheck-clojure flx-ido flash-region fill-column-indicator feature-mode fasd fancy-battery eyebrowse expand-region exec-path-from-shell excorporate eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-anyblock evil-surround evil-smartparens evil-search-highlight-persist evil-org evil-numbers evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens evil-args evil-anzu eshell-z eshell-prompt-extras esh-help ensime emr emms emmet-mode elisp-slime-nav elfeed-web elfeed-org elfeed-goodies editorconfig ecukes dumb-jump dired-sidebar dired-ranger dired-filter dired-efap dired-collapse diminish diff-hl define-word cython-mode cypher-mode csv-mode counsel-projectile company-web company-tern company-statistics company-restclient company-lsp company-go company-emacs-eclim company-anaconda command-log-mode column-enforce-mode color-identifiers-mode coffee-mode clojure-snippets clojure-cheatsheet clj-refactor clean-aindent-mode cider-eval-sexp-fu centered-cursor-mode browse-at-remote autopair auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile all-the-icons-dired aggressive-indent adaptive-wrap ace-link ace-jump-helm-line ac-ispell))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+)
