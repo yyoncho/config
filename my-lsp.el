@@ -2,7 +2,8 @@
 (use-package lsp-mode
   :load-path "~/Sources/lsp/lsp-mode/"
   :init (setq lsp-inhibit-message t
-              lsp-print-io nil))
+              lsp-print-io nil
+              lsp-highlight-symbol-at-point nil))
 
 (use-package company-lsp
   :load-path "~/Sources/lsp/company-lsp/"
@@ -10,7 +11,7 @@
   :ensure nil
   :config
   (setq company-lsp-enable-snippet t
-        company-lsp-cache-candidates 't)
+        company-lsp-cache-candidates t)
   (push 'company-lsp company-backends)
   (push 'java-mode company-global-modes))
 
@@ -19,11 +20,10 @@
   :config
   (setq lsp-ui-flycheck-report-all-buffers t
         lsp-ui-sideline-enable t
-        lsp-ui-sideline-show-symbol nil
-        lsp-ui-sideline-show-hover nil
+        lsp-ui-sideline-show-symbol t
+        lsp-ui-sideline-show-hover t
         lsp-ui-sideline-show-flycheck t
         lsp-ui-sideline-show-code-actions t
-        lsp-highlight-symbol-at-point nil
         lsp-ui-doc-use-childframe t
         lsp-ui-doc-use-window t))
 
@@ -44,7 +44,14 @@
          (java-mode . lsp-ui-sideline-mode))
   :config
   (setq lsp-java-server-install-dir (expand-file-name "~/Sources/lsp/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target/repository/")
-        lsp-java--workspace-folders (list "/home/kyoncho/Sources/demo/2/"))
+        lsp-java--workspace-folders (list "/home/kyoncho/Sources/tick42-gds/"
+                                          "/home/kyoncho/Sources/cm/java-server-backend/"
+                                          "/home/kyoncho/Sources/cm/java-storage-common/"
+                                          "/home/kyoncho/Sources/cm/java-storage-file/"
+                                          "/home/kyoncho/Sources/cm/java-server-app/"
+                                          "/home/kyoncho/Sources/cm/java-server-core/"
+                                          "/home/kyoncho/Sources/cm/java-configmanager-it/"
+                                          "/home/kyoncho/Sources/java-entitlement-system/"))
   (spacemacs/set-leader-keys-for-major-mode 'java-mode
     "rr" 'lsp-update-and-run
     "rs" 'lsp-rename
