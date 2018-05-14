@@ -228,4 +228,5 @@ REPL buffer.  This is controlled via
                         (s-equals?
                          (buffer-mode buffer) "cider-repl-mode"))
                       (buffer-list))))
-     (setq cider-dynamic-indentation nil)))
+     (setq cider-dynamic-indentation nil)
+     (setq cider-cljs-lein-repl 'node)))
