@@ -1,4 +1,3 @@
-
 (use-package lsp-mode
   :load-path "~/Sources/lsp/lsp-mode/"
   :init (setq lsp-inhibit-message t
@@ -9,14 +8,15 @@
   :load-path "~/Sources/lsp/company-lsp/"
   :after  company
   :ensure nil
+  :hook ((java-mode . (lambda () (push 'company-lsp company-backends))))
   :config
   (setq company-lsp-enable-snippet t
         company-lsp-cache-candidates t)
-  (push 'company-lsp company-backends)
   (push 'java-mode company-global-modes))
 
 (use-package lsp-ui
   :load-path "~/Sources/lsp/lsp-ui/"
+  :ensure nil
   :config
   (setq lsp-ui-flycheck-report-all-buffers t
         lsp-ui-sideline-enable t
@@ -25,7 +25,7 @@
         lsp-ui-sideline-show-flycheck t
         lsp-ui-sideline-show-code-actions t
         lsp-ui-doc-use-childframe t
-        lsp-ui-doc-use-window t))
+        lsp-ui-doc-use-window nil))
 
 (use-package lsp-java
   :load-path "~/Sources/lsp/lsp-java/"
@@ -57,6 +57,7 @@
     "rs" 'lsp-rename
     "ft" 'helm-lsp-workspace-symbol
     "roi" 'lsp-java-organize-imports
+    "rfu" 'xref-find-references
     "fp" 'my/find-pom-file))
 
 (defun lsp-update-and-run ()
