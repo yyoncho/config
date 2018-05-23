@@ -2,6 +2,7 @@
   :load-path "~/Sources/lsp/lsp-mode/"
   :init (setq lsp-inhibit-message t
               lsp-print-io nil
+              lsp-eldoc-render-all nil
               lsp-highlight-symbol-at-point nil))
 
 (use-package company-lsp
@@ -18,10 +19,11 @@
   :load-path "~/Sources/lsp/lsp-ui/"
   :ensure nil
   :config
-  (setq lsp-ui-flycheck-report-all-buffers t
+  (setq lsp-ui-flycheck-report-all-buffers nil
         lsp-ui-sideline-enable t
-        lsp-ui-sideline-show-symbol t
-        lsp-ui-sideline-show-hover t
+        lsp-ui-sideline-show-symbol nil
+        lsp-ui-sideline-show-hover nil
+        lsp-ui-sideline-delay 0.2
         lsp-ui-sideline-show-flycheck t
         lsp-ui-sideline-show-code-actions t
         lsp-ui-doc-use-childframe t
@@ -49,16 +51,33 @@
                                           "/home/kyoncho/Sources/cm/java-storage-common/"
                                           "/home/kyoncho/Sources/cm/java-storage-file/"
                                           "/home/kyoncho/Sources/cm/java-server-app/"
+                                          "/home/kyoncho/Sources/cm-workbench/"
                                           "/home/kyoncho/Sources/cm/java-server-core/"
                                           "/home/kyoncho/Sources/cm/java-configmanager-it/"
-                                          "/home/kyoncho/Sources/java-entitlement-system/"))
+                                          "/home/kyoncho/Sources/java-entitlement-system/"
+                                          "/home/kyoncho/Sources/cm/java-client-hazel/")
+        lsp-java-favorite-static-members '("org.junit.Assert.*"
+                                           "org.junit.Assume.*"
+                                           "java.util.Collections.*"
+                                           "org.junit.jupiter.api.Assertions.*"
+                                           "org.junit.jupiter.api.Assumptions.*"
+                                           "org.junit.jupiter.api.DynamicContainer.*"
+                                           "org.junit.jupiter.api.DynamicTest.*"))
   (spacemacs/set-leader-keys-for-major-mode 'java-mode
     "rr" 'lsp-update-and-run
     "rs" 'lsp-rename
-    "ft" 'helm-lsp-workspace-symbol
     "roi" 'lsp-java-organize-imports
+    "ril" 'lsp-java-extract-to-local-variable
+    "rcl" 'lsp-java-create-local
+    "rcf" 'lsp-java-create-field
+    "hh" 'lsp-describe-thing-at-point
+    "rcp" 'lsp-java-create-parameter
+    "rws" 'helm-lsp-workspace-symbol
     "rfu" 'xref-find-references
     "fp" 'my/find-pom-file))
+
+(use-package helm-lsp
+  :load-path "~/Sources/lsp/helm-lsp/")
 
 (defun lsp-update-and-run ()
   "Request code action to automatically fix issues reported by
