@@ -234,18 +234,27 @@ values."
   (spacemacs/toggle-highlight-current-line-globally-off)
   (spacemacs/toggle-automatic-symbol-highlight-on)
 
-  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jp" 'org-jira-progress-issue)
-  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jg" 'org-jira-get-issue)
-  (spacemacs/set-leader-keys-for-major-mode 'org-mode "ji" 'org-jira-update-issue)
-  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jG" 'org-jira-get-issues)
-  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jr" 'org-jira-refresh-issue)
-  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jR" 'org-jira-refresh-issues-in-buffer)
-  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jc" 'org-jira-update-comment)
-  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jd" 'org-jira-download-attachment)
-  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jt" 'org-jira-todo-to-jira)
-  (spacemacs/set-leader-keys-for-major-mode 'org-mode "jl" 'org-jira-update-worklogs-from-org-clocks)
-  (spacemacs/set-leader-keys-for-major-mode 'org-mode "=" 'org-timestamp-up)
-  (spacemacs/set-leader-keys-for-major-mode 'org-mode "-" 'org-timestamp-down)
+  (use-package org-mode
+    :requires (org-jira jiralib)
+    :defer t
+    :config
+    (progn
+      (spacemacs/set-leader-keys-for-major-mode 'org-mode "jp" 'org-jira-progress-issue)
+      (spacemacs/set-leader-keys-for-major-mode 'org-mode "jg" 'org-jira-get-issue)
+      (spacemacs/set-leader-keys-for-major-mode 'org-mode "ji" 'org-jira-update-issue)
+      (spacemacs/set-leader-keys-for-major-mode 'org-mode "jG" 'org-jira-get-issues)
+      (spacemacs/set-leader-keys-for-major-mode 'org-mode "jr" 'org-jira-refresh-issue)
+      (spacemacs/set-leader-keys-for-major-mode 'org-mode "jR" 'org-jira-refresh-issues-in-buffer)
+      (spacemacs/set-leader-keys-for-major-mode 'org-mode "jc" 'org-jira-update-comment)
+      (spacemacs/set-leader-keys-for-major-mode 'org-mode "jd" 'org-jira-download-attachment)
+      (spacemacs/set-leader-keys-for-major-mode 'org-mode "jt" 'org-jira-todo-to-jira)
+      (spacemacs/set-leader-keys-for-major-mode 'org-mode "jl" 'org-jira-update-worklogs-from-org-clocks)
+      (spacemacs/set-leader-keys-for-major-mode 'org-mode "=" 'org-timestamp-up)
+      (spacemacs/set-leader-keys-for-major-mode 'org-mode "-" 'org-timestamp-down)
+
+      ;; jira configuration
+      (setq jiralib-url "https://jira.tick42.com"
+            jiralib-user-login-name "iyonchovski")))
 
   (c-set-offset 'substatement-open 0)
 
@@ -286,8 +295,9 @@ values."
 
   (global-subword-mode t)
 
-  (custom-set-variables
-   '(evil-want-C-i-jump t))
+  (custom-set-variables '(evil-want-C-i-jump t))
+
+  (define-key evil-normal-state-map (kbd "C-i") 'evil-jump-forward)
 
   (defun my/switch-to-compilation-buffer (arg)
     "Switch to compilation buffer"
@@ -301,22 +311,18 @@ values."
   (defun my/find-pom-file ()
     "Find file in upper dirs"
     (interactive)
-    (if-let* ((pf (expand-file-name
-                   (concat (locate-dominating-file
-                            (if (string= (file-name-nondirectory (buffer-file-name)) "pom.xml")
-                                (file-name-directory
-                                 (directory-file-name (file-name-directory (buffer-file-name))))
-                              (buffer-file-name))
-                            "pom.xml")
-                           "pom.xml"))))
+    (if-let* (pf (expand-file-name
+                  (concat (locate-dominating-file
+                           (if (string= (file-name-nondirectory (buffer-file-name)) "pom.xml")
+                               (file-name-directory
+                                (directory-file-name (file-name-directory (buffer-file-name))))
+                             (buffer-file-name))
+                           "pom.xml")
+                          "pom.xml")))
         (find-file pf)
       (message "Unable to find pom.xml")))
 
   (global-evil-surround-mode 1)
-
-  (add-hook 'emacs-lisp-mode-hook
-            (lambda ()
-              (delete 'company-capf company-backends)))
 
   (defun my/projectile-switch-project-dired (&optional arg)
     "Switch to a project we have visited before.
@@ -361,12 +367,16 @@ With a prefix ARG invokes `projectile-commander' instead of
   (setq auto-revert-verbose nil)
 
   ;; emms configuration
-  (require 'emms-setup)
-  (emms-all)
-  (emms-default-players)
-  (emms-mode-line -1)
+  (use-package emms-setup
+    :config (progn
+              (config)
+
+              (emms-all)
+              (emms-default-players)
+              (emms-mode-line -1)))
 
   (require 'magit)
+
   (defun my/magit-stage-modified ()
     "Stage all changes to files"
     (interactive)
@@ -375,17 +385,9 @@ With a prefix ARG invokes `projectile-commander' instead of
 
   (setq evil-cross-lines t)
 
-  ;; jira configuration
-  (setq jiralib-url "https://jira.tick42.com"
-        jiralib-user-login-name "iyonchovski")
 
-  (require 'auto-complete)
-  (define-key ac-complete-mode-map "\C-n" 'ac-next)
-  (define-key ac-complete-mode-map "\C-p" 'ac-previous)
-
-  (require 'company)
-  (define-key company-active-map (kbd "<escape>") 'company-abort)
-  (define-key ac-complete-mode-map (kbd "<escape>") 'ac-abort)
+  (use-package 'company
+    :config (define-key company-active-map (kbd "<escape>") 'company-abort))
 
   (setq magit-diff-arguments '("--stat" "--no-ext-diff" "--ignore-all-space"))
 
@@ -434,8 +436,6 @@ With a prefix ARG invokes `projectile-commander' instead of
     (interactive)
     (message (propertize (s-replace "\n" "" text) 'face 'cider-error-highlight-face)))
 
-  (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
-
   ;; indent mode
   (indent-guide-global-mode nil)
   (spacemacs/toggle-indent-guide-globally-off)
@@ -472,15 +472,15 @@ PREFIX - whether to switch to the other window."
   ;; enable shift selection mode
   (setq shift-selection-mode t)
   (setq indent-guide-inhibit-modes
-    '(tabulated-list-mode
-      special-mode
-      dired-mode
-      java-mode
-      emacs-lisp-mode
-      web-mode
-      eww-mode
-      eshell-mode
-      Custom-mode))
+        '(tabulated-list-mode
+          special-mode
+          dired-mode
+          java-mode
+          emacs-lisp-mode
+          web-mode
+          eww-mode
+          eshell-mode
+          Custom-mode))
   ;; java configuration
   (defun my/configure-java ()
     "Configure java"
@@ -701,9 +701,6 @@ If EXTERNAL is double prefix, browse in new buffer."
   (spacemacs/set-leader-keys "ghk" 'diff-hl-revert-hunk)
   (spacemacs/set-leader-keys "ghv" 'diff-hl-mark-hunk)
   (spacemacs/set-leader-keys "ghp" 'diff-hl-previous-hunk)
-  (spacemacs/set-leader-keys "so" (lambda ()
-                                    (interactive)
-                                    (helm-do-ag default-directory)))
   (spacemacs/set-leader-keys "xts" 'transpose-sexps)
   (spacemacs/set-leader-keys "gd" 'magit-diff-buffer-file)
   (spacemacs/set-leader-keys "ag" 'browse-url-chrome)
@@ -885,7 +882,6 @@ in the other window."
   (load-file "~/.remote-config/config/my-tabbar.el")
   (load-file "~/.remote-config/config/my-cider.el")
   (load-file "~/.remote-config/config/my-lsp.el")
-  ;; (load-file "~/.remote-config/config/my-java.el")
   (load-file "~/.remote-config/config/my-dired.el")
   (load-file "~/.remote-config/config/my-snippets.el")
 
@@ -1066,7 +1062,7 @@ in the other window."
   (add-hook 'projectile-after-switch-project-hook 'treemacs-projectile)
 
 
-)
+  )
 
 
 (defun dotspacemacs/emacs-custom-settings ()
@@ -1074,18 +1070,18 @@ in the other window."
 This is an auto-generated function, do not modify its content directly, use
 Emacs customize menu instead.
 This function is called at the very end of Spacemacs initialization."
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(eww-search-prefix "https://www.google.com/search?q=")
- '(package-selected-packages
-   '(org-brain yasnippet-snippets yapfify yaml-mode xterm-color ws-butler winum which-key web-mode web-beautify w3m volatile-highlights vi-tilde-fringe uuidgen use-package treemacs-projectile treemacs-evil toc-org tide tagedit tabbar symon sx string-inflection spaceline-all-the-icons smeargle slim-mode shell-pop scss-mode sayid sass-mode restclient-helm restart-emacs rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyenv-mode py-isort pug-mode pretty-mode powershell pippel pipenv pip-requirements persp-mode persistent-scratch pcre2el password-generator paradox overseer origami orgit org-projectile org-present org-pomodoro org-mime org-jira org-download org-bullets open-junk-file ob-restclient ob-http nameless mvn multi-term mu4e-maildirs-extension mu4e-alert move-text mmm-mode meghanada maven-test-mode markdown-toc magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode linum-relative link-hint json-mode js2-refactor js-doc java-snippets indent-guide importmagic impatient-mode ibuffer-projectile hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-pydoc helm-purpose helm-projectile helm-mu helm-mode-manager helm-make helm-gitignore helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-bm helm-ag groovy-mode groovy-imports gradle-mode google-translate golden-ratio godoctor go-tag go-rename go-guru go-eldoc gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md fuzzy font-lock+ flyspell-correct-helm flycheck-pos-tip flycheck-clojure flx-ido flash-region fill-column-indicator feature-mode fasd fancy-battery eyebrowse expand-region exec-path-from-shell excorporate eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-anyblock evil-surround evil-smartparens evil-search-highlight-persist evil-org evil-numbers evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens evil-args evil-anzu eshell-z eshell-prompt-extras esh-help ensime emr emms emmet-mode elisp-slime-nav elfeed-web elfeed-org elfeed-goodies editorconfig ecukes dumb-jump dired-sidebar dired-ranger dired-filter dired-efap dired-collapse diminish diff-hl define-word cython-mode cypher-mode csv-mode counsel-projectile company-web company-tern company-statistics company-restclient company-go company-emacs-eclim company-anaconda command-log-mode column-enforce-mode color-identifiers-mode coffee-mode clojure-snippets clojure-cheatsheet clj-refactor clean-aindent-mode cider-eval-sexp-fu centered-cursor-mode browse-at-remote autopair auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile all-the-icons-dired aggressive-indent adaptive-wrap ace-link ace-jump-helm-line ac-ispell)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-)
+  (custom-set-variables
+   ;; custom-set-variables was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   '(eww-search-prefix "https://www.google.com/search?q=")
+   '(package-selected-packages
+     '(org-brain yasnippet-snippets yapfify yaml-mode xterm-color ws-butler winum which-key web-mode web-beautify w3m volatile-highlights vi-tilde-fringe uuidgen use-package treemacs-projectile treemacs-evil toc-org tide tagedit tabbar symon sx string-inflection spaceline-all-the-icons smeargle slim-mode shell-pop scss-mode sayid sass-mode restclient-helm restart-emacs rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyenv-mode py-isort pug-mode pretty-mode powershell pippel pipenv pip-requirements persp-mode persistent-scratch pcre2el password-generator paradox overseer origami orgit org-projectile org-present org-pomodoro org-mime org-jira org-download org-bullets open-junk-file ob-restclient ob-http nameless mvn multi-term mu4e-maildirs-extension mu4e-alert move-text mmm-mode meghanada maven-test-mode markdown-toc magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode linum-relative link-hint json-mode js2-refactor js-doc java-snippets indent-guide importmagic impatient-mode ibuffer-projectile hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-pydoc helm-purpose helm-projectile helm-mu helm-mode-manager helm-make helm-gitignore helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-bm helm-ag groovy-mode groovy-imports gradle-mode google-translate golden-ratio godoctor go-tag go-rename go-guru go-eldoc gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md fuzzy font-lock+ flyspell-correct-helm flycheck-pos-tip flycheck-clojure flx-ido flash-region fill-column-indicator feature-mode fasd fancy-battery eyebrowse expand-region exec-path-from-shell excorporate eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-anyblock evil-surround evil-smartparens evil-search-highlight-persist evil-org evil-numbers evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens evil-args evil-anzu eshell-z eshell-prompt-extras esh-help ensime emr emms emmet-mode elisp-slime-nav elfeed-web elfeed-org elfeed-goodies editorconfig ecukes dumb-jump dired-sidebar dired-ranger dired-filter dired-efap dired-collapse diminish diff-hl define-word cython-mode cypher-mode csv-mode counsel-projectile company-web company-tern company-statistics company-restclient company-go company-emacs-eclim company-anaconda command-log-mode column-enforce-mode color-identifiers-mode coffee-mode clojure-snippets clojure-cheatsheet clj-refactor clean-aindent-mode cider-eval-sexp-fu centered-cursor-mode browse-at-remote autopair auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile all-the-icons-dired aggressive-indent adaptive-wrap ace-link ace-jump-helm-line ac-ispell)))
+  (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   )
+  )
