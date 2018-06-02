@@ -38,9 +38,6 @@
 (spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "rfe" 'emr-el-implement-function)
 (spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "ris" 'emr-el-inline-let-variable)
 
-(let ((ssdf (let () "sd")))
-  ssdf)
-
 (add-hook 'emacs-lisp-mode-hook
           (lambda ()
             (delete 'company-capf company-backends)))
