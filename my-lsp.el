@@ -91,10 +91,15 @@
       (find-file pf)
     (message "Unable to find pom.xml")))
 
-(spacemacs/set-leader-keys-for-major-mode 'java-mode
-  "dn" 'dap-next
-  "dd" 'dap-java-debug
-  "di" 'dap-step-in
-  "dc" 'dap-continue
-  "db" 'dap-toggle-breakpoint
-  "do" 'dap-step-out))
+
+(use-package dap-mode
+  :load-path "~/Sources/lsp/dap-mode"
+  :ensure nil
+  :config
+  (spacemacs/set-leader-keys-for-major-mode 'java-mode
+    "dn" 'dap-next
+    "dd" 'dap-java-debug
+    "di" 'dap-step-in
+    "dc" 'dap-continue
+    "db" 'dap-toggle-breakpoint
+    "do" 'dap-step-out))

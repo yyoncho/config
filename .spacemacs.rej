@@ -1,0 +1,9 @@
+diff a/.spacemacs b/.spacemacs	(rejected hunks)
+@@ -1067,6 +1068,7 @@ in the other window."
+ 
+   (add-hook 'projectile-after-switch-project-hook 'treemacs-projectile)
+ 
++  (add-to-load-path "/home/kyoncho/Sources/lsp/dap-mode/")
+ 
+   )
+ 
