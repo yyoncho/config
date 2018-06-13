@@ -101,6 +101,7 @@ REPL buffer.  This is controlled via
          "rcl" 'my/cycle-log-level
          "tv" 'cider-toggle-trace-var
          "tg" 'cider-test-rerun-test
+         "df" 'cider-debug-defun-at-point
          "te" 'cider-visit-error-buffer
          "nt" 'cider-toggle-trace-ns
          "j"  'evil-operator-clojure

@@ -49,21 +49,8 @@
          (java-mode . lsp-ui-sideline-mode))
   :config
   (setq lsp-java-server-install-dir (expand-file-name "~/Sources/lsp/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target/repository/")
-<<<<<<< Updated upstream
-        lsp-java--workspace-folders (list "/home/kyoncho/Sources/demo/2/"
-                                          "/home/kyoncho/Sources/lsp/spring-boot-and-java-10/")
-=======
-        lsp-java--workspace-folders (list "/home/kyoncho/Sources/tick42-gds/"
-                                          "/home/kyoncho/Sources/cm/java-server-backend/"
-                                          "/home/kyoncho/Sources/cm/java-storage-common/"
-                                          "/home/kyoncho/Sources/cm/java-storage-file/"
-                                          "/home/kyoncho/Sources/cm/java-server-app/"
-                                          "/home/kyoncho/Sources/cm-workbench/"
-                                          "/home/kyoncho/Sources/cm/java-server-core/"
-                                          "/home/kyoncho/Sources/cm/java-client-hazel/"
-                                          "/home/kyoncho/Sources/cm/java-client-factory/"
-                                          "/home/kyoncho/Sources/java-aim-gen/")
->>>>>>> Stashed changes
+        ;; lsp-java--workspace-folders (list "/home/kyoncho/Sources/demo/2/"
+        ;;                                   "/home/kyoncho/Sources/lsp/spring-boot-and-java-10/")
         lsp-java-favorite-static-members '("org.junit.Assert.*"
                                            "org.junit.Assume.*"
                                            "java.util.Collections.*"

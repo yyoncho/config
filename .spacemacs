@@ -173,7 +173,19 @@ values."
    dotspacemacs-whitespace-cleanup 'trailing))
 
 (defun dotspacemacs/user-init ()
-  "User init.")
+  "User init."
+  (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
+
+  (add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
+  ;; (add-to-list 'package-pinned-packages '(clj-refactor . "melpa-stable") t)
+  (add-to-list 'package-pinned-packages '(cljr-helm . "melpa-stable") t)
+  (add-to-list 'package-pinned-packages '(ac-cider . "melpa-stable") t)
+
+
+  ;; (push '("melpa-stable" . "stable.melpa.org/packages/") configuration-layer--elpa-archives)
+  ;; (push '(ensime . "melpa-stable") package-pinned-packages)
+  )
+
 
 (defun dotspacemacs/user-config ()
   "User config."
@@ -494,7 +506,7 @@ PREFIX - whether to switch to the other window."
     (electric-layout-mode t)
     (company-mode-on)
     (rainbow-delimiters-mode-enable)
-    (setq c-basic-offset 2))
+    (setq c-basic-offset 4))
 
   (add-hook 'java-mode-hook 'my/configure-java)
 
@@ -1056,7 +1068,32 @@ in the other window."
   (setq magit-display-buffer-function 'magit-display-buffer-traditional)
 
   (helm-flx-mode -1)
-  (pupo-mode -1)
   (semantic-mode -1)
 
   (add-hook 'projectile-after-switch-project-hook 'treemacs-projectile))
+(defun dotspacemacs/emacs-custom-settings ()
+  "Emacs custom settings.
+This is an auto-generated function, do not modify its content directly, use
+Emacs customize menu instead.
+This function is called at the very end of Spacemacs initialization."
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(eww-search-prefix "https://www.google.com/search?q=")
+ '(package-selected-packages
+   '(org-brain yasnippet-snippets yapfify yaml-mode xterm-color ws-butler winum which-key web-mode web-beautify w3m volatile-highlights vi-tilde-fringe uuidgen use-package treemacs-projectile treemacs-evil tree-mode toc-org tide targets tagedit tabbar symon sx string-inflection spaceline-all-the-icons smeargle slim-mode shen-mode shen-elisp shell-pop scss-mode sayid sass-mode restclient-helm restart-emacs rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyenv-mode py-isort pug-mode pretty-mode powershell pippel pipenv pip-requirements persp-mode persistent-scratch pcre2el password-generator paradox overseer origami orgit org-projectile org-present org-pomodoro org-mime org-jira org-download org-bullets open-junk-file ob-restclient ob-http nameless mvn multi-term mu4e-maildirs-extension mu4e-alert move-text mmm-mode meghanada maven-test-mode markdown-toc magit-svn magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode link-hint less-css-mode json-navigator json-mode js2-refactor js-doc java-snippets inf-clojure indent-guide importmagic impatient-mode ibuffer-projectile hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-pydoc helm-purpose helm-projectile helm-mu helm-mode-manager helm-make helm-gitignore helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-c-yasnippet helm-bm helm-ag groovy-mode groovy-imports gradle-mode google-translate golden-ratio godoctor go-tag go-rename go-guru go-eldoc gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md fuzzy font-lock+ flyspell-correct-helm flycheck-pos-tip flycheck-clojure flx-ido flash-region fill-column-indicator feature-mode fasd fancy-battery eyebrowse expand-region exec-path-from-shell excorporate eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-smartparens evil-search-highlight-persist evil-org evil-numbers evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens evil-args evil-anzu eshell-z eshell-prompt-extras esh-help ensime emr emms emmet-mode elisp-slime-nav elfeed-web elfeed-org elfeed-goodies editorconfig ecukes dumb-jump dired-sidebar dired-ranger dired-filter dired-efap dired-collapse diminish diff-hl define-word cython-mode cypher-mode csv-mode counsel-projectile company-web company-tern company-statistics company-restclient company-go company-emacs-eclim company-anaconda command-log-mode column-enforce-mode color-identifiers-mode clojure-snippets clojure-cheatsheet clj-refactor clean-aindent-mode cider-eval-sexp-fu centered-cursor-mode browse-at-remote autopair auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile all-the-icons-dired aggressive-indent ace-link ace-jump-helm-line ac-ispell))
+ '(safe-local-variable-values
+   '((lsp-java--workspace-folders "/home/kyoncho/Sources/tick42-gds/" "/home/kyoncho/Sources/cm/java-server-backend/" "/home/kyoncho/Sources/cm/java-storage-common/" "/home/kyoncho/Sources/cm/java-storage-file/" "/home/kyoncho/Sources/cm/java-server-app/" "/home/kyoncho/Sources/cm/java-server-core/" "/home/kyoncho/Sources/cm/java-client-hazel/" "/home/kyoncho/Sources/cm/java-client-factory/" "/home/kyoncho/Sources/java-aim-gen/")
+     (typescript-backend . tide)
+     (typescript-backend . lsp)
+     (javascript-backend . tern)
+     (javascript-backend . lsp))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+)

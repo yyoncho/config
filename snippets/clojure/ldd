@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+#name : snippets
+#key : snippets
+#contributor : Ivan Yonchovski
+# --
+(timbre/debug "")
