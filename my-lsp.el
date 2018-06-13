@@ -28,7 +28,7 @@
         lsp-ui-sideline-show-code-actions t
         lsp-ui-sideline-update-mode 'point
         lsp-ui-doc-use-childframe t
-        lsp-ui-doc-use-window nil))
+        lsp-ui-sideline-update-mode 'point))
 
 (use-package lsp-java
   :load-path "~/Sources/lsp/lsp-java/"
@@ -77,20 +77,6 @@
 (use-package helm-lsp
   :load-path "~/Sources/lsp/helm-lsp/")
 
-;; (defun my/find-pom-file ()
-;;   "Find file in upper dirs"
-;;   (interactive)
-;;   (if-let* (pf (expand-file-name
-;;                 (concat (locate-dominating-file
-;;                          (if (string= (file-name-nondirectory (buffer-file-name)) "pom.xml")
-;;                              (file-name-directory
-;;                               (directory-file-name (file-name-directory (buffer-file-name))))
-;;                            (buffer-file-name))
-;;                          "pom.xml")
-;;                         "pom.xml")))
-;;       (find-file pf)
-;;     (message "Unable to find pom.xml")))
-
 (defun my/find-pom-file ()
   "Find file in upper dirs"
   (interactive)
@@ -105,19 +91,15 @@
       (find-file pf)
     (message "Unable to find pom.xml")))
 
-(defun lsp-update-and-run ()
-  "Request code action to automatically fix issues reported by
-the diagnostics."
-  (interactive)
-  (lsp--cur-workspace-check)
-  (with-demoted-errors
-      "%s"
-    (lsp--send-request-async
-     (lsp--make-request
-      "textDocument/codeAction"
-      (lsp--text-document-code-action-params))
-     (lambda (actions)
-       (setq lsp-code-actions actions)
-       (condition-case nil
-           (call-interactively 'lsp-execute-code-action)
-         (quit "Quit"))))))
+
+(use-package dap-mode
+  :load-path "~/Sources/lsp/dap-mode"
+  :ensure nil
+  :config
+  (spacemacs/set-leader-keys-for-major-mode 'java-mode
+    "dn" 'dap-next
+    "dd" 'dap-java-debug
+    "di" 'dap-step-in
+    "dc" 'dap-continue
+    "db" 'dap-toggle-breakpoint
+    "do" 'dap-step-out))

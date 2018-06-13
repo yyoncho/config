@@ -128,7 +128,7 @@ values."
                                :weight normal
                                :weight normal
                                :width normal
-                               :powerline-scale 1.5)
+                               :powerline-scale 0.7)
    dotspacemacs-leader-key "SPC"
    dotspacemacs-emacs-command-key "SPC"
    dotspacemacs-ex-command-key ":"
