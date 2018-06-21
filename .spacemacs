@@ -51,8 +51,7 @@ values."
      elfeed
      restclient
      bm
-     spacemacs-purpose
-)
+     spacemacs-purpose)
    dotspacemacs-additional-packages
    '(java-snippets
      flash-region
@@ -94,10 +93,11 @@ values."
                         :files ("*.el"))
       :upgrade 't)
      inf-clojure
-     (targets (:location
-               (resipe :repo "noctuid/targets.el" :fetcher github :files ("*.el"))))
+     (targets :location
+              (recipe :repo "noctuid/targets.el" :fetcher github :files ("*.el")))
      hierarchy
-     tree-mode)
+     tree-mode
+     undercover)
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -859,7 +859,7 @@ in the other window."
 
   (require 'cc-mode)
   (bind-key "TAB" 'company-indent-or-complete-common java-mode-map)
-  (bind-key "C-i" 'yas-expand-snippet)
+  ;; (bind-key "C-i" 'yas-expand-snippet)
   (bind-key "M-j" 'evil-join)
   (bind-key "C-j" 'newline-and-indent)
 
