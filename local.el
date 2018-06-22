@@ -21,7 +21,6 @@
 ;;; Commentary:
 
 ;;
-
 ;;; Code:
 
 (setq lsp-java--workspace-folders (list "/home/kyoncho/Sources/tick42-gds/"

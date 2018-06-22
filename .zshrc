@@ -113,7 +113,7 @@ export ZSH=~/.my-zsh/
 # time that oh-my-zsh is loaded.
 ZSH_THEME="robbyrussell"
 
-plugins=(colored-man-pages git mvn screen svn emacs fasd web-search)
+plugins=(colored-man-pages git mvn screen svn emacs fasd web-search vi-mode)
 
 source $ZSH/oh-my-zsh.sh
 # quote previous word in single or double quote

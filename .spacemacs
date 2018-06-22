@@ -12,12 +12,10 @@ values."
    dotspacemacs-ask-for-lazy-installation t
    dotspacemacs-configuration-layer-path '("~/.remote-config/config/layers/")
    dotspacemacs-configuration-layers
-   '(go
-     javascript
+   '(javascript
      vinegar
      (treemacs :variables
                treemacs-use-filewatch-mode t)
-     imenu-list
      (java :variables java-backend 'lsp)
      spacemacs
      spacemacs-base
@@ -49,10 +47,8 @@ values."
      clojure
      command-log
      elfeed
-     restclient
      bm
-     spacemacs-purpose
-)
+     spacemacs-purpose)
    dotspacemacs-additional-packages
    '(java-snippets
      flash-region
@@ -260,6 +256,7 @@ values."
     (spacemacs/set-leader-keys-for-major-mode 'org-mode "jc" 'org-jira-update-comment)
     (spacemacs/set-leader-keys-for-major-mode 'org-mode "jd" 'org-jira-download-attachment)
     (spacemacs/set-leader-keys-for-major-mode 'org-mode "jt" 'org-jira-todo-to-jira)
+    (spacemacs/set-leader-keys-for-major-mode 'org-mode "jb" 'org-jira-browse-issue)
     (spacemacs/set-leader-keys-for-major-mode 'org-mode "jl" 'org-jira-update-worklogs-from-org-clocks)
     (spacemacs/set-leader-keys-for-major-mode 'org-mode "=" 'org-timestamp-up)
     (spacemacs/set-leader-keys-for-major-mode 'org-mode "-" 'org-timestamp-down)
@@ -353,9 +350,9 @@ With a prefix ARG invokes `projectile-commander' instead of
                      (dired project)))
         (error "There are no known projects"))))
 
-  (define-key evil-normal-state-map "p" 'evil-paste-before)
+  (define-key evil-normal-state-map "P" 'evil-paste-before)
   (define-key evil-normal-state-map "\t" 'indent-for-tab-command)
-  (define-key evil-normal-state-map "P" 'evil-paste-after)
+  (define-key evil-normal-state-map "p" 'evil-paste-after)
   (define-key evil-normal-state-map "go" 'my/evil-replace-with-kill-ring)
 
   ;; projectile
@@ -421,7 +418,8 @@ With a prefix ARG invokes `projectile-commander' instead of
 
   (persistent-scratch-setup-default)
 
-  (setq evil-move-cursor-back nil
+  (require 'evil)
+  (setq evil-move-cursor-back t
         evil-move-beyond-eol t)
 
   (add-hook 'xml-mode-hook 'web-mode)
@@ -896,6 +894,7 @@ in the other window."
   (load-file "~/.remote-config/config/my-lsp.el")
   (load-file "~/.remote-config/config/my-dired.el")
   (load-file "~/.remote-config/config/my-snippets.el")
+  (load-file "~/.remote-config/config/local.el")
 
   (semantic-mode -1)
 
@@ -934,13 +933,13 @@ in the other window."
   (setq browse-url-browser-function 'w3m-browse-url)
   (setq w3m-view-this-url-new-session-in-background t)
 
-  (require 'flash-region)
-  (defun my/flash-region (beg end &optional register yank-handler)
-    (flash-region beg end eval-sexp-fu-flash-face 0.1))
+  ;; (require 'flash-region)
+  ;; (defun my/flash-region (beg end &optional register yank-handler)
+  ;;   (flash-region beg end eval-sexp-fu-flash-face 0.1))
 
-  (add-function :before (symbol-function 'evil-yank-characters) #'my/flash-region)
-  (add-function :before (symbol-function 'evil-yank-lines) #'my/flash-region)
-  (add-function :before (symbol-function 'evil-yank-rectangle) #'my/flash-region)
+  ;; (add-function :before (symbol-function 'evil-yank-characters) #'my/flash-region)
+  ;; (add-function :before (symbol-function 'evil-yank-lines) #'my/flash-region)
+  ;; (add-function :before (symbol-function 'evil-yank-rectangle) #'my/flash-region)
 
   (defun my/helm-find-file-in-directory ()
     "Find file in current directory"
@@ -950,7 +949,7 @@ in the other window."
   (setenv "PATH" (concat (getenv "PATH") ":~/.bin"))
 
   (require 'browse-url)
-  (setq browse-url-browser-function 'eww-browse-url
+  (setq browse-url-browser-function 'browse-url-chrome
         browse-url-generic-program "google-chrome")
 
   (require 'magit)

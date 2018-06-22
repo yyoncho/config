@@ -48,7 +48,7 @@
                                      '(xref-find-definitions :async true))))
          (java-mode . lsp-ui-sideline-mode))
   :config
-  (setq lsp-java-server-install-dir (expand-file-name "~/Sources/lsp/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target/repository/")
+  (setq ;; lsp-java-server-install-dir (expand-file-name "~/Sources/lsp/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target/repository/")
         ;; lsp-java--workspace-folders (list "/home/kyoncho/Sources/demo/2/"
         ;;                                   "/home/kyoncho/Sources/lsp/spring-boot-and-java-10/")
         lsp-java-favorite-static-members '("org.junit.Assert.*"
@@ -61,7 +61,7 @@
         lsp-java-format-settings-url "file:///home/kyoncho/Documents/tick42.xml"
         lsp-java-format-settings-profile "Tick42")
   (spacemacs/set-leader-keys-for-major-mode 'java-mode
-    "rr" 'lsp-update-and-run
+    "ra" 'lsp-execute-code-action
     "rs" 'lsp-rename
     "roi" 'lsp-java-organize-imports
     "rcl" 'lsp-java-create-local
@@ -96,10 +96,15 @@
   :load-path "~/Sources/lsp/dap-mode"
   :ensure nil
   :config
-  (spacemacs/set-leader-keys-for-major-mode 'java-mode
-    "dn" 'dap-next
-    "dd" 'dap-java-debug
-    "di" 'dap-step-in
-    "dc" 'dap-continue
-    "db" 'dap-toggle-breakpoint
-    "do" 'dap-step-out))
+  (progn
+    (require 'dap-java)
+    (require 'dap-ui)
+    (spacemacs/set-leader-keys-for-major-mode 'java-mode
+     "dn" 'dap-next
+     "dd" 'dap-java-debug
+     "di" 'dap-step-in
+     "dc" 'dap-continue
+     "db" 'dap-toggle-breakpoint
+     "do" 'dap-step-out)
+
+    (add-to-list 'lsp-java-bundles "/home/kyoncho/.emacs.d/eclipse.jdt.ls/plugins/com.microsoft.java.debug.plugin-0.9.0.jar")))
