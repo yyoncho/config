@@ -49,15 +49,16 @@
          (java-mode . lsp-ui-sideline-mode))
   :config
   (setq lsp-java-server-install-dir (expand-file-name "~/Sources/lsp/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target/repository/")
-        ;; lsp-java--workspace-folders (list "/home/kyoncho/Sources/demo/2/"
-        ;;                                   "/home/kyoncho/Sources/lsp/spring-boot-and-java-10/")
-        lsp-java-favorite-static-members '("org.junit.Assert.*"
-                                           "org.junit.Assume.*"
-                                           "java.util.Collections.*"
-                                           "org.junit.jupiter.api.Assertions.*"
-                                           "org.junit.jupiter.api.Assumptions.*"
-                                           "org.junit.jupiter.api.DynamicContainer.*"
-                                           "org.junit.jupiter.api.DynamicTest.*")
+        lsp-java--workspace-folders (list "/home/kyoncho/Sources/demo/2/"
+                                          "/home/kyoncho/Sources/lsp/spring-boot-and-java-10/")
+        ;; lsp-java-favorite-static-members
+        ;; '("org.junit.Assert.*"
+        ;;                                    "org.junit.Assume.*"
+        ;;                                    "java.util.Collections.*"
+        ;;                                    "org.junit.jupiter.api.Assertions.*"
+        ;;                                    "org.junit.jupiter.api.Assumptions.*"
+        ;;                                    "org.junit.jupiter.api.DynamicContainer.*"
+        ;;                                    "org.junit.jupiter.api.DynamicTest.*")
         lsp-java-format-settings-url "file:///home/kyoncho/Documents/tick42.xml"
         lsp-java-format-settings-profile "Tick42")
   (spacemacs/set-leader-keys-for-major-mode 'java-mode
@@ -104,7 +105,8 @@
     (spacemacs/set-leader-keys-for-major-mode 'java-mode
       "dq" 'dap-disconnect
       "dn" 'dap-next
-      "dd" 'dap-java-debug
+      "xj" 'dap-java-debug
+      "xl" 'dap-debug-last-configuration
       "di" 'dap-step-in
       "dc" 'dap-continue
       "db" 'dap-toggle-breakpoint
