@@ -91,20 +91,33 @@
       (find-file pf)
     (message "Unable to find pom.xml")))
 
-
 (use-package dap-mode
-  :load-path "~/Sources/lsp/dap-mode"
-  :ensure nil
+  :init (progn
+          (add-hook 'lsp-after-open-hook 'dap-ui-mode))
+  :load-path "~/Sources/lsp/dap-mode/"
   :config
   (progn
     (require 'dap-java)
     (require 'dap-ui)
+    (require 'gdb-mi)
+    (dap-turn-on-dap-mode)
     (spacemacs/set-leader-keys-for-major-mode 'java-mode
-     "dn" 'dap-next
-     "dd" 'dap-java-debug
-     "di" 'dap-step-in
-     "dc" 'dap-continue
-     "db" 'dap-toggle-breakpoint
-     "do" 'dap-step-out)
-
-    (add-to-list 'lsp-java-bundles "/home/kyoncho/.emacs.d/eclipse.jdt.ls/plugins/com.microsoft.java.debug.plugin-0.9.0.jar")))
+      "dq" 'dap-disconnect
+      "dn" 'dap-next
+      "xj" 'dap-java-debug
+      "xl" 'dap-debug-last-configuration
+      "di" 'dap-step-in
+      "dc" 'dap-continue
+      "db" 'dap-toggle-breakpoint
+      "do" 'dap-step-out
+      "ee" 'dap-eval
+      "er" 'dap-eval-region
+      "es" 'dap-eval-dwim
+      "ls" 'dap-ui-list-sessions
+      "ss" 'dap-switch-session
+      "st" 'dap-switch-thread
+      "sf" 'dap-switch-stack-frame)
+    (setq lsp-java-bundles (thread-first "eclipse.jdt.ls/plugins/com.microsoft.java.debug.plugin-0.9.0.jar"
+                             locate-user-emacs-file
+                             expand-file-name
+                             list))))
