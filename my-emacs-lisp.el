@@ -37,6 +37,10 @@
 (spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "ref" 'emr-el-extract-function)
 (spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "rfe" 'emr-el-implement-function)
 (spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "ris" 'emr-el-inline-let-variable)
+(spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "rtf" 'clojure-thread-first-all)
+(spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "rtl" 'clojure-thread-last-all)
+(spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "rua" 'clojure-unwind-all)
+(spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "ruw" 'clojure-unwind)
 
 (add-hook 'emacs-lisp-mode-hook
           (lambda ()
