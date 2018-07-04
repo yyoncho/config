@@ -685,7 +685,6 @@ If EXTERNAL is double prefix, browse in new buffer."
 
 
 
-  (spacemacs/set-leader-keys "bb" 'helm-mini)
   (spacemacs/set-leader-keys "ae" 'emms)
   (spacemacs/set-leader-keys "it" 'bm-toggle)
   (spacemacs/set-leader-keys "in" 'bm-next)
