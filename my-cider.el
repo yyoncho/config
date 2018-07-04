@@ -50,8 +50,8 @@
 
      (setq cider-save-file-on-load t
            cider-auto-jump-to-error nil
-           cider-auto-select-test-report-buffer nil
-           cider-show-error-buffer nil
+           cider-auto-select-test-report-buffer t
+           cider-show-error-buffer t
            cider-lein-command "~/.bin/lein"
            cider-prompt-save-file-on-load t
            cider-use-fringe-indicators t

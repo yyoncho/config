@@ -32,7 +32,8 @@
                                         "/home/kyoncho/Sources/cm/java-server-core/"
                                         "/home/kyoncho/Sources/cm/java-client-hazel/"
                                         "/home/kyoncho/Sources/cm/java-client-factory/"
-                                        "/home/kyoncho/Sources/java-aim-gen/"))
+                                        "/home/kyoncho/Sources/java-aim-gen/"
+                                        "/home/kyoncho/Sources/clj-gateway/app-config/"))
 
 (provide 'local)
 ;;; local.el ends here
