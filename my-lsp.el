@@ -121,3 +121,18 @@
                              locate-user-emacs-file
                              expand-file-name
                              list))))
+;; (vhl/install-extension ')
+
+;; (vhl/define-extension 'my-evil 'evil-paste-after 'evil-paste-before
+;;                       'evil-yank-line
+;;                       'evil-yank
+;;                       'evil-paste-pop 'evil-move)
+
+
+;; (vhl/define-extension 'my-cp-evil
+;;                       'evil-cp-yank 'evil-cp-yank-sexp)
+
+;; (vhl/install-extension 'my-cp-evil)
+
+;; (vhl/give-advice-to-make-vhl-on-changes evil-cp-yank-sexp)
+;; vhl/use-my-evil-extension-p

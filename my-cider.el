@@ -14,23 +14,23 @@
                   (0 (progn (compose-region (match-beginning 1)
                                             (match-end 1) "µ")
                             nil)))
-                 ("(\\(fn\\)[\[[:space:]]"  ; anon funcs 1
+                 ("(\\(fn\\)[\[[:space:]]" ; anon funcs 1
                   (0 (progn (compose-region (match-beginning 1)
                                             (match-end 1) "λ")
                             nil)))
-                 ("(\\(not=\\)[\[[:space:]]"  ; anon funcs 1
+                 ("(\\(not=\\)[\[[:space:]]" ; anon funcs 1
                   (0 (progn (compose-region (match-beginning 1)
                                             (match-end 1) "≠")
                             nil)))
-                 ("(\\(def\\)[\[[:space:]]"  ; anon funcs 1
+                 ("(\\(def\\)[\[[:space:]]" ; anon funcs 1
                   (0 (progn (compose-region (match-beginning 1)
                                             (match-end 1) "≡")
                             nil)))
-                 ("\\(#\\)("                ; anon funcs 2
+                 ("\\(#\\)("            ; anon funcs 2
                   (0 (progn (compose-region (match-beginning 1)
                                             (match-end 1) "λ")
                             nil)))
-                 ("\\(Math/PI\\)"                ; anon funcs 2
+                 ("\\(Math/PI\\)"       ; anon funcs 2
                   (0 (progn (compose-region (match-beginning 1)
                                             (match-end 1) "π")
                             nil)))
@@ -65,13 +65,13 @@
 
      (spacemacs/set-leader-keys-for-major-mode 'cider-repl-mode
        "sc" 'cider-repl-clear-buffer)
-     (defun cider-emit-interactive-eval-err-output (output)
-       "Emit err OUTPUT resulting from interactive code evaluation.
-The output can be send to either a dedicated output buffer or the current
-REPL buffer.  This is controlled via
-`cider-interactive-eval-output-destination'."
-       (my/show-error output)
-       (cider--emit-interactive-eval-output output 'cider-repl-emit-interactive-stderr))
+     ;;      (defun cider-emit-interactive-eval-err-output (output)
+     ;;        "Emit err OUTPUT resulting from interactive code evaluation.
+     ;; The output can be send to either a dedicated output buffer or the current
+     ;; REPL buffer.  This is controlled via
+     ;; `cider-interactive-eval-output-destination'."
+     ;;        (my/show-error output)
+     ;;        (cider--emit-interactive-eval-output output 'cider-repl-emit-interactive-stderr))
 
      (defun my/cycle-log-level ()
        (interactive)
@@ -83,6 +83,13 @@ REPL buffer.  This is controlled via
             ("debug" "info")
             ("info"  "debug")))))
 
+     (require 'helm-cider)
+
+     (eval-after-load 'flycheck '(flycheck-clojure-setup))
+     (add-hook 'clojure-mode-hook 'flycheck-mode)
+     (add-hook 'clojure-mode-hook (lambda () (eval-sexp-fu-flash-mode -1)))
+     (eval-after-load 'flycheck
+       '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
      (dolist (m '(clojure-mode
                   clojurec-mode
                   clojurescript-mode
@@ -107,7 +114,7 @@ REPL buffer.  This is controlled via
          "j"  'evil-operator-clojure
          "es" 'my/mount-restart
          "ld" 'my/timbre-debug
-         "sc" (lambda () (cider-find-and-clear-repl-output t))
+         ;; "sc" (lambda () (cider-find-and-clear-repl-output t))
          "li" 'my/timbre-info
          "lt" 'my/timbre-trace
          "," 'cider-eval-defun-at-point
@@ -177,24 +184,28 @@ REPL buffer.  This is controlled via
 
      (defun my/list-repls ()
        (interactive)
-       (helm :sources (helm-build-sync-source "REPS"
-                        :candidates (-map 'buffer-name
-                                          (-filter (lambda (buffer)
-                                                     (s-equals?
-                                                      (buffer-mode buffer) "cider-repl-mode"))
-                                                   (buffer-list)))
-                        :action '(("Switch to REPL" . switch-to-buffer)
-                                  ("Kill" . (lambda (candidate)
-                                              (interactive)
-                                              (with-current-buffer candidate
-                                                (cider-quit))))
-                                  ("Add to Perspective" . (lambda (candidate)
-                                                            (interactive)
-                                                            (persp-add-buffer candidate)))))
-             :buffer "*helm sync source*"))
-     (add-hook 'cider-mode-hook (lambda ()
-                                  (interactive)
-                                  (flycheck-mode nil)))
+       (let ((buffers (-map 'buffer-name
+                            (-filter (lambda (buffer)
+                                       (s-equals?
+                                        (buffer-mode buffer) "cider-repl-mode"))
+                                     (buffer-list)))))
+         (case (length buffers)
+           (0 (error "There is no active repls"))
+           (1 (switch-to-buffer (first buffers)))
+           (t (helm :sources (helm-build-sync-source "REPS"
+                               :candidates buffers
+                               :action '(("Switch to REPL" . switch-to-buffer)
+                                         ("Kill" . (lambda (candidate)
+                                                     (interactive)
+                                                     (with-current-buffer candidate
+                                                       (cider-quit))))
+                                         ("Add to Perspective" . (lambda (candidate)
+                                                                   (interactive)
+                                                                   (persp-add-buffer candidate)))))
+                    :buffer "*helm sync source*"))))
+       (add-hook 'cider-mode-hook (lambda ()
+                                    (interactive)
+                                    (flycheck-mode nil))))
 
      (setq sayid-version '1)
      (setq cider-jack-in-nrepl-middlewares (-remove-item "com.billpiel.sayid.nrepl-middleware/wrap-sayid" cider-jack-in-nrepl-middlewares))
