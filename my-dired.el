@@ -10,7 +10,6 @@
                                          (dired-subtree-toggle)
                                          (dired-revert)))
 
-(define-key dired-mode-map (kbd "E") 'dired-view-file)
 (define-key dired-mode-map (kbd "<f5>") (lambda ()
                                           (interactive)
                                           (dired-revert)))
@@ -39,44 +38,19 @@ Remove expanded subdir of deleted dir, if any."
 (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
 (add-hook 'dired-mode-hook 'dired-collapse)
 
-;; (define-key dired-mode-map (kbd "g f") dired-filter-map)
-(define-key dired-mode-map (kbd "C-c /") 'dired-narrow)
-
-
 (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$")
       delete-by-moving-to-trash t
       dired-recursive-deletes 'always
       dired-deletion-confirmer '(lambda (x) t)
       dired-sidebar-stale-buffer-time-idle-delay 2
       dired-sidebar-follow-file-idle-delay 0.5
-      dired-sidebar-should-follow-file t)
+      dired-sidebar-should-follow-file t
+      dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.$\\|GPATH\\|GTAGS\\|GSYMS\\|GRTAGS\\|.git")
 
-
-;; (diredp-toggle-find-file-reuse-dir 1)
-
-(setq-default dired-listing-switches "-aBhl  --group-directories-first"
+(setq-default dired-listing-switches "-aBhl --group-directories-first"
               dired-omit-files-p t)
 (remove-hook 'dired-subtree-after-insert-hook (lambda () (dired-revert)))
 
 (evilified-state-evilify dired-mode dired-mode-map
-      "f" dired-filter-map)
 
-(setq dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.$\\|GPATH\\|GTAGS\\|GSYMS\\|GRTAGS\\|.git")
-
-;; (require 'savehist)
-;; (add-to-list 'savehist-additional-variables 'helm-dired-history-variable)
-;; (savehist-mode 1)
-
-;; (with-eval-after-load 'dired
-;;   (require 'helm-dired-history)
-;;   ;; if you are using ido,you'd better disable ido for dired
-;;   (define-key (cdr ido-minor-mode-map-entry) [remap dired] nil) ;in ido-setup-hook
-;;   (require 'savehist)
-;;   (add-to-list 'savehist-additional-variables 'helm-dired-history-variable)
-;;   (savehist-mode 1)
-
-;;   (with-eval-after-load 'dired
-;;     (require 'helm-dired-history)
-;;     ;; if you are using ido,you'd better disable ido for dired
-;;     ;; (define-key (cdr ido-minor-mode-map-entry) [remap dired] nil) ;in ido-setup-hook
-;;     (define-key dired-mode-map (kbd "<f6>") 'dired)))
+  "f" dired-filter-map)

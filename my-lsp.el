@@ -101,53 +101,19 @@
 (use-package dap-mode
   :load-path "~/Sources/lsp/dap-mode/"
   :config
-<<<<<<< HEAD
-  (progn
-    (require 'dap-java)
-    (require 'dap-ui)
-    (require 'gdb-mi)
-    (dap-turn-on-dap-mode)
-    (spacemacs/set-leader-keys-for-major-mode 'java-mode
-      "dq" 'dap-disconnect
-      "dn" 'dap-next
-      "xj" 'dap-java-debug
-      "xl" 'dap-debug-last-configuration
-      "di" 'dap-step-in
-      "dc" 'dap-continue
-      "db" 'dap-toggle-breakpoint
-      "do" 'dap-step-out
-      "ee" 'dap-eval
-      "er" 'dap-eval-region
-      "es" 'dap-eval-dwim
-      "ls" 'dap-ui-list-sessions
-      "ss" 'dap-switch-session
-      "st" 'dap-switch-thread
-      "sf" 'dap-switch-stack-frame)
-    (setq lsp-java-bundles (thread-first "eclipse.jdt.ls/plugins/com.microsoft.java.debug.plugin-0.9.0.jar"
-                             locate-user-emacs-file
-                             expand-file-name
-                             list))))
-;; (vhl/install-extension ')
-
-;; (vhl/define-extension 'my-evil 'evil-paste-after 'evil-paste-before
-;;                       'evil-yank-line
-;;                       'evil-yank
-;;                       'evil-paste-pop 'evil-move)
-
-
-;; (vhl/define-extension 'my-cp-evil
-;;                       'evil-cp-yank 'evil-cp-yank-sexp)
-
-;; (vhl/install-extension 'my-cp-evil)
-
-;; (vhl/give-advice-to-make-vhl-on-changes evil-cp-yank-sexp)
-;; vhl/use-my-evil-extension-p
-=======
   (require 'dap-java)
+  (require 'lsp-java)
   (require 'dap-ui)
   (require 'gdb-mi)
   (dap-turn-on-dap-mode)
 
+  (setq lsp-java-bundles (thread-first "eclipse.jdt.ls/plugins/com.microsoft.java.debug.plugin-0.9.0.jar"
+                           locate-user-emacs-file
+                           expand-file-name
+                           list))
+
+  (dap-turn-on-dap-mode)
+  (add-hook 'dap-ui-sessions-mode-hook 'evil-evilified-state)
   (dap-ui-mode t)
   (spacemacs/set-leader-keys-for-major-mode 'java-mode
     "dq" 'dap-disconnect
@@ -166,9 +132,8 @@
     "st" 'dap-switch-thread
     "sf" 'dap-switch-stack-frame
     "go" 'dap-go-to-output-buffer)
+
   (setq lsp-java-bundles (thread-first "eclipse.jdt.ls/plugins/com.microsoft.java.debug.plugin-0.9.0.jar"
                            locate-user-emacs-file
                            expand-file-name
-                           list))
-  (add-hook 'dap-ui-sessions-mode-hook 'evil-evilified-state))
->>>>>>> 73bae981023edfaf12e9df93444f0a8602af6019
+                           list)))

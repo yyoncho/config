@@ -20,7 +20,6 @@
 
 ;;; Commentary:
 
-;;; Code:
 
 ;; Emacs lisp
 (require 'company)
@@ -42,15 +41,13 @@
 (spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "rua" 'clojure-unwind-all)
 (spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "ruw" 'clojure-unwind)
 
-(add-hook 'emacs-lisp-mode-hook
-          (lambda ()
-            (delete 'company-capf company-backends)))
-
 (add-hook 'emacs-lisp-mode-hook #'evil-cleverparens-mode)
 (add-hook 'emacs-lisp-mode-hook #'evil-smartparens-mode)
 (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode-enable)
 (add-hook 'emacs-lisp-mode-hook #'flycheck-mode)
 (add-hook 'emacs-lisp-mode-hook #'emr-initialize)
+(add-hook 'emacs-lisp-mode-hook #'eval-sexp-fu-flash-mode)
+(add-hook 'emacs-lisp-mode-hook #'nameless-mode)
 
 ;; Emacs lisp
 (spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "," 'eval-defun)

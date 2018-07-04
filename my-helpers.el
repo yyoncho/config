@@ -26,21 +26,6 @@
 
 (require 'mu4e)
 
-(defun my/send-to-jpm ()
-  "Sends current file to JPM"
-  (interactive)
-  (let ((file-name (buffer-file-name))
-        (short-name (buffer-name)))
-    (when (equal (file-name-extension file-name) "jar")
-      (setq file-name (concat file-name ".zip"))
-      (copy-file (buffer-file-name) file-name t))
-    (save-excursion
-      (mu4e-compose-new)
-      (erase-buffer)
-      (insert-file "~/.send-template")
-      (replace-string "{file-name}" file-name)
-      (beginning-of-buffer)
-      (replace-string "{short-name}" short-name)
-      (message-send-and-exit))))
+
 
 (provide 'my-helpers)

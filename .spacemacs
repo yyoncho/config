@@ -12,7 +12,8 @@ values."
    dotspacemacs-ask-for-lazy-installation t
    dotspacemacs-configuration-layer-path '("~/.remote-config/config/layers/")
    dotspacemacs-configuration-layers
-   '(javascript
+   '(vimscript
+     javascript
      vinegar
      (treemacs :variables
                treemacs-use-filewatch-mode t)
@@ -180,10 +181,7 @@ values."
   (add-to-list 'package-pinned-packages '(cljr-helm . "melpa-stable") t)
   (add-to-list 'package-pinned-packages '(ac-cider . "melpa-stable") t)
 
-
-  ;; (push '("melpa-stable" . "stable.melpa.org/packages/") configuration-layer--elpa-archives)
-  ;; (push '(ensime . "melpa-stable") package-pinned-packages)
-  )
+  (setq-default custom-file "~/.remote-config/config/.custom.el"))
 
 
 (defun dotspacemacs/user-config ()
@@ -242,7 +240,7 @@ values."
   (smartparens-global-strict-mode t)
 
   (evil-visual-mark-mode t)
-  (setq custom-file "~/.remote-config/config/.custom.el")
+
 
   (sp-use-paredit-bindings)
   (spacemacs/toggle-highlight-current-line-globally-off)
@@ -353,14 +351,14 @@ With a prefix ARG invokes `projectile-commander' instead of
                      (dired project)))
         (error "There are no known projects"))))
 
-  (define-key evil-normal-state-map "P" 'evil-paste-before)
   (define-key evil-normal-state-map "\t" 'indent-for-tab-command)
-  (define-key evil-normal-state-map "p" 'evil-paste-after)
   (define-key evil-normal-state-map "go" 'my/evil-replace-with-kill-ring)
 
   ;; projectile
-  (require 'projectile)
-  (setq projectile-create-missing-test-files t)
+  (use-package projectile
+    :defer t
+    :config
+    (setq projectile-create-missing-test-files t))
 
   (evil-define-command my/goto-end-of-form (count)
     "Go to end the the form."
@@ -374,14 +372,12 @@ With a prefix ARG invokes `projectile-commander' instead of
           (evil-insert 1)))))
 
   (require 'evil-cleverparens)
-
   (global-set-key [remap evil-cp-end-of-defun] 'my/goto-end-of-form)
 
   ;; Also auto refresh dired, but be quiet about it
+  (require 'autorevert)
   (setq global-auto-revert-non-file-buffers t)
   (setq auto-revert-verbose nil)
-
-
 
   ;; emms configuration
   (use-package emms-setup
@@ -390,24 +386,24 @@ With a prefix ARG invokes `projectile-commander' instead of
               (emms-default-players)
               (emms-mode-line -1)))
 
-  (require 'magit)
-
   (defun my/magit-stage-modified ()
     "Stage all changes to files"
     (interactive)
     (magit-with-toplevel
       (magit-stage-1 "--all")))
 
-  (setq evil-cross-lines t)
-
 
   (use-package company
     :config
     (progn
       (define-key company-active-map (kbd "<escape>") 'company-abort)
-      (setq-default company-auto-complete-chars '(?\) ?.))))
+      (setq-default company-auto-complete-chars '(?\) ?.))
+      (setq-default company-auto-complete t)))
 
-  (setq magit-diff-arguments '("--stat" "--no-ext-diff" "--ignore-all-space"))
+  (setq magit-diff-arguments '("--stat" "--no-ext-diff" "--ignore-all-space")
+        magit-save-repository-buffers 'dontask
+        magit-revision-show-gravatars nil
+        magit-display-buffer-function 'magit-display-buffer-traditional)
 
   (defun eval-and-replace ()
     "Replace the preceding sexp with its value."
@@ -422,8 +418,8 @@ With a prefix ARG invokes `projectile-commander' instead of
   (persistent-scratch-setup-default)
 
   (require 'evil)
-  (setq evil-move-cursor-back t
-        evil-move-beyond-eol t)
+  (setq evil-move-beyond-eol t
+        evil-cross-lines t)
 
   (add-hook 'xml-mode-hook 'web-mode)
 
@@ -441,7 +437,6 @@ With a prefix ARG invokes `projectile-commander' instead of
 
   (display-time-mode t)
 
-  (setq-default company-auto-complete t)
 
   (defun my/show-error (text)
     "Shows error message"
@@ -543,7 +538,6 @@ PREFIX - whether to switch to the other window."
   (add-hook 'yas-before-expand-snippet-hook (lambda () (autopair-mode 1)))
   (add-hook 'yas-after-exit-snippet-hook (lambda () (autopair-mode -1)))
 
-  (setq magit-revision-show-gravatars nil)
   (defun my/two-monitors ()
     "Set frame size to cover 2 monitors"
     (interactive)
@@ -840,7 +834,6 @@ in the other window."
                           (goto-char (posn-point (event-start click)))
                           (my/find-symbol-at-point))))))
 
-  (setq magit-save-repository-buffers 'dontask)
 
   (setq-default default-input-method 'bulgarian-phonetic)
 
@@ -957,7 +950,6 @@ in the other window."
   (setq url-user-agent (concat
                         "User-Agent: Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) "
                         "AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7\n")
-
         w3m-user-agent nil
         w3m-use-cookies t)
 
@@ -1061,29 +1053,8 @@ in the other window."
 
 
 
-  (setq magit-display-buffer-function 'magit-display-buffer-traditional)
 
   (helm-flx-mode -1)
   (semantic-mode -1)
 
   (add-hook 'projectile-after-switch-project-hook 'treemacs-projectile))
-(defun dotspacemacs/emacs-custom-settings ()
-  "Emacs custom settings.
-This is an auto-generated function, do not modify its content directly, use
-Emacs customize menu instead.
-This function is called at the very end of Spacemacs initialization."
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(eww-search-prefix "https://www.google.com/search?q=")
- '(package-selected-packages
-   '(clj-refactor yasnippet-snippets yapfify yaml-mode xterm-color ws-butler winum which-key web-mode web-beautify w3m volatile-highlights vi-tilde-fringe uuidgen use-package undercover treemacs-projectile treemacs-evil tree-mode toc-org tide targets tagedit tabbar symon sx string-inflection spaceline-all-the-icons smeargle slim-mode shen-mode shen-elisp shell-pop scss-mode sayid sass-mode restart-emacs rainbow-mode rainbow-identifiers rainbow-delimiters pyvenv pytest pyenv-mode py-isort pug-mode pretty-mode powershell pippel pipenv pip-requirements persp-mode persistent-scratch pcre2el password-generator paradox overseer origami orgit org-projectile org-present org-pomodoro org-mime org-jira org-download org-bullets org-brain open-junk-file nameless mvn multi-term mu4e-maildirs-extension mu4e-alert move-text mmm-mode meghanada maven-test-mode markdown-toc magit-svn magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode link-hint less-css-mode json-navigator json-mode js2-refactor js-doc java-snippets inflections inf-clojure indent-guide importmagic impatient-mode ibuffer-projectile hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-pydoc helm-purpose helm-projectile helm-mu helm-mode-manager helm-make helm-gitignore helm-flx helm-descbinds helm-dash helm-css-scss helm-company helm-cider helm-c-yasnippet helm-bm helm-ag groovy-mode groovy-imports gradle-mode google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md fuzzy font-lock+ flyspell-correct-helm flycheck-pos-tip flycheck-clojure flx-ido flash-region fill-column-indicator feature-mode fasd fancy-battery eyebrowse expand-region exec-path-from-shell excorporate eww-lnum evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-snipe evil-smartparens evil-search-highlight-persist evil-org evil-numbers evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens evil-args evil-anzu eshell-z eshell-prompt-extras esh-help ensime emr emms emmet-mode elisp-slime-nav elfeed-web elfeed-org elfeed-goodies edn editorconfig ecukes dumb-jump dired-sidebar dired-ranger dired-filter dired-efap dired-collapse diminish diff-hl define-word cython-mode cypher-mode csv-mode counsel-projectile company-web company-tern company-statistics company-emacs-eclim company-anaconda command-log-mode column-enforce-mode color-identifiers-mode clojure-snippets clojure-cheatsheet clean-aindent-mode cider-eval-sexp-fu centered-cursor-mode browse-at-remote autopair auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile all-the-icons-dired aggressive-indent ace-link ace-jump-helm-line ac-ispell)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-)

@@ -4,3 +4,4 @@ flycheck_.emacs
 .custom.el
 .ssh-agent
 .ssh-agent
+local.el
