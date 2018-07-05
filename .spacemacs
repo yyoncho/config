@@ -47,7 +47,10 @@ values."
      ibuffer
      clojure
      command-log
-     elfeed
+     (elfeed :variables
+             elfeed-feeds '("http://sachachua.com/blog/feed/"
+                            "http://nullprogram.com/feed/"
+                            "https://www.dnevnik.bg/author/rss"))
      bm
      spacemacs-purpose
      evil-snipe)
@@ -117,18 +120,16 @@ values."
    dotspacemacs-verbose-loading nil
    dotspacemacs-startup-banner 'nil
    dotspacemacs-mode-line-theme 'spacemacs
-   ;; dotspacemacs-mode-line-theme 'vim-powerline
-   dotspacemacs-startup-lists '((recents . 5)
-                                (projects . 7))
+   dotspacemacs-startup-lists '((recents . 5) (projects . 7))
    dotspacemacs-startup-buffer-responsive t
    dotspacemacs-scratch-mode 'text-mode
    dotspacemacs-colorize-cursor-according-to-state t
    dotspacemacs-default-font '("Source Code Pro Medium"
-                               :size 15
-                               :weight normal
-                               :weight normal
-                               :width normal
-                               :powerline-scale 0.7)
+                     :size 15
+                     :weight normal
+                     :weight normal
+                     :width normal
+                     :powerline-scale 0.7)
    dotspacemacs-leader-key "SPC"
    dotspacemacs-emacs-command-key "SPC"
    dotspacemacs-ex-command-key ":"
@@ -186,25 +187,20 @@ values."
 
 (defun dotspacemacs/user-config ()
   "User config."
-  ;; (add-to-list 'load-path "~/Sources/xelb/")
-  ;; (add-to-list 'load-path "~/Sources/exwm/")
-  ;; (require 'exwm-config)
-  ;; (exwm-config-default)
 
-  (require 'helm-projectile)
-  (setq helm-projectile-fuzzy-match nil)
+  (use-package helm-projectile
+    :defer t
+    :config
+    (setq helm-projectile-fuzzy-match nil))
 
   (use-package evil-cleverparens
     :defer t
     :init
-    (progn
-      (spacemacs|diminish evil-cleverparens-mode)))
+    (spacemacs|diminish evil-cleverparens-mode))
 
   (use-package ggtags
     :defer t
-    :init
-    (progn
-      (spacemacs|diminish ggtags-mode "GT" "")))
+    :init (spacemacs|diminish ggtags-mode "GT" ""))
 
   (use-package eww
     :requires (evil-evilified-state)
@@ -220,54 +216,20 @@ values."
                 ("h" . 'helm-eww-history)
                 ("l" . 'helm-eww-links)))
 
-
-  (setq treemacs-change-root-without-asking t
-        treemacs-collapse-dirs 3)
-
-  (setq w3m-user-agent "Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC_Pyramid Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.")
-
-
   (setq helm-ff-guess-ffap-filenames t)
 
   ;; do not ask when deleting buffers
   (setq kill-buffer-query-functions (delq 'process-kill-buffer-query-function kill-buffer-query-functions))
 
-  ;; ;; contrast configuration
-  ;; (require 'shr-color)
-  ;; (setq shr-color-visible-distance-min 62)
-  ;; (setq shr-color-visible-luminance-min 80)
-
   (smartparens-global-strict-mode t)
 
   (evil-visual-mark-mode t)
 
-
   (sp-use-paredit-bindings)
+
   (spacemacs/toggle-highlight-current-line-globally-off)
   (spacemacs/toggle-automatic-symbol-highlight-on)
 
-  (require 'org-jira)
-  (progn
-    (spacemacs/set-leader-keys-for-major-mode 'org-mode "jp" 'org-jira-progress-issue)
-    (spacemacs/set-leader-keys-for-major-mode 'org-mode "jg" 'org-jira-get-issue)
-    (spacemacs/set-leader-keys-for-major-mode 'org-mode "ji" 'org-jira-update-issue)
-    (spacemacs/set-leader-keys-for-major-mode 'org-mode "jG" 'org-jira-get-issues)
-    (spacemacs/set-leader-keys-for-major-mode 'org-mode "jr" 'org-jira-refresh-issue)
-    (spacemacs/set-leader-keys-for-major-mode 'org-mode "jR" 'org-jira-refresh-issues-in-buffer)
-    (spacemacs/set-leader-keys-for-major-mode 'org-mode "jc" 'org-jira-update-comment)
-    (spacemacs/set-leader-keys-for-major-mode 'org-mode "jd" 'org-jira-download-attachment)
-    (spacemacs/set-leader-keys-for-major-mode 'org-mode "jt" 'org-jira-todo-to-jira)
-    (spacemacs/set-leader-keys-for-major-mode 'org-mode "jb" 'org-jira-browse-issue)
-    (spacemacs/set-leader-keys-for-major-mode 'org-mode "jl" 'org-jira-update-worklogs-from-org-clocks)
-    (spacemacs/set-leader-keys-for-major-mode 'org-mode "=" 'org-timestamp-up)
-    (spacemacs/set-leader-keys-for-major-mode 'org-mode "-" 'org-timestamp-down)
-
-
-
-    ;; jira configuration
-    (require 'jiralib)
-    (setq jiralib-url "https://jira.tick42.com"
-          jiralib-user-login-name "iyonchovski"))
 
   (c-set-offset 'substatement-open 0)
 
@@ -311,6 +273,8 @@ values."
   (custom-set-variables '(evil-want-C-i-jump t))
 
   (define-key evil-normal-state-map (kbd "C-i") 'evil-jump-forward)
+
+  (define-key mu4e-main-mode-map "q" 'kill-current-buffer)
 
   (defun my/switch-to-compilation-buffer (arg)
     "Switch to compilation buffer"
@@ -358,7 +322,10 @@ With a prefix ARG invokes `projectile-commander' instead of
   (use-package projectile
     :defer t
     :config
-    (setq projectile-create-missing-test-files t))
+    (setq projectile-create-missing-test-files t
+          projectile-globally-ignored-files (list "TAGS" ".lein-repl-history")
+          projectile-globally-ignored-directories (list ".idea" ".ensime_cache" ".eunit" "target" ".git" ".hg" ".fslckout"
+                                                        "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "target" ".cask")))
 
   (evil-define-command my/goto-end-of-form (count)
     "Go to end the the form."
@@ -394,16 +361,20 @@ With a prefix ARG invokes `projectile-commander' instead of
 
 
   (use-package company
+    :defer t
     :config
     (progn
       (define-key company-active-map (kbd "<escape>") 'company-abort)
       (setq-default company-auto-complete-chars '(?\) ?.))
       (setq-default company-auto-complete t)))
 
-  (setq magit-diff-arguments '("--stat" "--no-ext-diff" "--ignore-all-space")
-        magit-save-repository-buffers 'dontask
-        magit-revision-show-gravatars nil
-        magit-display-buffer-function 'magit-display-buffer-traditional)
+  (use-package magit
+    :defer t
+    :config
+    (setq magit-diff-arguments '("--stat" "--no-ext-diff" "--ignore-all-space")
+          magit-save-repository-buffers 'dontask
+          magit-revision-show-gravatars nil
+          magit-display-buffer-function 'magit-display-buffer-traditional))
 
   (defun eval-and-replace ()
     "Replace the preceding sexp with its value."
@@ -414,8 +385,6 @@ With a prefix ARG invokes `projectile-commander' instead of
                (current-buffer))
       (error (message "Invalid expression")
              (insert (current-kill 0)))))
-
-  (persistent-scratch-setup-default)
 
   (require 'evil)
   (setq evil-move-beyond-eol t
@@ -545,9 +514,10 @@ PREFIX - whether to switch to the other window."
     (set-frame-position (selected-frame) 0 0)
     (set-frame-size (selected-frame) (* 2 1920) 1080 t))
 
-
-  (require 'sx-interaction)
-  (setq sx-question-mode-display-buffer-function #'pop-to-buffer-same-window)
+  (use-package sx-interaction
+    :defer t
+    :config
+    (setq sx-question-mode-display-buffer-function #'pop-to-buffer-same-window))
 
   (define-key evil-motion-state-map (kbd "C-f") 'forward-char)
   (define-key evil-motion-state-map (kbd "C-e") 'end-of-line)
@@ -626,15 +596,7 @@ PREFIX - whether to switch to the other window."
   ;; Auto refresh buffers
   (global-auto-revert-mode 1)
 
-  ;; elfeed configuration
-  (require 'elfeed)
-  (setq elfeed-feeds
-        '("http://sachachua.com/blog/feed/"
-          "http://nullprogram.com/feed/"
-          "https://www.dnevnik.bg/author/rss"))
 
-  (require 'calendar)
-  (define-key calendar-mode-map (kbd "<f2>") #'exco-calendar-show-day)
   (setq helm-locate-fuzzy-match nil)
 
   (defun my/browse-url (url new-window)
@@ -675,10 +637,6 @@ If EXTERNAL is double prefix, browse in new buffer."
        (t
         (my/browse-url url external)))))
 
-  (setq large-file-warning-threshold nil)
-
-
-
   (spacemacs/set-leader-keys "ae" 'emms)
   (spacemacs/set-leader-keys "it" 'bm-toggle)
   (spacemacs/set-leader-keys "in" 'bm-next)
@@ -698,28 +656,18 @@ If EXTERNAL is double prefix, browse in new buffer."
   (spacemacs/set-leader-keys "o=" 'my/format-defun)
   (spacemacs/set-leader-keys "ot" 'projectile-find-test-file)
   (spacemacs/set-leader-keys "ghk" 'diff-hl-revert-hunk)
-  (spacemacs/set-leader-keys "ghv" 'diff-hl-mark-hunk)
-  (spacemacs/set-leader-keys "ghp" 'diff-hl-previous-hunk)
   (spacemacs/set-leader-keys "xts" 'transpose-sexps)
   (spacemacs/set-leader-keys "gd" 'magit-diff-buffer-file)
   (spacemacs/set-leader-keys "ag" 'browse-url-chrome)
   (spacemacs/set-leader-keys "pp" 'my/projectile-switch-project-dired)
-  (spacemacs/set-leader-keys "pt" 'projectile-test-project)
-  (spacemacs/set-leader-keys "TDe" 'toggle-debug-on-error)
-  (spacemacs/set-leader-keys "TDq" 'toggle-debug-on-quit)
-  (spacemacs/set-leader-keys "pT" 'dired-sidebar-toggle-with-current-directory)
-  (spacemacs/set-leader-keys "ar" 'mu4e-alert-view-unread-mails)
-  (spacemacs/set-leader-keys "ai" 'mu4e-alert-view-unread-mails)
   (spacemacs/set-leader-keys "TE" 'emacs-lisp-mode)
   (spacemacs/set-leader-keys "os" 'my/store-the-default-buffer)
   (spacemacs/set-leader-keys "oo" 'my/go-to-the-default-buffer)
   (spacemacs/set-leader-keys "sm" 'helm-mu)
   (spacemacs/set-leader-keys "sR" 'my/helm-ag-recentf)
   (spacemacs/set-leader-keys "mm" (lambda () (interactive)
-                                    (mu4e~headers-jump-to-maildir "/Inbox")))
+                             (mu4e~headers-jump-to-maildir "/Inbox")))
 
-  (setq imenu-create-index-function 'imenu-default-create-index-function)
-  (remove-hook 'org-mode-hook 'spacemacs/delay-emoji-cheat-sheet-hook)
 
   (spacemacs/toggle-evil-visual-mark-mode-off)
 
@@ -729,22 +677,6 @@ If EXTERNAL is double prefix, browse in new buffer."
     "Returns the major mode associated with a buffer."
     (with-current-buffer buffer-or-string
       major-mode))
-
-  (defun my/find-symbol-at-point ()
-    "Find the function, face, or variable definition for the symbol at point
-in the other window."
-    (interactive)
-    (let ((symb (symbol-at-point)))
-      (cond
-       ((and (or (functionp symb)
-                 (fboundp symb))
-             (find-definition-noselect symb nil))
-        (find-function symb))
-       ((and (facep symb) (find-definition-noselect symb 'defface))
-        (find-face-definition symb))
-       ((and (boundp symb) (find-definition-noselect symb 'defvar))
-        (find-variable-other-window symb))
-       (t (message "No symbol at point")))))
 
   (evil-define-operator evil-cp-change (beg end type register yank-handler delete-func)
     "Call `evil-change' while keeping parentheses balanced."
@@ -822,18 +754,6 @@ in the other window."
         (find-file my/default-buffer)
       (switch-to-buffer my/default-buffer)))
 
-  (global-set-key [(control down-mouse-1)]
-                  (lambda (click)
-                    (interactive "e")
-                    (mouse-minibuffer-check click)
-                    (let* ((window (posn-window (event-start click)))
-                           (buf (window-buffer window)))
-                      (with-current-buffer buf
-                        (save-excursion
-                          (goto-char (posn-point (event-start click)))
-                          (my/find-symbol-at-point))))))
-
-
   (setq-default default-input-method 'bulgarian-phonetic)
 
   (define-key evil-normal-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
@@ -842,11 +762,8 @@ in the other window."
   (define-key evil-motion-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
 
   ;; bind key
-  (bind-key "M-/" 'hippie-expand)
-
   (require 'cc-mode)
   (bind-key "TAB" 'company-indent-or-complete-common java-mode-map)
-  ;; (bind-key "C-i" 'yas-expand-snippet)
   (bind-key "M-j" 'evil-join)
   (bind-key "C-j" 'newline-and-indent)
 
@@ -895,10 +812,10 @@ in the other window."
         (concat (capitalize first-char) rest-str))))
 
   (require 'imenu)
+  (setq imenu-create-index-function 'imenu-default-create-index-function)
   (setq imenu-auto-rescan t)
 
   (setq-default helm-exit-idle-delay 0)
-  ;;
   (require 'helm)
   (setq-default helm-display-function 'helm-default-display-buffer)
 
@@ -922,26 +839,25 @@ in the other window."
   (setq browse-url-browser-function 'w3m-browse-url)
   (setq w3m-view-this-url-new-session-in-background t)
 
-  ;; (require 'flash-region)
-  ;; (defun my/flash-region (beg end &optional register yank-handler)
-  ;;   (flash-region beg end eval-sexp-fu-flash-face 0.1))
+  (require 'flash-region)
+  (defun my/flash-region (beg end &optional register yank-handler)
+    (flash-region beg end eval-sexp-fu-flash-face 0.1))
 
-  ;; (add-function :before (symbol-function 'evil-yank-characters) #'my/flash-region)
-  ;; (add-function :before (symbol-function 'evil-yank-lines) #'my/flash-region)
-  ;; (add-function :before (symbol-function 'evil-yank-rectangle) #'my/flash-region)
+  (add-function :before (symbol-function 'evil-yank-characters) #'my/flash-region)
+  (add-function :before (symbol-function 'evil-yank-lines) #'my/flash-region)
+  (add-function :before (symbol-function 'evil-yank-rectangle) #'my/flash-region)
 
   (defun my/helm-find-file-in-directory ()
     "Find file in current directory"
     (interactive)
     (let ((projectile-cached-project-root default-directory))
       (projectile-find-file)))
+
   (setenv "PATH" (concat (getenv "PATH") ":~/.bin"))
 
   (require 'browse-url)
   (setq browse-url-browser-function 'browse-url-chrome
         browse-url-generic-program "google-chrome")
-
-  (require 'magit)
 
   (add-hook 'hack-local-variables-hook (lambda () (setq truncate-lines t)))
   (global-set-key [remap eww-follow-link] 'my/eww-follow-link)
@@ -953,45 +869,25 @@ in the other window."
         w3m-use-cookies t)
 
   (use-package persistent-scratch
-    :init
-    (persistent-scratch-setup-default))
-
-  (require 'cc-mode)
-
-  (custom-set-variables
-   '(projectile-globally-ignored-files
-     (quote ("TAGS" ".lein-repl-history")))
-   '(projectile-globally-ignored-directories
-     (quote (".idea" ".ensime_cache" ".eunit" "target" ".git" ".hg" ".fslckout" "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "target" ".cask"))))
+    :init (persistent-scratch-setup-default))
 
   (setq xref-prompt-for-identifier nil)
   (global-subword-mode t)
   (which-function-mode t)
+
   (condition-case nil
       (load-file "~/.remote-config/config/my-pidgin.el")
     (error
      (message "Error loading pidgin...")))
+
   (add-hook 'edebug-mode-hook 'evil-normalize-keymaps)
 
   (spaceline-toggle-buffer-id-on)
 
-  (setq powerline-default-separator 'arrow)
-
-  (setq evil-lisp-safe-structural-editing-modes (add-to-list 'evil-lisp-safe-structural-editing-modes 'java-mode))
+  (setq evil-lisp-safe-structural-editing-modes
+        (add-to-list 'evil-lisp-safe-structural-editing-modes 'java-mode))
   (setq helm-display-buffer-default-height 15)
-
   (setq helm-buffer-max-length 60)
-
-  (defun my/insert-eval-last-sexp ()
-    (interactive)
-    (let ((beg (point)))
-      (let ((current-prefix-arg '(4)))
-        (call-interactively 'eval-last-sexp))
-      (goto-char beg)
-      (when (looking-back ")")
-        (insert "\n"))
-      (insert ";; ⇒ ")
-      (move-end-of-line 1)))
 
   (defun my/toggle-window-split ()
     (interactive)
@@ -1018,9 +914,29 @@ in the other window."
             (select-window first-win)
             (if this-win-2nd (other-window 1))))))
 
-  (require 'org-agenda)
-
-  (setq org-agenda-files (directory-files "~/.org-jira" t "^[[:alpha:])_]+.org"))
+  (use-package org-agenda
+    :defer t
+    :config
+    (setq org-agenda-files (directory-files "~/.org-jira" t "^[[:alpha:])_]+.org"))
+    (require 'org-jira)
+    (spacemacs/set-leader-keys-for-major-mode 'org-mode "jp" 'org-jira-progress-issue)
+    (spacemacs/set-leader-keys-for-major-mode 'org-mode "jg" 'org-jira-get-issue)
+    (spacemacs/set-leader-keys-for-major-mode 'org-mode "ji" 'org-jira-update-issue)
+    (spacemacs/set-leader-keys-for-major-mode 'org-mode "jG" 'org-jira-get-issues)
+    (spacemacs/set-leader-keys-for-major-mode 'org-mode "jr" 'org-jira-refresh-issue)
+    (spacemacs/set-leader-keys-for-major-mode 'org-mode "jR" 'org-jira-refresh-issues-in-buffer)
+    (spacemacs/set-leader-keys-for-major-mode 'org-mode "jc" 'org-jira-update-comment)
+    (spacemacs/set-leader-keys-for-major-mode 'org-mode "jd" 'org-jira-download-attachment)
+    (spacemacs/set-leader-keys-for-major-mode 'org-mode "jt" 'org-jira-todo-to-jira)
+    (spacemacs/set-leader-keys-for-major-mode 'org-mode "jb" 'org-jira-browse-issue)
+    (spacemacs/set-leader-keys-for-major-mode 'org-mode "jl" 'org-jira-update-worklogs-from-org-clocks)
+    (spacemacs/set-leader-keys-for-major-mode 'org-mode "=" 'org-timestamp-up)
+    (spacemacs/set-leader-keys-for-major-mode 'org-mode "-" 'org-timestamp-down)
+    ;; jira configuration
+    (require 'jiralib)
+    (setq jiralib-url "https://jira.tick42.com"
+          jiralib-user-login-name "iyonchovski")
+    (remove-hook 'org-mode-hook 'spacemacs/delay-emoji-cheat-sheet-hook))
 
   (spacemacs|use-package-add-hook which-key
     :post-init (setq which-key-idle-delay 1.0))
@@ -1035,6 +951,7 @@ in the other window."
     (aset buffer-display-table ?\^M []))
 
   (use-package treemacs
+    :defer t
     :init
     (progn
       (defun my/treemacs-ignored-predicates (file _)
@@ -1045,15 +962,15 @@ in the other window."
                     file))
 
       (setq treemacs-ignored-file-predicates
-            '(treemacs--std-ignore-file-predicate my/treemacs-ignored-predicates))
+            '(treemacs--std-ignore-file-predicate my/treemacs-ignored-predicates)
+            treemacs-collapse-dirs 3)
 
+      (require 'treemacs-follow-mode)
       (treemacs-follow-mode t)
-      (treemacs-filewatch-mode t)))
-
-
-
+      (require 'treemacs-filewatch-mode)
+      (treemacs-filewatch-mode t)
+      ))
 
   (helm-flx-mode -1)
-  (semantic-mode -1)
 
   (add-hook 'projectile-after-switch-project-hook 'treemacs-projectile))
