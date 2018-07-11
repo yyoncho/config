@@ -42,9 +42,7 @@
   (require 'smtpmail)
   (define-key mu4e-main-mode-map "j" nil)
   (define-key mu4e-main-mode-map "i" 'mu4e~headers-jump-to-maildir)
-
-
-
+  (define-key mu4e-main-mode-map "q" 'kill-current-buffer)
   (use-package mu4e-alert
     :ensure t
     :config

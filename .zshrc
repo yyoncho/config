@@ -97,7 +97,7 @@ zstyle ":completion:*:commands" rehash 1
 
 setopt rmstarsilent
 
-source ~/.zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# source ~/.zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 #make the cursor faster
 xset r rate 200 60
@@ -133,3 +133,6 @@ alias d='emacsclient -e '"'"'(dired "'"'"'`pwd`'"'"'")'"'"''
 alias m='emacsclient -e '"'"'(magit-status "'"'"'`git rev-parse --show-toplevel`'"'"'")'"'"''
 
 export TERM=xterm-256color
+
+export ATHAME_SHOW_MODE=
+export ATHAME_VIM_PERSIST=1

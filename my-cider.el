@@ -125,7 +125,8 @@
          "k" 'cider-interrupt
          ";" 'sp-comment
          "fp" 'my/find-project-file
-         "ej" 'cider-pprint-eval-last-sexp))
+         "ej" 'cider-pprint-eval-last-sexp
+         "F" 'my/fix-version))
 
      (spacemacs/set-leader-keys-for-major-mode 'cider-repl-mode "gu" 'cider-jump-to-locref-at-point)
      (spacemacs/set-leader-keys-for-major-mode 'cider-repl-mode "sc" 'cider-repl-clear-buffer)

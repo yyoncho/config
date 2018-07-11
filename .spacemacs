@@ -53,7 +53,9 @@ values."
                             "https://www.dnevnik.bg/author/rss"))
      bm
      spacemacs-purpose
-     evil-snipe)
+     evil-snipe
+     ;; gnus
+     )
    dotspacemacs-additional-packages
    '(java-snippets
      flash-region
@@ -178,7 +180,6 @@ values."
   (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
 
   (add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
-  ;; (add-to-list 'package-pinned-packages '(clj-refactor . "melpa-stable") t)
   (add-to-list 'package-pinned-packages '(cljr-helm . "melpa-stable") t)
   (add-to-list 'package-pinned-packages '(ac-cider . "melpa-stable") t)
 
@@ -273,8 +274,6 @@ values."
   (custom-set-variables '(evil-want-C-i-jump t))
 
   (define-key evil-normal-state-map (kbd "C-i") 'evil-jump-forward)
-
-  (define-key mu4e-main-mode-map "q" 'kill-current-buffer)
 
   (defun my/switch-to-compilation-buffer (arg)
     "Switch to compilation buffer"
@@ -406,14 +405,12 @@ With a prefix ARG invokes `projectile-commander' instead of
 
   (display-time-mode t)
 
-
   (defun my/show-error (text)
     "Shows error message"
     (interactive)
     (message (propertize (s-replace "\n" "" text) 'face 'cider-error-highlight-face)))
 
   ;; indent mode
-  (indent-guide-global-mode nil)
   (spacemacs/toggle-indent-guide-globally-off)
 
   ;; better window splitting
@@ -434,19 +431,8 @@ PREFIX - whether to switch to the other window."
     (other-window 1 nil)
     (if (= prefix 1) (switch-to-next-buffer)))
 
-
-  (require 'term)
-  (define-key term-raw-map  (kbd "C-'") 'term-line-mode)
-  (define-key term-mode-map (kbd "C-'") 'term-char-mode)
-  (define-key term-raw-map  (kbd "C-y") 'term-paste)
-
-  (global-set-key [remap kbd-end-or-call-macro] 'my/kmacro-end-and-call-macro)
   (global-set-key [remap split-window-right] 'my/hsplit-last-buffer)
 
-  (put 'set-goal-column 'disabled nil)
-
-  ;; enable shift selection mode
-  (setq shift-selection-mode t)
   (setq indent-guide-inhibit-modes
         '(tabulated-list-mode
           special-mode
@@ -457,12 +443,11 @@ PREFIX - whether to switch to the other window."
           eww-mode
           eshell-mode
           Custom-mode))
+
   ;; java configuration
   (defun my/configure-java ()
     "Configure java"
     (interactive)
-    (c-set-offset 'arglist-cont-nonempty '++)
-    (c-set-offset 'arglist-intro '++)
     (electric-layout-mode t)
     (company-mode-on)
     (rainbow-delimiters-mode-enable)
@@ -470,30 +455,18 @@ PREFIX - whether to switch to the other window."
 
   (add-hook 'java-mode-hook 'my/configure-java)
 
-  (setq c-default-style
-        '((java-mode . "java")
-          (other . "gnu")))
-
-  ;; company key configuration
-  (require 'company)
-  ;; (define-key company-active-map "\C-p" 'company-select-previous)
-  ;; (define-key company-active-map "\C-n" 'company-select-next)
-  ;; (define-key company-active-map "\C-j" 'company-complete-selection)
-
   ;; always follow symlinks
-
   (setq vc-follow-symlinks t)
 
   (require 'vc-dispatcher)
   (setq vc-suppress-confirm nil)
 
-  ;; Save point position between sessions
-  (require 'saveplace)
-  (setq-default save-place t)
-  (setq save-place-file (expand-file-name ".places" user-emacs-directory))
+  ;; ;; Save point position between sessions
+  ;; (require 'saveplace)
+  ;; (setq-default save-place t)
+  ;; (setq save-place-file (expand-file-name ".places" user-emacs-directory))
 
   ;; cleverparens configuration
-  ;; (spacemacs/toggle-evil-cleverparens-on)
   (add-hook 'clojure-mode-hook #'evil-cleverparens-mode)
   (add-hook 'emacs-lisp-mode-hook #'evil-cleverparens-mode)
   (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode-enable)
@@ -593,11 +566,7 @@ PREFIX - whether to switch to the other window."
       (when (equal old-window (selected-window))
         (other-frame arg))))
 
-  ;; Auto refresh buffers
   (global-auto-revert-mode 1)
-
-
-  (setq helm-locate-fuzzy-match nil)
 
   (defun my/browse-url (url new-window)
     "Browse url in the associated app.
@@ -667,7 +636,6 @@ If EXTERNAL is double prefix, browse in new buffer."
   (spacemacs/set-leader-keys "sR" 'my/helm-ag-recentf)
   (spacemacs/set-leader-keys "mm" (lambda () (interactive)
                              (mu4e~headers-jump-to-maildir "/Inbox")))
-
 
   (spacemacs/toggle-evil-visual-mark-mode-off)
 
@@ -914,9 +882,17 @@ If EXTERNAL is double prefix, browse in new buffer."
             (select-window first-win)
             (if this-win-2nd (other-window 1))))))
 
-  (use-package org-agenda
+  ;; jira configuration
+  (use-package org-jira
+    :init
+    (require 'jiralib)
+    (setq jiralib-url "https://jira.tick42.com"
+          jiralib-user-login-name "iyonchovski"))
+
+  (use-package org
     :defer t
     :config
+    (require 'org-agenda)
     (setq org-agenda-files (directory-files "~/.org-jira" t "^[[:alpha:])_]+.org"))
     (require 'org-jira)
     (spacemacs/set-leader-keys-for-major-mode 'org-mode "jp" 'org-jira-progress-issue)
@@ -932,10 +908,6 @@ If EXTERNAL is double prefix, browse in new buffer."
     (spacemacs/set-leader-keys-for-major-mode 'org-mode "jl" 'org-jira-update-worklogs-from-org-clocks)
     (spacemacs/set-leader-keys-for-major-mode 'org-mode "=" 'org-timestamp-up)
     (spacemacs/set-leader-keys-for-major-mode 'org-mode "-" 'org-timestamp-down)
-    ;; jira configuration
-    (require 'jiralib)
-    (setq jiralib-url "https://jira.tick42.com"
-          jiralib-user-login-name "iyonchovski")
     (remove-hook 'org-mode-hook 'spacemacs/delay-emoji-cheat-sheet-hook))
 
   (spacemacs|use-package-add-hook which-key
@@ -968,9 +940,11 @@ If EXTERNAL is double prefix, browse in new buffer."
       (require 'treemacs-follow-mode)
       (treemacs-follow-mode t)
       (require 'treemacs-filewatch-mode)
-      (treemacs-filewatch-mode t)
-      ))
+      (treemacs-filewatch-mode t)))
 
   (helm-flx-mode -1)
+
+  (evil-set-command-property 'lsp-goto-type-definition :jump t)
+  (evil-set-command-property 'lsp-goto-implementation :jump t)
 
   (add-hook 'projectile-after-switch-project-hook 'treemacs-projectile))

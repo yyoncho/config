@@ -3,7 +3,12 @@
   :init (setq lsp-inhibit-message t
               lsp-print-io nil
               lsp-eldoc-render-all nil
-              lsp-highlight-symbol-at-point nil))
+              lsp-highlight-symbol-at-point nil)
+
+  :config
+  (evil-set-command-property 'lsp-goto-type-definition :jump t)
+  (evil-set-command-property 'lsp-goto-implementation :jump t)
+)
 
 (use-package company-lsp
   :load-path "~/Sources/lsp/company-lsp/"
@@ -25,7 +30,6 @@
         lsp-ui-sideline-show-hover nil
         lsp-ui-sideline-show-code-actions t
         lsp-ui-sideline-update-mode 'point))
-
 (use-package lsp-java
   :load-path "~/Sources/lsp/lsp-java/"
   :requires (lsp-ui-flycheck lsp-ui-sideline)
@@ -41,12 +45,12 @@
                         (lsp-ui-flycheck-enable 1)))
          (java-mode . (lambda ()
                         (add-to-list 'spacemacs-jump-handlers
-                                     '(xref-find-definitions :async true))))
+                                     '(xref-find-definitions :async true))
+                        (require 'lsp-imenu)
+                        (lsp-ui-imenu-enable t)))
          (java-mode . lsp-ui-sideline-mode))
   :config
   (setq lsp-java-server-install-dir (expand-file-name "~/Sources/lsp/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target/repository/")
-        lsp-java--workspace-folders (list "/home/kyoncho/Sources/demo/2/"
-                                          "/home/kyoncho/Sources/lsp/spring-boot-and-java-10/")
         lsp-java-favorite-static-members '("org.junit.Assert.*"
                                            "org.junit.Assume.*"
                                            "java.util.Collections.*"
@@ -79,7 +83,8 @@
     "rem" 'lsp-java-extract-method
     "cc"  'lsp-java-build-project
     "an"  'lsp-java-actionable-notifications
-    "="   'lsp-format-buffer))
+    "="   'lsp-format-buffer
+    "fp" 'my/find-pom-file))
 
 (use-package helm-lsp
   :load-path "~/Sources/lsp/helm-lsp/")
