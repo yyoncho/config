@@ -57,21 +57,20 @@
            cider-use-fringe-indicators t
            clojure-enable-fancify-symbols t
            clojure-indent-style :align-arguments
-           clojure-align-forms-automatically t)
+           clojure-align-forms-automatically t
+           cider-jack-in-nrepl-middlewares (-remove-item "com.billpiel.sayid.nrepl-middleware/wrap-sayid" cider-jack-in-nrepl-middlewares)
+           cider-jack-in-lein-plugins (-remove-item `("com.billpiel/sayid" ,sayid-version) cider-jack-in-lein-plugins)
+           cider-dynamic-indentation nil
+           cider-cljs-lein-repl 'node)
 
      (add-hook 'cider-mode-hook 'rainbow-delimiters-mode-enable)
+     (add-hook 'cider-mode-hook 'helm-cider-mode)
      (add-hook 'cider-mode-hook 'aggressive-indent-mode)
+
      (bind-key "TAB" 'company-indent-or-complete-common cider-mode-map)
 
      (spacemacs/set-leader-keys-for-major-mode 'cider-repl-mode
        "sc" 'cider-repl-clear-buffer)
-     ;;      (defun cider-emit-interactive-eval-err-output (output)
-     ;;        "Emit err OUTPUT resulting from interactive code evaluation.
-     ;; The output can be send to either a dedicated output buffer or the current
-     ;; REPL buffer.  This is controlled via
-     ;; `cider-interactive-eval-output-destination'."
-     ;;        (my/show-error output)
-     ;;        (cider--emit-interactive-eval-output output 'cider-repl-emit-interactive-stderr))
 
      (defun my/cycle-log-level ()
        (interactive)
@@ -88,15 +87,13 @@
      (eval-after-load 'flycheck '(flycheck-clojure-setup))
      (add-hook 'clojure-mode-hook 'flycheck-mode)
      (add-hook 'clojure-mode-hook (lambda () (eval-sexp-fu-flash-mode -1)))
-     (eval-after-load 'flycheck
-       '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
+
      (dolist (m '(clojure-mode
                   clojurec-mode
                   clojurescript-mode
                   clojurex-mode
                   cider-repl-mode
                   cider-clojure-interaction-mode))
-
 
        (spacemacs/set-leader-keys-for-major-mode m
          "(" 'clojure-convert-collection-to-list
@@ -130,7 +127,6 @@
 
      (spacemacs/set-leader-keys-for-major-mode 'cider-repl-mode "gu" 'cider-jump-to-locref-at-point)
      (spacemacs/set-leader-keys-for-major-mode 'cider-repl-mode "sc" 'cider-repl-clear-buffer)
-
 
      (evil-define-operator evil-operator-clojure (beg end)
        "Evil operator for evaluating code."
@@ -208,14 +204,10 @@
                                     (interactive)
                                     (flycheck-mode nil))))
 
-     (setq sayid-version '1)
-     (setq cider-jack-in-nrepl-middlewares (-remove-item "com.billpiel.sayid.nrepl-middleware/wrap-sayid" cider-jack-in-nrepl-middlewares))
-     (setq cider-jack-in-lein-plugins (-remove-item `("com.billpiel/sayid" ,sayid-version) cider-jack-in-lein-plugins))
-
      (require 'clj-refactor)
      (setq cljr-warn-on-eval nil)
 
-     (setq  nrepl-prompt-to-kill-server-buffer-on-quit nil)
+     (setq nrepl-prompt-to-kill-server-buffer-on-quit nil)
      (defun my/find-project-file (args)
        "Find file in upper dirs"
        (interactive "P")
@@ -228,18 +220,7 @@
                                "project.clj")
                               "project.clj"))))
            (find-file pf)
-
          (message "Unable to find project.clj")))
-     (add-hook 'clojure-mode-hook #'evil-cleverparens-mode)
-     (spacemacs/set-leader-keys "bl" 'my/list-repls)
 
-     (defun my/kill-all-repls ()
-       "Kill all repl buffers"
-       (interactive)
-       (-map 'kill-buffer
-             (-filter (lambda (buffer)
-                        (s-equals?
-                         (buffer-mode buffer) "cider-repl-mode"))
-                      (buffer-list))))
-     (setq cider-dynamic-indentation nil)
-     (setq cider-cljs-lein-repl 'node)))
+     (add-hook 'clojure-mode-hook #'evil-cleverparens-mode)
+     (spacemacs/set-leader-keys "bl" 'my/list-repls)))
