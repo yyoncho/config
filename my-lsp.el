@@ -21,7 +21,6 @@
   (push 'java-mode company-global-modes))
 
 (use-package lsp-ui
-  :load-path "~/Sources/lsp/lsp-ui/"
   :ensure nil
   :config
   (setq lsp-ui-flycheck-report-all-buffers nil

@@ -47,6 +47,7 @@
                   (0 (progn (compose-region (match-beginning 1)
                                             (match-end 1) "∈"))))))))
      (require 'cider)
+     ;; (require 'sayid)
 
      (setq cider-save-file-on-load t
            cider-auto-jump-to-error nil
@@ -58,8 +59,8 @@
            clojure-enable-fancify-symbols t
            clojure-indent-style :align-arguments
            clojure-align-forms-automatically t
-           cider-jack-in-nrepl-middlewares (-remove-item "com.billpiel.sayid.nrepl-middleware/wrap-sayid" cider-jack-in-nrepl-middlewares)
-           cider-jack-in-lein-plugins (-remove-item `("com.billpiel/sayid" ,sayid-version) cider-jack-in-lein-plugins)
+           ;; cider-jack-in-nrepl-middlewares (-remove-item "com.billpiel.sayid.nrepl-middleware/wrap-sayid" cider-jack-in-nrepl-middlewares)
+           ;; cider-jack-in-lein-plugins (-remove-item `("com.billpiel/sayid" ,sayid-version) cider-jack-in-lein-plugins)
            cider-dynamic-indentation nil
            cider-cljs-lein-repl 'node)
 

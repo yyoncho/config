@@ -102,7 +102,8 @@ values."
      hierarchy
      tree-mode
      undercover
-     helm-cider)
+     helm-cider
+     lsp-ui)
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -850,10 +851,10 @@ If EXTERNAL is double prefix, browse in new buffer."
 
   (add-hook 'edebug-mode-hook 'evil-normalize-keymaps)
 
-  (spaceline-toggle-buffer-id-on)
+  (spaceline-toggle-buffer-id-off)
 
-  (setq evil-lisp-safe-structural-editing-modes
-        (add-to-list 'evil-lisp-safe-structural-editing-modes 'java-mode))
+  (add-to-list 'evil-lisp-safe-structural-editing-modes 'java-mode)
+
   (setq helm-display-buffer-default-height 15)
   (setq helm-buffer-max-length 60)
 
