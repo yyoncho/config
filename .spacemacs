@@ -103,7 +103,8 @@ values."
      tree-mode
      undercover
      helm-cider
-     lsp-ui)
+     lsp-ui
+     bui)
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -269,11 +270,10 @@ values."
 
   (setq kill-do-not-save-duplicates t
         make-backup-files nil)
-
   (global-subword-mode t)
 
   (custom-set-variables '(evil-want-C-i-jump t))
-
+  (evil-set-command-property 'evil-mc-skip-and-goto-next-match :jump t)
   (define-key evil-normal-state-map (kbd "C-i") 'evil-jump-forward)
 
   (defun my/switch-to-compilation-buffer (arg)
@@ -944,6 +944,10 @@ If EXTERNAL is double prefix, browse in new buffer."
       (treemacs-filewatch-mode t)))
 
   (helm-flx-mode -1)
+  (require 'nameless)
+  (add-to-list 'nameless-global-aliases (cons "L" "lsp"))
+  (add-to-list 'nameless-global-aliases (cons "D" "dap"))
+  (add-to-list 'nameless-global-aliases (cons "J" "dap-java"))
 
   (evil-set-command-property 'lsp-goto-type-definition :jump t)
   (evil-set-command-property 'lsp-goto-implementation :jump t)

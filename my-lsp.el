@@ -49,7 +49,7 @@
                         (lsp-ui-imenu-enable t)))
          (java-mode . lsp-ui-sideline-mode))
   :config
-  (setq lsp-java-server-install-dir (expand-file-name "~/Sources/lsp/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target/repository/")
+  (setq lsp-java-server-install-dir (locate-user-emacs-file "eclipse.jdt.ls/server/")
         lsp-java-favorite-static-members '("org.junit.Assert.*"
                                            "org.junit.Assume.*"
                                            "java.util.Collections.*"
@@ -57,8 +57,8 @@
                                            "org.junit.jupiter.api.Assumptions.*"
                                            "org.junit.jupiter.api.DynamicContainer.*"
                                            "org.junit.jupiter.api.DynamicTest.*")
-        lsp-java-format-settings-url "file:///home/kyoncho/Documents/tick42.xml"
-        lsp-java-format-settings-profile "Tick42"
+        ;; lsp-java-format-settings-url "file:///home/kyoncho/Documents/tick42.xml"
+        ;; lsp-java-format-settings-profile "Tick42"
         lsp-java-completion-guess-arguments t)
   (spacemacs/set-leader-keys-for-major-mode 'java-mode
     "gt"  'lsp-goto-type-definition
@@ -82,8 +82,9 @@
     "rem" 'lsp-java-extract-method
     "cc"  'lsp-java-build-project
     "an"  'lsp-java-actionable-notifications
-    "="   'lsp-format-buffer
-    "fp" 'my/find-pom-file))
+    "fp"  'my/find-pom-file
+
+    "="   'lsp-format-buffer))
 
 (use-package helm-lsp
   :load-path "~/Sources/lsp/helm-lsp/")
@@ -115,27 +116,39 @@
                            locate-user-emacs-file
                            expand-file-name
                            list))
+  (dap-ui-mode 1)
 
-  (dap-turn-on-dap-mode)
   (add-hook 'dap-ui-sessions-mode-hook 'evil-evilified-state)
-  (dap-ui-mode t)
+
   (spacemacs/set-leader-keys-for-major-mode 'java-mode
     "dq" 'dap-disconnect
     "dn" 'dap-next
-    "xj" 'dap-java-debug
-    "xl" 'dap-debug-last-configuration
     "di" 'dap-step-in
     "dc" 'dap-continue
     "db" 'dap-toggle-breakpoint
     "do" 'dap-step-out
     "ee" 'dap-eval
     "er" 'dap-eval-region
-    "es" 'dap-eval-dwim
+    "es" 'dap-eval-thing-at-point
     "ls" 'dap-ui-sessions
     "ss" 'dap-switch-session
     "st" 'dap-switch-thread
     "sf" 'dap-switch-stack-frame
-    "go" 'dap-go-to-output-buffer)
+    "go" 'dap-go-to-output-buffer
+    "sD" 'dap-delete-session
+    "xd" 'dap-debug
+    "xr" 'dap-debug-recent
+    "xl" 'dap-debug-last
+    "xj" 'dap-java-debug
+    "eis" 'dap-ui-inspect-thing-at-point
+    "eie" 'dap-ui-inspect
+    "eir" 'dap-ui-inspect-region
+    "is" 'dap-ui-inspect-thing-at-point
+    ;;
+    "tt" 'dap-java-debug-test-method
+    "tc" 'dap-java-debug-test-class
+    "ll" 'dap-ui-locals)
+
 
   (setq lsp-java-bundles (thread-first "eclipse.jdt.ls/plugins/com.microsoft.java.debug.plugin-0.9.0.jar"
                            locate-user-emacs-file
