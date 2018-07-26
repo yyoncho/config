@@ -40,6 +40,8 @@
 (spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "rtl" 'clojure-thread-last-all)
 (spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "rua" 'clojure-unwind-all)
 (spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "ruw" 'clojure-unwind)
+(spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "," 'eval-defun)
+(spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "db" 'edebug-set-breakpoint)
 
 (add-hook 'emacs-lisp-mode-hook #'evil-cleverparens-mode)
 (add-hook 'emacs-lisp-mode-hook #'evil-smartparens-mode)
@@ -50,7 +52,6 @@
 (add-hook 'emacs-lisp-mode-hook #'nameless-mode)
 
 ;; Emacs lisp
-(spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "," 'eval-defun)
 
 (provide 'my-emacs-lisp)
 ;;; my-emacs-lisp.el ends here

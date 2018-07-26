@@ -38,14 +38,15 @@ Remove expanded subdir of deleted dir, if any."
 (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
 (add-hook 'dired-mode-hook 'dired-collapse)
 
-(setq dired-omit-files (concat dired-omit-files "\\|^\\..+$")
-      delete-by-moving-to-trash t
+(setq delete-by-moving-to-trash t
       dired-recursive-deletes 'always
       dired-deletion-confirmer '(lambda (x) t)
       dired-sidebar-stale-buffer-time-idle-delay 2
       dired-sidebar-follow-file-idle-delay 0.5
       dired-sidebar-should-follow-file t
-      dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.$\\|GPATH\\|GTAGS\\|GSYMS\\|GRTAGS\\|.git")
+      ;; dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.$\\|GPATH\\|GTAGS\\|GSYMS\\|GRTAGS\\|.git"
+      dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.*$\\|^\\..*\\|GPATH\\|GTAGS\\|GSYMS\\|GRTAGS")
+
 
 (setq-default dired-listing-switches "-aBhl --group-directories-first"
               dired-omit-files-p t)

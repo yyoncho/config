@@ -31,7 +31,7 @@ values."
      mu4e
      fasd
      colors
-     shell
+     (shell :variables shell-default-shell 'eshell)
      eww
      python
      helm
@@ -55,7 +55,8 @@ values."
      spacemacs-purpose
      evil-snipe
      ;; gnus
-     )
+
+     github)
    dotspacemacs-additional-packages
    '(java-snippets
      flash-region
@@ -190,7 +191,7 @@ values."
 
 (defun dotspacemacs/user-config ()
   "User config."
-
+  (setq paradox-github-token "751283e9741a5e90f60cadd3cab305d5f932eef9")
   (use-package helm-projectile
     :defer t
     :config
@@ -952,4 +953,15 @@ If EXTERNAL is double prefix, browse in new buffer."
   (evil-set-command-property 'lsp-goto-type-definition :jump t)
   (evil-set-command-property 'lsp-goto-implementation :jump t)
 
-  (add-hook 'projectile-after-switch-project-hook 'treemacs-projectile))
+  (add-hook 'projectile-after-switch-project-hook 'treemacs-projectile)
+
+  (defun my/evil-iedit-state/iedit-mode (&optional arg)
+    "Start `iedit-mode'."
+    (interactive "P")
+    (if (fboundp 'ahs-clear) (ahs-clear))
+    (iedit-mode (or arg 0))
+    (evil-iedit-state))
+
+  (spacemacs/set-leader-keys "se" 'my/evil-iedit-state/iedit-mode )
+  (spacemacs/set-leader-keys "sE" 'evil-iedit-state/iedit-mode)
+  (add-to-list 'eshell-visual-commands "htop"))

@@ -136,3 +136,12 @@ export TERM=xterm-256color
 
 export ATHAME_SHOW_MODE=
 export ATHAME_VIM_PERSIST=1
+
+function zle-line-init zle-keymap-select {
+    VIM_PROMPT="%{$fg_bold[yellow]%} [% NORMAL]% %{$reset_color%}"
+    RPS1="$ATHAME_VIM_MODE"
+    zle reset-prompt
+}
+
+zle -N zle-line-init
+zle -N zle-keymap-select

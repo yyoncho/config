@@ -8,7 +8,7 @@
   :config
   (evil-set-command-property 'lsp-goto-type-definition :jump t)
   (evil-set-command-property 'lsp-goto-implementation :jump t)
-)
+  )
 
 (use-package company-lsp
   :load-path "~/Sources/lsp/company-lsp/"
@@ -51,14 +51,14 @@
   :config
   (setq lsp-java-server-install-dir (locate-user-emacs-file "eclipse.jdt.ls/server/")
         lsp-java-favorite-static-members '("org.junit.Assert.*"
-                                           "org.junit.Assume.*"
-                                           "java.util.Collections.*"
-                                           "org.junit.jupiter.api.Assertions.*"
-                                           "org.junit.jupiter.api.Assumptions.*"
-                                           "org.junit.jupiter.api.DynamicContainer.*"
-                                           "org.junit.jupiter.api.DynamicTest.*")
-        ;; lsp-java-format-settings-url "file:///home/kyoncho/Documents/tick42.xml"
-        ;; lsp-java-format-settings-profile "Tick42"
+                                          "org.junit.Assume.*"
+                                          "java.util.Collections.*"
+                                          "org.junit.jupiter.api.Assertions.*"
+                                          "org.junit.jupiter.api.Assumptions.*"
+                                          "org.junit.jupiter.api.DynamicContainer.*"
+                                          "org.junit.jupiter.api.DynamicTest.*")
+        lsp-java-format-settings-url "file:///home/kyoncho/Documents/tick42.xml"
+        lsp-java-format-settings-profile "Tick42"
         lsp-java-completion-guess-arguments t)
   (spacemacs/set-leader-keys-for-major-mode 'java-mode
     "gt"  'lsp-goto-type-definition
@@ -113,15 +113,26 @@
   (dap-turn-on-dap-mode)
 
   (setq lsp-java-bundles (thread-first "eclipse.jdt.ls/plugins/com.microsoft.java.debug.plugin-0.9.0.jar"
-                           locate-user-emacs-file
-                           expand-file-name
-                           list))
+                          locate-user-emacs-file
+                          expand-file-name
+                          list))
   (dap-ui-mode 1)
 
   (add-hook 'dap-ui-sessions-mode-hook 'evil-evilified-state)
 
+  (defun my/show-and-copy-class-name ()
+    "Show and copy classname."
+    (interactive)
+    (if-let ((class-name (->> (list :cursorOffset (point)
+                                    :sourceUri (lsp--path-to-uri (buffer-file-name)))
+                              (lsp-send-execute-command "che.jdt.ls.extension.findTestByCursor")
+                              first)))
+        (message (kill-new class-name))
+      (error "No classname")))
+
   (spacemacs/set-leader-keys-for-major-mode 'java-mode
     "dq" 'dap-disconnect
+    "dQ" 'dap-delete-all-sessions
     "dn" 'dap-next
     "di" 'dap-step-in
     "dc" 'dap-continue
@@ -151,6 +162,6 @@
 
 
   (setq lsp-java-bundles (thread-first "eclipse.jdt.ls/plugins/com.microsoft.java.debug.plugin-0.9.0.jar"
-                           locate-user-emacs-file
-                           expand-file-name
-                           list)))
+                          locate-user-emacs-file
+                          expand-file-name
+                          list)))
