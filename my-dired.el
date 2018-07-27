@@ -47,7 +47,6 @@ Remove expanded subdir of deleted dir, if any."
       ;; dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.$\\|GPATH\\|GTAGS\\|GSYMS\\|GRTAGS\\|.git"
       dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.*$\\|^\\..*\\|GPATH\\|GTAGS\\|GSYMS\\|GRTAGS")
 
-
 (setq-default dired-listing-switches "-aBhl --group-directories-first"
               dired-omit-files-p t)
 (remove-hook 'dired-subtree-after-insert-hook (lambda () (dired-revert)))

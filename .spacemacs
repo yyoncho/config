@@ -964,4 +964,29 @@ If EXTERNAL is double prefix, browse in new buffer."
 
   (spacemacs/set-leader-keys "se" 'my/evil-iedit-state/iedit-mode )
   (spacemacs/set-leader-keys "sE" 'evil-iedit-state/iedit-mode)
-  (add-to-list 'eshell-visual-commands "htop"))
+
+  (define-key evil-ex-map "C-b" 'backward-char)
+  (define-key evil-ex-map "C-f" 'forward-char)
+
+  (setq recentf-exclude
+        '("/git-rebase-todo\\'" "/\\(\\(\\(COMMIT\\|NOTES\\|PULLREQ\\|TAG\\)_EDIT\\|MERGE_\\|\\)MSG\\|\\(BRANCH\\|EDIT\\)_DESCRIPTION\\)\\'" "COMMIT_EDITMSG\\'" ))
+  (use-package eshell
+    :defer t
+    :config
+    (add-to-list 'eshell-visual-commands "htop" "finch")
+    (defun my/eshell-kill-output ()
+      "Kill all output from interpreter since last input.
+Does not delete the prompt."
+      (interactive)
+      (save-excursion
+        (goto-char (eshell-beginning-of-output))
+        (insert "*** output flushed ***\n")
+        (kill-region (point) (eshell-end-of-output))))
+
+    (evil-define-key 'normal eshell-mode-map  (kbd "C-r") 'helm-eshell-history)
+    (evil-define-key 'visual eshell-mode-map  (kbd "C-r") 'helm-eshell-history)
+    (evil-define-key 'insert eshell-mode-map  (kbd "C-r") 'helm-eshell-history)
+
+    (spacemacs/set-leader-keys-for-major-mode 'eshell-mode "k" 'my/eshell-kill-output)
+    (spacemacs/set-leader-keys-for-major-mode 'eshell-mode "p" 'helm-eshell-prompts)
+    (spacemacs/set-leader-keys-for-major-mode 'eshell-mode "P" 'helm-eshell-prompts-all)))
