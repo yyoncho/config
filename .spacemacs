@@ -962,8 +962,8 @@ If EXTERNAL is double prefix, browse in new buffer."
     (iedit-mode (or arg 0))
     (evil-iedit-state))
 
-  (spacemacs/set-leader-keys "se" 'my/evil-iedit-state/iedit-mode )
-  (spacemacs/set-leader-keys "sE" 'evil-iedit-state/iedit-mode)
+  (spacemacs/set-leader-keys "sE" 'my/evil-iedit-state/iedit-mode)
+  (spacemacs/set-leader-keys "se" 'evil-iedit-state/iedit-mode)
 
   (define-key evil-ex-map "C-b" 'backward-char)
   (define-key evil-ex-map "C-f" 'forward-char)
