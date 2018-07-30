@@ -155,7 +155,6 @@
     "eie" 'dap-ui-inspect
     "eir" 'dap-ui-inspect-region
     "is" 'dap-ui-inspect-thing-at-point
-    ;;
     "tt" 'dap-java-debug-test-method
     "tc" 'dap-java-debug-test-class
     "ll" 'dap-ui-locals)
