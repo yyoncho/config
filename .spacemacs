@@ -130,7 +130,7 @@ values."
    dotspacemacs-scratch-mode 'text-mode
    dotspacemacs-colorize-cursor-according-to-state t
    dotspacemacs-default-font '("Source Code Pro Medium"
-                     :size 15
+                     :size 14
                      :weight normal
                      :weight normal
                      :width normal
@@ -970,6 +970,7 @@ If EXTERNAL is double prefix, browse in new buffer."
 
   (setq recentf-exclude
         '("/git-rebase-todo\\'" "/\\(\\(\\(COMMIT\\|NOTES\\|PULLREQ\\|TAG\\)_EDIT\\|MERGE_\\|\\)MSG\\|\\(BRANCH\\|EDIT\\)_DESCRIPTION\\)\\'" "COMMIT_EDITMSG\\'" ))
+
   (use-package eshell
     :defer t
     :config
