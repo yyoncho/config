@@ -112,13 +112,12 @@
   (require 'gdb-mi)
   (dap-turn-on-dap-mode)
 
-  (setq lsp-java-bundles (thread-first "eclipse.jdt.ls/plugins/com.microsoft.java.debug.plugin-0.9.0.jar"
-                          locate-user-emacs-file
-                          expand-file-name
-                          list))
   (dap-ui-mode 1)
 
   (add-hook 'dap-ui-sessions-mode-hook 'evil-evilified-state)
+  (add-hook 'dap-ui-breakpoints-ui-list-mode-hook 'evil-evilified-state)
+  (add-hook 'bui-after-redisplay-hook 'evil-evilified-state)
+  (add-hook 'dap-ui-breakpoints-ui-list-displayed-hook 'evil-evilified-state)
 
   (defun my/show-and-copy-class-name ()
     "Show and copy classname."
@@ -136,12 +135,10 @@
     "dn" 'dap-next
     "di" 'dap-step-in
     "dc" 'dap-continue
-    "db" 'dap-toggle-breakpoint
     "do" 'dap-step-out
     "ee" 'dap-eval
     "er" 'dap-eval-region
     "es" 'dap-eval-thing-at-point
-    "ls" 'dap-ui-sessions
     "ss" 'dap-switch-session
     "st" 'dap-switch-thread
     "sf" 'dap-switch-stack-frame
@@ -157,10 +154,18 @@
     "is" 'dap-ui-inspect-thing-at-point
     "tt" 'dap-java-debug-test-method
     "tc" 'dap-java-debug-test-class
-    "ll" 'dap-ui-locals)
+    "ll" 'dap-ui-locals
+    "lb" 'dap-ui-breakpoints
+
+    ;; breakpoints
+    "bb" 'dap-breakpoint-toggle
+    "bd" 'dap-breakpoint-delete
+    "ba" 'dap-breakpoint-add
+    "bc" 'dap-breakpoint-condition
+    "bh" 'dap-breakpoint-hit-condition)
 
 
-  (setq lsp-java-bundles (thread-first "eclipse.jdt.ls/plugins/com.microsoft.java.debug.plugin-0.9.0.jar"
+  (setq lsp-java-bundles (thread-first "eclipse.jdt.ls/plugins/com.microsoft.java.debug.plugin-0.10.0.jar"
                           locate-user-emacs-file
                           expand-file-name
                           list)))

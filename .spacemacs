@@ -104,7 +104,8 @@ values."
      undercover
      helm-cider
      lsp-ui
-     bui)
+     bui
+     package-lint)
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -960,7 +961,6 @@ If EXTERNAL is double prefix, browse in new buffer."
 
   (evil-set-command-property 'lsp-goto-type-definition :jump t)
   (evil-set-command-property 'lsp-goto-implementation :jump t)
-
   (add-hook 'projectile-after-switch-project-hook 'treemacs-projectile)
 
   (defun my/evil-iedit-state/iedit-mode (&optional arg)
