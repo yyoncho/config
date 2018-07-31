@@ -639,6 +639,14 @@ If EXTERNAL is double prefix, browse in new buffer."
   (spacemacs/set-leader-keys "mm" (lambda () (interactive)
                              (mu4e~headers-jump-to-maildir "/Inbox")))
 
+  ;; shell configuration
+  (defun my/shell-pop-no-cd (arg)
+    (interactive "P")
+    (let ((shell-pop-autocd-to-working-dir nil))
+      (shell-pop arg)))
+
+  (spacemacs/set-leader-keys "\"" 'my/shell-pop-no-cd)
+
   (spacemacs/toggle-evil-visual-mark-mode-off)
 
   (add-to-list 'auto-mode-alist '("\\.xml\\'" . web-mode))
