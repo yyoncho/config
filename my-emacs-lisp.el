@@ -49,7 +49,7 @@
 (add-hook 'emacs-lisp-mode-hook #'flycheck-mode)
 (add-hook 'emacs-lisp-mode-hook #'emr-initialize)
 (add-hook 'emacs-lisp-mode-hook #'eval-sexp-fu-flash-mode)
-(add-hook 'emacs-lisp-mode-hook #'nameless-mode)
+(remove-hook 'emacs-lisp-mode-hook #'nameless-mode)
 
 ;; Emacs lisp
 

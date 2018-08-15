@@ -29,11 +29,12 @@ values."
      html
      typescript
      mu4e
+     lsp
      fasd
      colors
      (shell :variables shell-default-shell 'eshell)
      eww
-     python
+     (python :variables python-backend 'lsp)
      helm
      auto-completion
      spacemacs-layouts
@@ -54,7 +55,7 @@ values."
      bm
      spacemacs-purpose
      evil-snipe
-     ;; gnus
+     erc
      github)
    dotspacemacs-additional-packages
    '(java-snippets
@@ -105,7 +106,8 @@ values."
      helm-cider
      lsp-ui
      bui
-     package-lint)
+     package-lint
+     md4rd)
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -820,7 +822,7 @@ If EXTERNAL is double prefix, browse in new buffer."
 
   (require 'flash-region)
   (defun my/flash-region (beg end &optional register yank-handler)
-    (flash-region beg end eval-sexp-fu-flash-face 0.1))
+    (flash-region beg end nil 0.1))
 
   (add-function :before (symbol-function 'evil-yank-characters) #'my/flash-region)
   (add-function :before (symbol-function 'evil-yank-lines) #'my/flash-region)
@@ -958,6 +960,7 @@ If EXTERNAL is double prefix, browse in new buffer."
   (add-to-list 'nameless-global-aliases (cons "L" "lsp"))
   (add-to-list 'nameless-global-aliases (cons "D" "dap"))
   (add-to-list 'nameless-global-aliases (cons "J" "dap-java"))
+  (add-to-list 'nameless-global-aliases (cons "P" "dap-python"))
 
   (evil-set-command-property 'lsp-goto-type-definition :jump t)
   (evil-set-command-property 'lsp-goto-implementation :jump t)
@@ -998,4 +1001,5 @@ Does not delete the prompt."
 
     (spacemacs/set-leader-keys-for-major-mode 'eshell-mode "k" 'my/eshell-kill-output)
     (spacemacs/set-leader-keys-for-major-mode 'eshell-mode "p" 'helm-eshell-prompts)
-    (spacemacs/set-leader-keys-for-major-mode 'eshell-mode "P" 'helm-eshell-prompts-all)))
+    (spacemacs/set-leader-keys-for-major-mode 'eshell-mode "P" 'helm-eshell-prompts-all))
+  (targets-setup t :around-key "R"))
