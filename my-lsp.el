@@ -163,15 +163,20 @@
     "is" 'dap-ui-inspect-thing-at-point
     "tt" 'dap-java-debug-test-method
     "tc" 'dap-java-debug-test-class
-    "ll" 'dap-ui-locals
-    "lb" 'dap-ui-breakpoints
+
+    ;; "ll" 'dap-ui-locals
+    ;; "lb" 'dap-ui-breakpoints
 
     ;; breakpoints
     "bb" 'dap-breakpoint-toggle
     "bd" 'dap-breakpoint-delete
     "ba" 'dap-breakpoint-add
     "bc" 'dap-breakpoint-condition
-    "bh" 'dap-breakpoint-hit-condition)
+    "bl" 'dap-breakpoint-log-message
+    "bh" 'dap-breakpoint-hit-condition
+    "." 'hydra-dap)
+
+
   (setq lsp-java-bundles (thread-first "eclipse.jdt.ls/plugins/com.microsoft.java.debug.plugin-0.10.0.jar"
                           locate-user-emacs-file
                           expand-file-name
