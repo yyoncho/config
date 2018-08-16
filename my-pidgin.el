@@ -15,7 +15,7 @@
     major-mode))
 
 (defun my/helm-chats ()
-  "X"
+  "Helm chats"
   (interactive)
   (helm :sources (helm-build-sync-source "REPS"
                    :candidates (-map 'buffer-name
@@ -27,7 +27,23 @@
                              ("Delete buffer" . kill-buffer)
                              ("Add to Perspective" . persp-add-buffer)))
         :buffer "*chats*"))
-(spacemacs/set-leader-keys "bc" 'my/helm-chats)
+
+(defun my/helm-chats-active ()
+  "Helm chats"
+  (interactive)
+  (let ((chat-buffers (-map 'pidgin-chat-get-buffer pidgin-activity-list)))
+    (case (length chat-buffers)
+      (0 (error "no active windows"))
+      (1 (switch-to-buffer (first chat-buffers)))
+      (t (helm :sources (helm-build-sync-source "REPS"
+                          :candidates chat-buffers
+                          :action '(("Switch to chat" . switch-to-buffer)
+                                    ("Delete buffer" . kill-buffer)
+                                    ("Add to Perspective" . persp-add-buffer)))
+               :buffer "*chats*")))))
+
+(spacemacs/set-leader-keys "bc" 'my/helm-chats-active)
+(spacemacs/set-leader-keys "bC" 'my/helm-chats)
 
 (spacemacs/set-leader-keys "jc"
   (lambda () (interactive)

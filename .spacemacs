@@ -276,6 +276,7 @@ values."
 
   (custom-set-variables '(evil-want-C-i-jump t))
   (evil-set-command-property 'evil-mc-skip-and-goto-next-match :jump t)
+  (evil-set-command-property 'find-file-at-point :jump t)
   (define-key evil-normal-state-map (kbd "C-i") 'evil-jump-forward)
 
   (defun my/switch-to-compilation-buffer (arg)

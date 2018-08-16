@@ -29,7 +29,10 @@
 (require 'evil-cleverparens)
 (require 'flycheck)
 
-(spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "," 'eval-defun)
+(add-hook 'emacs-lisp-mode-hook #'evil-cleverparens-mode)
+(add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode-enable)
+
+(spacemacs/set-leader-keys-for-major-mode'emacs-lisp-mode "," 'eval-defun)
 (spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "riv" 'emr-el-inline-variable)
 (spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "rlv" 'emr-el-extract-variable)
 (spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode "ril" 'emr-el-extract-to-let)
@@ -49,7 +52,7 @@
 (add-hook 'emacs-lisp-mode-hook #'flycheck-mode)
 (add-hook 'emacs-lisp-mode-hook #'emr-initialize)
 (add-hook 'emacs-lisp-mode-hook #'eval-sexp-fu-flash-mode)
-(add-hook 'emacs-lisp-mode-hook #'nameless-mode)
+(remove-hook 'emacs-lisp-mode-hook #'nameless-mode)
 
 ;; Emacs lisp
 

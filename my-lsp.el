@@ -7,8 +7,7 @@
 
   :config
   (evil-set-command-property 'lsp-goto-type-definition :jump t)
-  (evil-set-command-property 'lsp-goto-implementation :jump t)
-  )
+  (evil-set-command-property 'lsp-goto-implementation :jump t))
 
 (use-package company-lsp
   :load-path "~/Sources/lsp/company-lsp/"
@@ -25,10 +24,12 @@
   :config
   (setq lsp-ui-flycheck-report-all-buffers nil
         lsp-ui-sideline-enable t
+        lsp-ui-doc-enable nil
         lsp-ui-sideline-show-symbol nil
         lsp-ui-sideline-show-hover nil
         lsp-ui-sideline-show-code-actions t
         lsp-ui-sideline-update-mode 'point))
+
 (use-package lsp-java
   :load-path "~/Sources/lsp/lsp-java/"
   :requires (lsp-ui-flycheck lsp-ui-sideline)
@@ -47,7 +48,7 @@
                                      '(xref-find-definitions :async true))
                         (require 'lsp-imenu)
                         (lsp-ui-imenu-enable t)))
-         (java-mode . lsp-ui-sideline-mode))
+         (java-mode . lsp-ui-mode))
   :config
   (setq lsp-java-server-install-dir (locate-user-emacs-file "eclipse.jdt.ls/server/")
         lsp-java-favorite-static-members '("org.junit.Assert.*"
@@ -83,8 +84,16 @@
     "cc"  'lsp-java-build-project
     "an"  'lsp-java-actionable-notifications
     "fp"  'my/find-pom-file
-
-    "="   'lsp-format-buffer))
+    "="   'lsp-format-buffer)
+  ;; java configuration
+  (defun my/configure-java ()
+    "Configure java"
+    (interactive)
+    (electric-layout-mode t)
+    (company-mode-on)
+    (rainbow-delimiters-mode-enable)
+    (setq c-basic-offset 4))
+  (add-hook 'java-mode-hook 'my/configure-java))
 
 (use-package helm-lsp
   :load-path "~/Sources/lsp/helm-lsp/")
@@ -163,8 +172,6 @@
     "ba" 'dap-breakpoint-add
     "bc" 'dap-breakpoint-condition
     "bh" 'dap-breakpoint-hit-condition)
-
-
   (setq lsp-java-bundles (thread-first "eclipse.jdt.ls/plugins/com.microsoft.java.debug.plugin-0.10.0.jar"
                           locate-user-emacs-file
                           expand-file-name
