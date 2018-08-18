@@ -79,7 +79,6 @@ values."
      all-the-icons-dired
      helm-bm
      helm-xref
-     dired-sidebar
      w3m
      emr
      dired-collapse
@@ -100,7 +99,6 @@ values."
      inf-clojure
      (targets :location
               (recipe :repo "noctuid/targets.el" :fetcher github :files ("*.el")))
-     hierarchy
      tree-mode
      undercover
      helm-cider
@@ -158,7 +156,7 @@ values."
    dotspacemacs-helm-no-header nil
    dotspacemacs-helm-position 'bottom
    dotspacemacs-helm-use-fuzzy 'source
-   dotspacemacs-enable-paste-transient-state nil
+   dotspacemacs-enable-paste-transient-state t
    dotspacemacs-which-key-delay 1.0
    dotspacemacs-which-key-position 'bottom
    dotspacemacs-loading-progress-bar nil
@@ -216,7 +214,6 @@ values."
     :bind (:map eww-mode-map
                 ("f" . 'ace-link-eww)
                 ("g" . 'eww)
-                ("r" . 'eww)
                 ("p" . 'eww-back-url)
                 ("n" . 'eww-forward-url)
                 ("G" . 'eww-reload)
