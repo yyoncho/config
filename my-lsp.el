@@ -1,5 +1,7 @@
 (use-package lsp-mode
   :load-path "~/Sources/lsp/lsp-mode/"
+  ;; :defer t
+  :ensure nil
   :init (setq lsp-inhibit-message t
               lsp-print-io nil
               lsp-eldoc-render-all nil
@@ -11,8 +13,9 @@
 
 (use-package company-lsp
   :load-path "~/Sources/lsp/company-lsp/"
-  :after  company
+  :after company
   :ensure nil
+  ;; :defer t
   :hook ((java-mode . (lambda () (push 'company-lsp company-backends))))
   :config
   (setq company-lsp-enable-snippet t
@@ -21,6 +24,7 @@
 
 (use-package lsp-ui
   :ensure nil
+  ;; :defer t
   :config
   (setq lsp-ui-flycheck-report-all-buffers nil
         lsp-ui-sideline-enable t
@@ -128,6 +132,8 @@
   (add-hook 'bui-after-redisplay-hook 'evil-evilified-state)
   (add-hook 'dap-ui-breakpoints-ui-list-displayed-hook 'evil-evilified-state)
 
+  (add-hook 'dap-ui-repl-mode-hook 'company-mode)
+
   (defun my/show-and-copy-class-name ()
     "Show and copy classname."
     (interactive)
@@ -149,6 +155,7 @@
     "er" 'dap-eval-region
     "es" 'dap-eval-thing-at-point
     "ss" 'dap-switch-session
+    "'"  'dap-ui-repl
     "st" 'dap-switch-thread
     "sf" 'dap-switch-stack-frame
     "go" 'dap-go-to-output-buffer
@@ -175,7 +182,6 @@
     "bl" 'dap-breakpoint-log-message
     "bh" 'dap-breakpoint-hit-condition
     "." 'hydra-dap)
-
 
   (setq lsp-java-bundles (list
                           "/home/kyoncho/.vscode/extensions/testtt/server/org.sat4j.pb_2.3.5.v201404071733.jar"

@@ -14,7 +14,7 @@
                                                (dired-revert)))
 
 
-     '(defun dired-clean-up-after-deletion (fn)
+     (defun dired-clean-up-after-deletion (fn)
         "My. Clean up after a deleted file or directory FN.
 Remove expanded subdir of deleted dir, if any."
         (save-excursion (and (cdr dired-subdir-alist)
