@@ -1,6 +1,8 @@
 (eval-after-load "cider"
   '(progn
 
+     (add-hook 'clojure-mode-hook #'evil-cleverparens-mode)
+
      (flycheck-clojure-setup)
 
      (dolist (mode '(clojure-mode clojurescript-mode cider-mode clojurec-mode))
@@ -47,7 +49,6 @@
                   (0 (progn (compose-region (match-beginning 1)
                                             (match-end 1) "∈"))))))))
      (require 'cider)
-     ;; (require 'sayid)
 
      (setq cider-save-file-on-load t
            cider-auto-jump-to-error nil

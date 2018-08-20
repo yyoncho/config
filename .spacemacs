@@ -60,7 +60,6 @@ values."
    dotspacemacs-additional-packages
    '(java-snippets
      flash-region
-     autopair
      tabbar
      ecukes
      feature-mode
@@ -69,7 +68,6 @@ values."
      excorporate
      cypher-mode
      org-jira
-     dired-efap
      sx
      persistent-scratch
      diff-hl
@@ -78,8 +76,6 @@ values."
      flycheck-clojure
      all-the-icons-dired
      helm-bm
-     helm-xref
-     dired-sidebar
      w3m
      emr
      dired-collapse
@@ -100,7 +96,6 @@ values."
      inf-clojure
      (targets :location
               (recipe :repo "noctuid/targets.el" :fetcher github :files ("*.el")))
-     hierarchy
      tree-mode
      undercover
      helm-cider
@@ -158,7 +153,7 @@ values."
    dotspacemacs-helm-no-header nil
    dotspacemacs-helm-position 'bottom
    dotspacemacs-helm-use-fuzzy 'source
-   dotspacemacs-enable-paste-transient-state nil
+   dotspacemacs-enable-paste-transient-state t
    dotspacemacs-which-key-delay 1.0
    dotspacemacs-which-key-position 'bottom
    dotspacemacs-loading-progress-bar nil
@@ -216,7 +211,6 @@ values."
     :bind (:map eww-mode-map
                 ("f" . 'ace-link-eww)
                 ("g" . 'eww)
-                ("r" . 'eww)
                 ("p" . 'eww-back-url)
                 ("n" . 'eww-forward-url)
                 ("G" . 'eww-reload)
@@ -336,8 +330,10 @@ With a prefix ARG invokes `projectile-commander' instead of
 
 
 
-  (require 'evil-cleverparens)
-  (global-set-key [remap evil-cp-end-of-defun] 'my/goto-end-of-form)
+  (use-package evil-cleverparens
+    :defer t
+    :config
+    (global-set-key [remap evil-cp-end-of-defun] 'my/goto-end-of-form))
 
   ;; Also auto refresh dired, but be quiet about it
   (require 'autorevert)
@@ -351,11 +347,6 @@ With a prefix ARG invokes `projectile-commander' instead of
               (emms-default-players)
               (emms-mode-line -1)))
 
-  (defun my/magit-stage-modified ()
-    "Stage all changes to files"
-    (interactive)
-    (magit-with-toplevel
-      (magit-stage-1 "--all")))
 
 
   (use-package company
@@ -372,9 +363,15 @@ With a prefix ARG invokes `projectile-commander' instead of
     (setq magit-diff-arguments '("--stat" "--no-ext-diff" "--ignore-all-space")
           magit-save-repository-buffers 'dontask
           magit-revision-show-gravatars nil
-          magit-display-buffer-function 'magit-display-buffer-traditional))
+          magit-display-buffer-function 'magit-display-buffer-traditional)
 
-  (defun eval-and-replace ()
+    (defun my/magit-stage-modified ()
+      "Stage all changes to files"
+      (interactive)
+      (magit-with-toplevel
+        (magit-stage-1 "--all"))))
+
+  (defun my/eval-and-replace ()
     "Replace the preceding sexp with its value."
     (interactive)
     (backward-kill-sexp)
@@ -384,8 +381,11 @@ With a prefix ARG invokes `projectile-commander' instead of
       (error (message "Invalid expression")
              (insert (current-kill 0)))))
 
-
-
+  (use-package evil
+    :defer t
+    :config
+    (setq evil-move-beyond-eol t
+          evil-cross-lines t))
 
   (add-hook 'xml-mode-hook 'web-mode)
 
@@ -403,44 +403,12 @@ With a prefix ARG invokes `projectile-commander' instead of
 
   (display-time-mode t)
 
-  (defun my/show-error (text)
-    "Shows error message"
-    (interactive)
-    (message (propertize (s-replace "\n" "" text) 'face 'cider-error-highlight-face)))
-
   ;; indent mode
   (spacemacs/toggle-indent-guide-globally-off)
 
-  ;; better window splitting
-  (defun my/vsplit-last-buffer (prefix)
-    "Split the window vertically and display the previous buffer.
-PREFIX - whether to switch to the other window."
-    (interactive "p")
-    (split-window-vertically)
-    (other-window 1 nil)
-    (if (= prefix 1)
-        (switch-to-next-buffer)))
-
-  (defun my/hsplit-last-buffer (prefix)
-    "Split the window horizontally and display the previous buffer.
-PREFIX - whether to switch to the other window."
-    (interactive "p")
-    (split-window-horizontally)
-    (other-window 1 nil)
-    (if (= prefix 1) (switch-to-next-buffer)))
-
-  (global-set-key [remap split-window-right] 'my/hsplit-last-buffer)
-
-  (setq indent-guide-inhibit-modes
-        '(tabulated-list-mode
-          special-mode
-          dired-mode
-          java-mode
-          emacs-lisp-mode
-          web-mode
-          eww-mode
-          eshell-mode
-          Custom-mode))
+  (setq indent-guide-inhibit-modes '(tabulated-list-mode
+                                     special-mode dired-mode java-mode emacs-lisp-mode web-mode
+                                     eww-mode eshell-mode Custom-mode))
 
   ;; java configuration
   (defun my/configure-java ()
@@ -449,31 +417,22 @@ PREFIX - whether to switch to the other window."
     (electric-layout-mode t)
     (company-mode-on)
     (rainbow-delimiters-mode-enable)
-    (setq c-basic-offset 4))
+    (setq c-basic-offset 4)
+    (bind-key "TAB" 'company-indent-or-complete-common java-mode-map))
 
   (add-hook 'java-mode-hook 'my/configure-java)
 
   ;; always follow symlinks
   (setq vc-follow-symlinks t)
 
-  (require 'vc-dispatcher)
-  (setq vc-suppress-confirm nil)
-
-  ;; ;; Save point position between sessions
-  ;; (require 'saveplace)
-  ;; (setq-default save-place t)
-  ;; (setq save-place-file (expand-file-name ".places" user-emacs-directory))
+  (use-package vc-dispatcher
+    :defer t
+    :config
+    (setq vc-suppress-confirm nil))
 
   ;; cleverparens configuration
-  (add-hook 'clojure-mode-hook #'evil-cleverparens-mode)
   (add-hook 'emacs-lisp-mode-hook #'evil-cleverparens-mode)
   (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode-enable)
-
-  ;; set frame name to emacs
-  (defun my/set-frame-name (frame)
-    (modify-frame-parameters frame
-                             (list (cons 'name "emacs"))))
-  (add-to-list 'after-make-frame-functions 'my/set-frame-name)
 
   (add-hook 'yas-before-expand-snippet-hook (lambda () (autopair-mode 1)))
   (add-hook 'yas-after-exit-snippet-hook (lambda () (autopair-mode -1)))
@@ -539,25 +498,6 @@ PREFIX - whether to switch to the other window."
           (kill-line)
           (kill-line)
           (replace-match (concat "${" property-name "}") property-value)))))
-
-  (defun my/mvn-sort-properties ()
-    "Sort maven properties."
-    (interactive "p")
-    (save-excursion
-      (beginning-of-buffer)
-      (search-forward "<properties>")
-      (set-mark-command (point))
-      (search-forward "</properties>")
-                                        ;(flush-lines "^\\s-*$"  (region-beginning) (region-end))
-      (sort-lines nil (region-beginning) (region-end))))
-
-  (defun my/other-window (arg)
-    "Select ARGth window or switch buffer if there is only one window."
-    (interactive "p")
-    (let ((old-window  (selected-window)))
-      (other-window arg)
-      (when (equal old-window (selected-window))
-        (other-frame arg))))
 
   (global-auto-revert-mode 1)
 
@@ -638,8 +578,6 @@ If EXTERNAL is double prefix, browse in new buffer."
 
   (spacemacs/set-leader-keys "\"" 'my/shell-pop-no-cd)
 
-  (spacemacs/toggle-evil-visual-mark-mode-off)
-
   (add-to-list 'auto-mode-alist '("\\.xml\\'" . web-mode))
 
   (defun buffer-mode (buffer-or-string)
@@ -691,21 +629,6 @@ If EXTERNAL is double prefix, browse in new buffer."
    '(helm-ag-command-option "-i"))
 
 
-
-  (defun my/store-the-default-buffer ()
-    "Stores the default buffer."
-    (interactive)
-    (setq my/default-buffer (or (buffer-file-name (current-buffer)) (buffer-name (current-buffer))))
-    (message (s-concat "Stored the default buffer:"   (if (bufferp my/default-buffer)
-                                                          (buffer-name my/default-buffer)
-                                                        my/default-buffer))))
-
-  (defun my/go-to-the-default-buffer ()
-    "Goes to the default buffer."
-    (interactive)
-    (if (file-exists-p my/default-buffer)
-        (find-file my/default-buffer)
-      (switch-to-buffer my/default-buffer)))
 
   (setq-default default-input-method 'bulgarian-phonetic)
 
