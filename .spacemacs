@@ -133,11 +133,11 @@ values."
    dotspacemacs-colorize-cursor-according-to-state t
    dotspacemacs-distinguish-gui-tab t
    dotspacemacs-default-font '("Source Code Pro Medium"
-                     :size 14
-                     :weight normal
-                     :weight normal
-                     :width normal
-                     :powerline-scale 0.7)
+                               :size 14
+                               :weight normal
+                               :weight normal
+                               :width normal
+                               :powerline-scale 0.7)
    dotspacemacs-leader-key "SPC"
    dotspacemacs-emacs-command-key "SPC"
    dotspacemacs-ex-command-key ":"
@@ -243,10 +243,12 @@ values."
   ;; needed for equkes
   (setenv "EMACS" (expand-file-name "~/.bin/emacs/bin/emacs26"))
 
-  (require 'evil-smartparens)
-  (sp-pair "(" ")" :wrap "M-(")
-  (sp-pair "{" "}" :wrap "M-{")
-  (sp-pair "[" "]" :wrap "M-[")
+  (use-package evil-smartparens
+    :defer t
+    :config
+    (sp-pair "(" ")" :wrap "M-(")
+    (sp-pair "{" "}" :wrap "M-{")
+    (sp-pair "[" "]" :wrap "M-["))
 
   ;; evil-mc configuration
   (global-evil-mc-mode t)
@@ -332,16 +334,7 @@ With a prefix ARG invokes `projectile-commander' instead of
           projectile-globally-ignored-directories (list ".idea" ".ensime_cache" ".eunit" "target" ".git" ".hg" ".fslckout"
                                                         "_FOSSIL_" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "target" ".cask")))
 
-  (evil-define-command my/goto-end-of-form (count)
-    "Go to end the the form."
-    (interactive "<c>")
-    (let ((line-end (point-at-eol)))
-      (when (or (when (sp-up-sexp count) (backward-char) t)
-                (-when-let (enc-end (cdr (evil-cp--top-level-bounds)))
-                  (goto-char (1- enc-end))))
-        (if (<= (point) line-end)
-            (evil-insert 1)
-          (evil-insert 1)))))
+
 
   (require 'evil-cleverparens)
   (global-set-key [remap evil-cp-end-of-defun] 'my/goto-end-of-form)
@@ -391,9 +384,8 @@ With a prefix ARG invokes `projectile-commander' instead of
       (error (message "Invalid expression")
              (insert (current-kill 0)))))
 
-  (require 'evil)
-  (setq evil-move-beyond-eol t
-        evil-cross-lines t)
+
+
 
   (add-hook 'xml-mode-hook 'web-mode)
 
@@ -497,11 +489,6 @@ PREFIX - whether to switch to the other window."
     :defer t
     :config
     (setq sx-question-mode-display-buffer-function #'pop-to-buffer-same-window))
-
-  (define-key evil-motion-state-map (kbd "C-f") 'forward-char)
-  (define-key evil-motion-state-map (kbd "C-e") 'end-of-line)
-  (define-key evil-motion-state-map (kbd "C-b") 'backward-char)
-  (define-key evil-motion-state-map (kbd "C-d") 'delete-char)
 
   (defun my/mvn-dependency-version-to-properties ()
     (interactive)
@@ -641,7 +628,7 @@ If EXTERNAL is double prefix, browse in new buffer."
   (spacemacs/set-leader-keys "sm" 'helm-mu)
   (spacemacs/set-leader-keys "sR" 'my/helm-ag-recentf)
   (spacemacs/set-leader-keys "mm" (lambda () (interactive)
-                             (mu4e~headers-jump-to-maildir "/Inbox")))
+                                    (mu4e~headers-jump-to-maildir "/Inbox")))
 
   ;; shell configuration
   (defun my/shell-pop-no-cd (arg)
@@ -695,31 +682,15 @@ If EXTERNAL is double prefix, browse in new buffer."
                (funcall delete-func beg end type register yank-handler)
                (evil-insert 1))))))
 
-  (setq helm-imenu-fuzzy-match nil)
-
-  (require 'recentf)
-  (recentf-auto-cleanup)
+  (use-package recentf
+    :defer t
+    :config
+    (recentf-auto-cleanup))
 
   (custom-set-variables
    '(helm-ag-command-option "-i"))
 
-  (defun my/helm-ag-recentf ()
-    "Search through the recent file."
-    (interactive)
-    (recentf-cleanup)
-    (helm-do-ag "~/" (-filter
-                      'file-exists-p
-                      (-remove
-                       (lambda (s)
-                         (or (s-starts-with-p "/ssh:" s)
-                             (s-starts-with-p "/sudo:" s)))
-                       recentf-list))))
 
-  (defun my/helm-ag-recentf-only-matches ()
-    "Search through the recent file."
-    (interactive)
-    (let ((helm-ag-command-option "-i -l"))
-      (helm-do-ag "~/" recentf-list)))
 
   (defun my/store-the-default-buffer ()
     "Stores the default buffer."
@@ -738,42 +709,66 @@ If EXTERNAL is double prefix, browse in new buffer."
 
   (setq-default default-input-method 'bulgarian-phonetic)
 
-  (define-key evil-normal-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
-  (define-key evil-normal-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
-  (define-key evil-motion-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
-  (define-key evil-motion-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
-
   ;; bind key
-  (require 'cc-mode)
-  (bind-key "TAB" 'company-indent-or-complete-common java-mode-map)
+  (use-package cc-mode
+    :defer t
+    :config
+    (bind-key "TAB" 'company-indent-or-complete-common java-mode-map))
+
   (bind-key "M-j" 'evil-join)
   (bind-key "C-j" 'newline-and-indent)
 
-  (evil-define-text-object my/function-text-object (count)
-    "Function text object"
-    (interactive)
-    (save-mark-and-excursion
-      (mark-defun)
-      (let ((m (mark)))
-        (if (looking-back "*/\n")
-            (progn
-              (previous-line)
-              (list m (first (sp-get-comment-bounds))))
-          (list m (point))))))
+  (use-package evil
+    :defer t
+    :config
 
-  (evil-define-text-object my/statement-text-object (count)
-    "Statement text object."
-    (interactive)
-    (save-mark-and-excursion
-      (call-interactively 'c-beginning-of-statement)
-      (let ((point-start (point)))
-        (c-end-of-statement count)
-        (list point-start (point)))))
+    (evil-define-text-object my/function-text-object (count)
+      "Function text object"
+      (interactive)
+      (save-mark-and-excursion
+        (mark-defun)
+        (let ((m (mark)))
+          (if (looking-back "*/\n")
+              (progn
+                (previous-line)
+                (list m (first (sp-get-comment-bounds))))
+            (list m (point))))))
 
-  (require 'evil)
-  (define-key evil-inner-text-objects-map "m" 'my/function-text-object)
-  (define-key evil-outer-text-objects-map "m" 'my/function-text-object)
-  (define-key evil-outer-text-objects-map "e" 'my/statement-text-object)
+    (evil-define-text-object my/statement-text-object (count)
+      "Statement text object."
+      (interactive)
+      (save-mark-and-excursion
+        (call-interactively 'c-beginning-of-statement)
+        (let ((point-start (point)))
+          (c-end-of-statement count)
+          (list point-start (point)))))
+    (evil-define-command my/goto-end-of-form (count)
+      "Go to end the the form."
+      (interactive "<c>")
+      (let ((line-end (point-at-eol)))
+        (when (or (when (sp-up-sexp count) (backward-char) t)
+                  (-when-let (enc-end (cdr (evil-cp--top-level-bounds)))
+                    (goto-char (1- enc-end))))
+          (if (<= (point) line-end)
+              (evil-insert 1)
+            (evil-insert 1)))))
+
+    (setq evil-move-beyond-eol t
+          evil-cross-lines t)
+
+    (define-key evil-motion-state-map (kbd "C-f") 'forward-char)
+    (define-key evil-motion-state-map (kbd "C-e") 'end-of-line)
+    (define-key evil-motion-state-map (kbd "C-b") 'backward-char)
+    (define-key evil-motion-state-map (kbd "C-d") 'delete-char)
+
+    (define-key evil-normal-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
+    (define-key evil-normal-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
+    (define-key evil-motion-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
+    (define-key evil-motion-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
+
+    (define-key evil-inner-text-objects-map "m" 'my/function-text-object)
+    (define-key evil-outer-text-objects-map "m" 'my/function-text-object)
+    (define-key evil-outer-text-objects-map "e" 'my/statement-text-object))
 
   (load-file "~/.remote-config/config/my-mu4e.el")
   (load-file "~/.remote-config/config/my-emacs-lisp.el")
@@ -784,8 +779,6 @@ If EXTERNAL is double prefix, browse in new buffer."
   (load-file "~/.remote-config/config/my-snippets.el")
   (load-file "~/.remote-config/config/local.el")
 
-  (semantic-mode -1)
-
   (defun my/capitalize-first-char (&optional string)
     "Capitalize only the first character of the input STRING."
     (when (and string (> (length string) 0))
@@ -793,17 +786,42 @@ If EXTERNAL is double prefix, browse in new buffer."
             (rest-str   (substring string 1)))
         (concat (capitalize first-char) rest-str))))
 
-  (require 'imenu)
-  (setq imenu-create-index-function 'imenu-default-create-index-function)
-  (setq imenu-auto-rescan t)
+  (use-package imenu
+    :defer t
+    :config
+    (setq imenu-create-index-function 'imenu-default-create-index-function)
+    (setq imenu-auto-rescan t))
 
-  (setq-default helm-exit-idle-delay 0)
-  (require 'helm)
-  (setq-default helm-display-function 'helm-default-display-buffer)
+  (use-package helm
+    :defer t
+    :config
+    (setq-default helm-display-function 'helm-default-display-buffer
+                  helm-exit-idle-delay 0)
 
-  ;; cucumber
-  (require 'feature-mode)
-  (add-to-list 'auto-mode-alist '("\.feature$" . feature-mode))
+    (defun my/helm-ag-recentf ()
+      "Search through the recent file."
+      (interactive)
+      (recentf-cleanup)
+      (helm-do-ag "~/" (-filter
+                        'file-exists-p
+                        (-remove
+                         (lambda (s)
+                           (or (s-starts-with-p "/ssh:" s)
+                               (s-starts-with-p "/sudo:" s)))
+                         recentf-list))))
+
+    (defun my/helm-ag-recentf-only-matches ()
+      "Search through the recent file."
+      (interactive)
+      (let ((helm-ag-command-option "-i -l"))
+        (helm-do-ag "~/" recentf-list)))
+
+    (setq helm-imenu-fuzzy-match nil))
+
+  (use-package feature-mode
+    :defer t
+    :config
+    (add-to-list 'auto-mode-alist '("\.feature$" . feature-mode)))
 
   (setq feature-step-search-path "features/steps/*steps.el")
 
@@ -898,6 +916,7 @@ If EXTERNAL is double prefix, browse in new buffer."
 
   ;; jira configuration
   (use-package org-jira
+    :defer t
     :init
     (require 'jiralib)
     (setq jiralib-url "https://jira.tick42.com"

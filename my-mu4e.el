@@ -6,8 +6,6 @@
   (require 'mu4e)
   (require 'mu4e-vars)
 
-
-
   (defun my/mu4e-go-to-inbox ()
     "Go to inbox."
     (interactive)
