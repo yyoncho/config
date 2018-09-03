@@ -17,7 +17,10 @@ values."
      vinegar
      (treemacs :variables
                treemacs-use-filewatch-mode t)
-     (java :variables java-backend 'lsp)
+     (java :variables
+           java-backend 'lsp
+           lsp-ui-doc-enable nil
+           lsp-ui-sideline-enable t)
      spacemacs
      spacemacs-base
      spacemacs-evil
@@ -61,6 +64,8 @@ values."
    '(java-snippets
      flash-region
      tabbar
+     (treemacs :location "/home/kyoncho/Sources/lsp/treemacs/src/elisp/")
+     lsp-ui
      ecukes
      feature-mode
      emms
@@ -99,10 +104,10 @@ values."
      tree-mode
      undercover
      helm-cider
-     lsp-ui
      bui
      package-lint
-     md4rd)
+     md4rd
+     autopair)
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -186,10 +191,9 @@ values."
 
   (setq-default custom-file "~/.remote-config/config/.custom.el"))
 
-
 (defun dotspacemacs/user-config ()
   "User config."
-  (setq paradox-github-token "751283e9741a5e90f60cadd3cab305d5f932eef9")
+  (-map 'load-file (directory-files "/home/kyoncho/Sources/lsp/treemacs/src/elisp/" t ".*el"))
   (use-package helm-projectile
     :defer t
     :config
@@ -282,8 +286,6 @@ values."
     (interactive "P")
     (switch-to-buffer "*compilation*"))
 
-  (global-flycheck-mode t)
-
   (add-hook 'custom-mode-hook 'evil-evilified-state)
 
   (defun my/find-pom-file ()
@@ -299,7 +301,6 @@ values."
                           "pom.xml")))
         (find-file pf)
       (message "Unable to find pom.xml")))
-
   (global-evil-surround-mode 1)
 
   (defun my/projectile-switch-project-dired (&optional arg)
@@ -346,8 +347,6 @@ With a prefix ARG invokes `projectile-commander' instead of
               (emms-all)
               (emms-default-players)
               (emms-mode-line -1)))
-
-
 
   (use-package company
     :defer t
@@ -409,18 +408,6 @@ With a prefix ARG invokes `projectile-commander' instead of
   (setq indent-guide-inhibit-modes '(tabulated-list-mode
                                      special-mode dired-mode java-mode emacs-lisp-mode web-mode
                                      eww-mode eshell-mode Custom-mode))
-
-  ;; java configuration
-  (defun my/configure-java ()
-    "Configure java"
-    (interactive)
-    (electric-layout-mode t)
-    (company-mode-on)
-    (rainbow-delimiters-mode-enable)
-    (setq c-basic-offset 4)
-    (bind-key "TAB" 'company-indent-or-complete-common java-mode-map))
-
-  (add-hook 'java-mode-hook 'my/configure-java)
 
   ;; always follow symlinks
   (setq vc-follow-symlinks t)
@@ -633,12 +620,9 @@ If EXTERNAL is double prefix, browse in new buffer."
   (setq-default default-input-method 'bulgarian-phonetic)
 
   ;; bind key
-  (use-package cc-mode
-    :defer t
-    :config
-    (bind-key "TAB" 'company-indent-or-complete-common java-mode-map))
+  (require 'cc-mode)
 
-  (bind-key "M-j" 'evil-join)
+
   (bind-key "C-j" 'newline-and-indent)
 
   (use-package evil

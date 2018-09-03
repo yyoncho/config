@@ -1,106 +1,40 @@
-(use-package lsp-mode
-  :load-path "~/Sources/lsp/lsp-mode/"
-  ;; :defer t
-  :ensure nil
-  :init (setq lsp-inhibit-message t
-              lsp-print-io nil
-              lsp-eldoc-render-all nil
-              lsp-highlight-symbol-at-point nil)
-
-  :config
-  (evil-set-command-property 'lsp-goto-type-definition :jump t)
-  (evil-set-command-property 'lsp-goto-implementation :jump t))
-
-(use-package company-lsp
-  :load-path "~/Sources/lsp/company-lsp/"
-  :after company
-  :ensure nil
-  ;; :defer t
-  :hook ((java-mode . (lambda () (push 'company-lsp company-backends))))
-  :config
-  (setq company-lsp-enable-snippet t
-        company-lsp-cache-candidates t)
-  (push 'java-mode company-global-modes))
-
-(use-package lsp-ui
-  :ensure nil
-  ;; :defer t
-  :config
-  (setq lsp-ui-flycheck-report-all-buffers nil
-        lsp-ui-sideline-enable t
-        lsp-ui-doc-enable nil
-        lsp-ui-sideline-show-symbol nil
-        lsp-ui-sideline-show-hover nil
-        lsp-ui-sideline-show-code-actions t
-        lsp-ui-sideline-update-mode 'point))
-
 (use-package lsp-java
-  :load-path "~/Sources/lsp/lsp-java/"
   :requires (lsp-ui-flycheck lsp-ui-sideline)
   :ensure nil
-  :hook ((java-mode . lsp-java-enable)
-         (java-mode . flycheck-mode)
-         (java-mode . smartparens-mode)
-         (java-mode . company-mode)
+  :hook ((java-mode . smartparens-mode)
          (java-mode . evil-cleverparens-mode)
          (java-mode . evil-smartparens-mode)
-         (java-mode . (lambda ()
-                        (setq tab-width 4)
-                        (lsp-ui-flycheck-enable 1)))
-         (java-mode . (lambda ()
-                        (add-to-list 'spacemacs-jump-handlers
-                                     '(xref-find-definitions :async true))
-                        (require 'lsp-imenu)
-                        (lsp-ui-imenu-enable t)))
-         (java-mode . lsp-ui-mode))
+         (java-mode . rainbow-delimiters-mode)
+         (java-mode . my/configure-java))
   :config
-  (setq lsp-java-server-install-dir (locate-user-emacs-file "eclipse.jdt.ls/server/")
-        lsp-java-favorite-static-members '("org.junit.Assert.*"
-                                           "org.junit.Assume.*"
+  ;; (setq lsp-java-vmargs '("-noverify" "-Xmx1G" "-XX:+UseG1GC" "-XX:+UseStringDeduplication" "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=1044,quiet=y"))
+  (setq lsp-java-vmargs '("-noverify" "-Xmx1G" "-XX:+UseG1GC" "-XX:+UseStringDeduplication" "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=1044,quiet=y"))
+  (setq lsp-java-favorite-static-members '("org.junit.Assume.*"
                                            "java.util.Collections.*"
                                            "org.junit.jupiter.api.Assertions.*"
                                            "org.junit.jupiter.api.Assumptions.*"
                                            "org.junit.jupiter.api.DynamicContainer.*"
                                            "org.junit.jupiter.api.DynamicTest.*")
-        lsp-java-format-settings-url "file:///home/kyoncho/Documents/tick42.xml"
+        lsp-java-format-settings-url nil ; "file:///home/kyoncho/Documents/tick42.xml"
         lsp-java-format-settings-profile "Tick42"
+
         lsp-java-completion-guess-arguments t)
   (spacemacs/set-leader-keys-for-major-mode 'java-mode
-    "gt"  'lsp-goto-type-definition
-    "gr"  'xref-find-references
-    "gR"  'lsp-ui-peek-find-references
-    "ha"  'xref-find-apropos
-    "hA"  'lsp-ui-peek-find-workspace-symbol
-    "hh"  'lsp-describe-thing-at-point
-    "pu"  'lsp-java-update-user-settings
-    "el"  'lsp-ui-flycheck-list
-    "ea"  'lsp-execute-code-action
-    "qr"  'lsp-restart-workspace
-    "roi" 'lsp-java-organize-imports
-    "rrs" 'lsp-rename
-    "rcp" 'lsp-java-create-parameter
-    "rai" 'lsp-java-add-import
-    "rcf" 'lsp-java-create-field
-    "rec" 'lsp-java-extract-to-constant
-    "rel" 'lsp-java-extract-to-local-variable
-    "ram" 'lsp-java-add-unimplemented-methods
-    "rem" 'lsp-java-extract-method
-    "cc"  'lsp-java-build-project
-    "an"  'lsp-java-actionable-notifications
-    "fp"  'my/find-pom-file
-    "="   'lsp-format-buffer)
-  ;; java configuration
+    "fa" 'lsp-workspace-folders-add
+    "fr" 'lsp-workspace-folders-remove
+    "fs" 'lsp-workspace-folders-switch
+    "fp" 'my/find-pom-file)
+
   (defun my/configure-java ()
     "Configure java"
     (interactive)
-    (electric-layout-mode t)
-    (company-mode-on)
-    (rainbow-delimiters-mode-enable)
-    (setq c-basic-offset 4))
-  (add-hook 'java-mode-hook 'my/configure-java))
+    (setq tab-width 4)))
 
 (use-package helm-lsp
   :load-path "~/Sources/lsp/helm-lsp/")
+
+(use-package company-lsp
+  :load-path "~/Sources/lsp/company-lsp")
 
 (defun my/find-pom-file ()
   "Find file in upper dirs"
@@ -122,7 +56,6 @@
   (require 'dap-java)
   (require 'lsp-java)
   (require 'dap-ui)
-  (require 'gdb-mi)
   (dap-turn-on-dap-mode)
 
   (dap-ui-mode 1)
@@ -171,8 +104,8 @@
     "tt" 'dap-java-debug-test-method
     "tc" 'dap-java-debug-test-class
 
-    ;; "ll" 'dap-ui-locals
-    ;; "lb" 'dap-ui-breakpoints
+    "ll" 'dap-ui-locals
+    "lb" 'dap-ui-breakpoints
 
     ;; breakpoints
     "bb" 'dap-breakpoint-toggle
