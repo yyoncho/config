@@ -8,6 +8,7 @@
                                               (interactive)
                                               (dired-subtree-toggle)
                                               (dired-revert)))
+     (define-key dired-mode-map (kbd "O") 'dired-view-file)
 
      (define-key dired-mode-map (kbd "<f5>") (lambda ()
                                                (interactive)
