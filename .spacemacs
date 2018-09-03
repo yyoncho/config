@@ -728,16 +728,14 @@ If EXTERNAL is double prefix, browse in new buffer."
   (use-package feature-mode
     :defer t
     :config
-    (add-to-list 'auto-mode-alist '("\.feature$" . feature-mode)))
-
-  (setq feature-step-search-path "features/steps/*steps.el")
-
-  (set-frame-name "emacs")
+    (add-to-list 'auto-mode-alist '("\.feature$" . feature-mode))
+    (setq feature-step-search-path "features/steps/*steps.el"))
 
   (evil-define-key 'normal evil-mc-key-map (kbd "C-p") 'evil-paste-pop)
   (evil-define-key 'visual evil-mc-key-map (kbd "C-p") 'evil-paste-pop)
 
   (require 'w3m)
+
   (setq w3m-home-page "https://www.google.com")
   (setq w3m-default-display-inline-images t)
   (setq w3m-default-toggle-inline-images t)
@@ -877,9 +875,7 @@ If EXTERNAL is double prefix, browse in new buffer."
             '(treemacs--std-ignore-file-predicate my/treemacs-ignored-predicates)
             treemacs-collapse-dirs 3)
 
-      (require 'treemacs-follow-mode)
       (treemacs-follow-mode t)
-      (require 'treemacs-filewatch-mode)
       (treemacs-filewatch-mode t)))
 
   (helm-flx-mode -1)
