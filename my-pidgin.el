@@ -33,7 +33,7 @@
   (interactive)
   (let ((chat-buffers (-map 'pidgin-chat-get-buffer pidgin-activity-list)))
     (case (length chat-buffers)
-      (0 (error "no active windows"))
+      (0 (my/helm-chats))
       (1 (switch-to-buffer (first chat-buffers)))
       (t (helm :sources (helm-build-sync-source "REPS"
                           :candidates chat-buffers
