@@ -8,7 +8,7 @@
          (java-mode . my/configure-java))
   :config
   ;; (setq lsp-java-vmargs '("-noverify" "-Xmx1G" "-XX:+UseG1GC" "-XX:+UseStringDeduplication" "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=1044,quiet=y"))
-  (setq lsp-java-vmargs '("-noverify" "-Xmx1G" "-XX:+UseG1GC" "-XX:+UseStringDeduplication" "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=1044,quiet=y"))
+  ;; (setq lsp-java-vmargs '("-noverify" "-Xmx1G" "-XX:+UseG1GC" "-XX:+UseStringDeduplication" "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=1044,quiet=y"))
   (setq lsp-java-favorite-static-members '("org.junit.Assume.*"
                                            "java.util.Collections.*"
                                            "org.junit.jupiter.api.Assertions.*"
@@ -32,6 +32,9 @@
 
 (use-package helm-lsp
   :load-path "~/Sources/lsp/helm-lsp/")
+
+(use-package lsp-mode
+  :load-path "~/Sources/lsp/lsp-mode/")
 
 (use-package company-lsp
   :load-path "~/Sources/lsp/company-lsp")
