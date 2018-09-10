@@ -32,7 +32,8 @@ values."
      html
      typescript
      mu4e
-     lsp
+     (lsp :variables lsp-ui-sideline-show-symbol nil
+          lsp-ui-sideline-show-hover nil)
      fasd
      colors
      (shell :variables shell-default-shell 'eshell)
@@ -105,7 +106,9 @@ values."
      package-lint
      md4rd
      evil-easymotion
-     autopair)
+     autopair
+     inline-docs
+     company-box)
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -125,6 +128,7 @@ values."
    dotspacemacs-verbose-loading nil
    dotspacemacs-startup-banner 'nil
    dotspacemacs-mode-line-theme 'spacemacs
+   dotspacemacs-themes '(spacemacs-light)
    dotspacemacs-startup-lists '((recents . 5) (projects . 7))
    dotspacemacs-startup-buffer-responsive nil
    dotspacemacs-scratch-mode 'emacs-lisp-mode
