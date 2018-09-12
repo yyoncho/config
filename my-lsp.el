@@ -1,5 +1,6 @@
 (use-package lsp-java
   :requires (lsp-ui-flycheck lsp-ui-sideline)
+  :load-path "~/Sources/lsp/lsp-java/"
   :ensure nil
   :hook ((java-mode . smartparens-mode)
          (java-mode . evil-cleverparens-mode)
@@ -32,6 +33,9 @@
 
 (use-package helm-lsp
   :load-path "~/Sources/lsp/helm-lsp/")
+
+(use-package lsp-java
+  :load-path "~/Sources/lsp/lsp-java/")
 
 (use-package company-lsp
   :load-path "~/Sources/lsp/company-lsp")

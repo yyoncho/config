@@ -27,6 +27,7 @@
         user-mail-address "ivan.yonchovski@tick42.com"
         user-full-name  "Ivan Yonchovski"
         mu4e-compose-signature nil
+
         message-send-mail-function 'smtpmail-send-it
         starttls-use-gnutls t
         smtpmail-starttls-credentials '(("smtp.office365.com" 587 nil nil))
@@ -41,6 +42,9 @@
   (define-key mu4e-main-mode-map "j" nil)
   (define-key mu4e-main-mode-map "i" 'mu4e~headers-jump-to-maildir)
   (define-key mu4e-main-mode-map "q" 'kill-current-buffer)
+
+  (add-hook 'mu4e-compose-mode-hook (lambda () (setq fill-column 70)))
+
   (use-package mu4e-alert
     :ensure t
     :config

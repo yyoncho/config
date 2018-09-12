@@ -107,7 +107,8 @@ values."
      bui
      package-lint
      md4rd
-     autopair)
+     autopair
+     helm-flycheck)
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
