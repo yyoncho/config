@@ -32,7 +32,8 @@ values."
      html
      typescript
      mu4e
-     lsp
+     (lsp :variables lsp-ui-sideline-show-symbol nil
+          lsp-ui-sideline-show-hover nil)
      fasd
      colors
      (shell :variables shell-default-shell 'eshell)
@@ -40,7 +41,6 @@ values."
      (python :variables python-backend 'lsp)
      helm
      auto-completion
-     spacemacs-layouts
      evil-commentary
      emacs-lisp
      git
@@ -56,13 +56,11 @@ values."
                             "http://nullprogram.com/feed/"
                             "https://www.dnevnik.bg/author/rss"))
      bm
-     spacemacs-purpose
      evil-snipe
      erc
      github)
    dotspacemacs-additional-packages
-   '(java-snippets
-     flash-region
+   '(flash-region
      tabbar
      (treemacs :location "/home/kyoncho/Sources/lsp/treemacs/src/elisp/")
      lsp-ui
@@ -107,8 +105,15 @@ values."
      bui
      package-lint
      md4rd
+<<<<<<< HEAD
      autopair
      helm-flycheck)
+=======
+     evil-easymotion
+     autopair
+     inline-docs
+     company-box)
+>>>>>>> be66b97e13d66792f8a234543481df5408f25118
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -128,9 +133,10 @@ values."
    dotspacemacs-verbose-loading nil
    dotspacemacs-startup-banner 'nil
    dotspacemacs-mode-line-theme 'spacemacs
+   dotspacemacs-themes '(spacemacs-light)
    dotspacemacs-startup-lists '((recents . 5) (projects . 7))
-   dotspacemacs-startup-buffer-responsive t
-   dotspacemacs-scratch-mode 'text-mode
+   dotspacemacs-startup-buffer-responsive nil
+   dotspacemacs-scratch-mode 'emacs-lisp-mode
    dotspacemacs-colorize-cursor-according-to-state t
    dotspacemacs-distinguish-gui-tab t
    dotspacemacs-default-font '("Source Code Pro Medium"
@@ -147,7 +153,7 @@ values."
    dotspacemacs-major-mode-emacs-leader-key "C-l"
    dotspacemacs-remap-Y-to-y$ t
    dotspacemacs-retain-visual-state-on-shift t
-   dotspacemacs-visual-line-move-text nil
+   dotspacemacs-visual-line-move-text t
    dotspacemacs-ex-substitute-global nil
    dotspacemacs-default-layout-name "Default"
    dotspacemacs-display-default-layout nil
@@ -156,7 +162,7 @@ values."
    dotspacemacs-auto-save-file-location 'cache
    dotspacemacs-max-rollback-slots 5
    dotspacemacs-helm-resize nil
-   dotspacemacs-helm-no-header nil
+   dotspacemacs-helm-no-header t
    dotspacemacs-helm-position 'bottom
    dotspacemacs-helm-use-fuzzy 'source
    dotspacemacs-enable-paste-transient-state t
@@ -703,8 +709,7 @@ If EXTERNAL is double prefix, browse in new buffer."
   (use-package helm
     :defer t
     :config
-    (setq-default helm-display-function 'helm-default-display-buffer
-                  helm-exit-idle-delay 0)
+    (setq-default helm-exit-idle-delay 0)
 
     (defun my/helm-ag-recentf ()
       "Search through the recent file."
@@ -779,7 +784,6 @@ If EXTERNAL is double prefix, browse in new buffer."
 
   (setq xref-prompt-for-identifier nil)
   (global-subword-mode t)
-  (which-function-mode t)
 
   (condition-case nil
       (load-file "~/.remote-config/config/my-pidgin.el")
