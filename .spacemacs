@@ -189,10 +189,6 @@ values."
   "User init."
   (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
 
-  (add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
-  (add-to-list 'package-pinned-packages '(cljr-helm . "melpa-stable") t)
-  (add-to-list 'package-pinned-packages '(ac-cider . "melpa-stable") t)
-
   (setq-default custom-file "~/.remote-config/config/.custom.el"))
 
 (defun dotspacemacs/user-config ()
