@@ -52,8 +52,11 @@
 
 ;;;###autoload
 (define-minor-mode pidgin-activity-mode
+  "Activity mode."
+  :init-value nil
   :global t
-  :init-value t
+  :require 'dap-ui
+
   (if pidgin-activity-mode
       (progn
         (add-hook 'window-configuration-change-hook

@@ -129,7 +129,7 @@ values."
    dotspacemacs-editing-style 'hybrid
    dotspacemacs-verbose-loading nil
    dotspacemacs-startup-banner 'nil
-   dotspacemacs-mode-line-theme 'spacemacs
+   dotspacemacs-mode-line-theme 'custom
    dotspacemacs-themes '(spacemacs-light)
    dotspacemacs-startup-lists '((recents . 5) (projects . 7))
    dotspacemacs-startup-buffer-responsive nil
@@ -187,7 +187,55 @@ values."
 
 (defun dotspacemacs/user-init ()
   "User init."
-  (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
+  (defun my/spaceline--theme (left second-left &rest additional-segments)
+    "Convenience function for the spacemacs and emacs themes."
+    (spaceline-compile
+      `(,left
+        (anzu :priority 95)
+        auto-compile
+        ,second-left
+        (major-mode :priority 79)
+        (process :when active)
+        ((flycheck-error flycheck-warning flycheck-info)
+         :when active
+         :priority 89)
+        (minor-modes :when active
+                     :priority 9)
+        (mu4e-alert-segment :when active)
+        (erc-track :when active)
+        (version-control :when active
+                         :priority 78)
+        (org-pomodoro :when active)
+        (org-clock :when active)
+        nyan-cat)
+      `(which-function
+        (python-pyvenv :fallback python-pyenv)
+        (purpose :priority 94)
+        (battery :when active)
+        (selection-info :priority 95)
+        input-method
+        ((buffer-encoding-abbrev
+          point-position
+          line-column)
+         :separator " | "
+         :priority 96)
+        (global :when active)
+        ,@additional-segments))
+
+    (setq-default mode-line-format '("%e" (:eval (spaceline-ml-main)))))
+
+  (defun spaceline-custom-theme (&rest additional-segments)
+    "My custom theme."
+    (apply 'my/spaceline--theme
+           '((persp-name
+              workspace-number
+              window-number)
+             :fallback evil-state
+             :face highlight-face
+             :priority 100)
+           '((buffer-modified buffer-size buffer-id remote-host)
+             :priority 98)
+           additional-segments))
 
   (setq-default custom-file "~/.remote-config/config/.custom.el"))
 
