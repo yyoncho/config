@@ -5,3 +5,7 @@ flycheck_.emacs
 .ssh-agent
 .ssh-agent
 local.el
+/GRTAGS
+/GPATH
+/GSYMS
+/GTAGS

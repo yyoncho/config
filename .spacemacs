@@ -105,15 +105,12 @@ values."
      bui
      package-lint
      md4rd
-<<<<<<< HEAD
      autopair
-     helm-flycheck)
-=======
+     helm-flycheck
      evil-easymotion
      autopair
      inline-docs
      company-box)
->>>>>>> be66b97e13d66792f8a234543481df5408f25118
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -139,7 +136,7 @@ values."
    dotspacemacs-scratch-mode 'emacs-lisp-mode
    dotspacemacs-colorize-cursor-according-to-state t
    dotspacemacs-distinguish-gui-tab t
-   dotspacemacs-default-font '("Source Code Pro Medium"
+   dotspacemacs-default-font '("DejaVu Sans Mono"
                                :size 14
                                :weight normal
                                :weight normal
