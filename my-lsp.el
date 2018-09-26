@@ -120,37 +120,4 @@
     "bh" 'dap-breakpoint-hit-condition
     "." 'hydra-dap)
 
-  (setq lsp-java-bundles (list
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.sat4j.pb_2.3.5.v201404071733.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.sat4j.core_2.3.5.v201308161310.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.ecf.identity_3.8.0.v20161203-2153.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.ecf.provider.filetransfer_3.2.300.v20161203-1840.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.equinox.concurrent_1.1.0.v20130327-1442.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.ecf_3.8.0.v20170104-0657.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.ecf.filetransfer_5.0.0.v20160817-1024.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.apache.felix.scr_2.0.10.v20170501-2007.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.equinox.p2.transport.ecf_1.1.300.v20161004-0244.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.tukaani.xz_1.5.0.v20170111-1717.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.equinox.p2.engine_2.5.0.v20170319-2002.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.equinox.p2.repository_2.3.301.v20170906-1259.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.equinox.ds_1.5.0.v20170307-1429.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.equinox.p2.metadata.repository_1.2.401.v20170906-1259.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.equinox.p2.metadata_2.3.200.v20170511-1106.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.equinox.p2.garbagecollector_1.0.300.v20160504-1450.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.equinox.p2.jarprocessor_1.0.500.v20160504-1450.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.equinox.p2.artifact.repository_1.1.650.v20170928-1405.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.equinox.p2.director_2.3.300.v20160504-1450.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.equinox.p2.director.app_1.0.500.v20160419-0834.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.equinox.p2.publisher.eclipse_1.2.201.v20170906-1259.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.equinox.p2.publisher_1.4.200.v20170511-1216.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.pde.build_3.9.300.v20170515-0912.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.update.configurator_3.3.400.v20160506-0750.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.team.core_3.8.100.v20170516-0820.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.equinox.p2.repository.tools_2.1.400.v20170511-1216.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.equinox.p2.core_2.4.101.v20170906-1259.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.pde.core_3.11.100.v20170517-0724.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.equinox.p2.touchpoint.natives_1.2.200.v20170511-1216.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.equinox.p2.touchpoint.eclipse_2.1.501.v20170906-1259.jar"
-                          "/home/kyoncho/.vscode/extensions/testtt/server/org.eclipse.jdt.ls.importer.pde_1.0.0.20171101-2108.jar"
-                          "/home/kyoncho/.vscode/extensions/vscjava.vscode-java-debug-0.11.0/server/com.microsoft.java.debug.plugin-0.11.0.jar"
-                          "/home/kyoncho/.vscode/extensions/vscjava.vscode-java-test-0.8.0/server/com.microsoft.java.test.plugin-0.8.0.jar")))
+  (setq lsp-java-bundles ()))

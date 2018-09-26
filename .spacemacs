@@ -64,6 +64,7 @@ values."
      tabbar
      (treemacs :location "/home/kyoncho/Sources/lsp/treemacs/src/elisp/")
      lsp-ui
+     ubuntu-theme
      ecukes
      feature-mode
      emms
@@ -71,7 +72,6 @@ values."
      excorporate
      cypher-mode
      org-jira
-     sx
      persistent-scratch
      diff-hl
      helm-dash
@@ -85,6 +85,8 @@ values."
      dired-ranger
      dired-filter
      pretty-mode
+     (dired+
+      :fetcher url :url "https://www.emacswiki.org/emacs/download/dired+.el")
      (shen-elisp
       :location (recipe :repo "deech/shen-elisp"
                         :fetcher github
@@ -110,7 +112,8 @@ values."
      evil-easymotion
      autopair
      inline-docs
-     company-box)
+     company-box
+     quelpa-use-package)
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -131,13 +134,14 @@ values."
    dotspacemacs-startup-banner 'nil
    dotspacemacs-mode-line-theme 'custom
    dotspacemacs-themes '(spacemacs-light)
+   ;; dotspacemacs-themes '(ubuntu)
    dotspacemacs-startup-lists '((recents . 5) (projects . 7))
    dotspacemacs-startup-buffer-responsive nil
    dotspacemacs-scratch-mode 'emacs-lisp-mode
    dotspacemacs-colorize-cursor-according-to-state t
    dotspacemacs-distinguish-gui-tab t
    dotspacemacs-default-font '("DejaVu Sans Mono"
-                               :size 14
+                               :size 13
                                :weight normal
                                :weight normal
                                :width normal
@@ -971,4 +975,10 @@ Does not delete the prompt."
     (spacemacs/set-leader-keys-for-major-mode 'eshell-mode "k" 'my/eshell-kill-output)
     (spacemacs/set-leader-keys-for-major-mode 'eshell-mode "p" 'helm-eshell-prompts)
     (spacemacs/set-leader-keys-for-major-mode 'eshell-mode "P" 'helm-eshell-prompts-all))
-  (targets-setup t :around-key "R"))
+  (targets-setup t :around-key "R")
+  (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   '(lsp-ui-sideline-code-action ((t (:foreground "#659637"))))))
