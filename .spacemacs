@@ -14,9 +14,12 @@ values."
    dotspacemacs-configuration-layers
    '(vimscript
      javascript
+     twitter
      vinegar
      (treemacs :variables
-               treemacs-use-filewatch-mode t)
+               treemacs-use-filewatch-mode t
+               treemacs-indentation 1
+               treemacs-space-between-root-nodes nil)
      (java :variables
            java-backend 'lsp
            lsp-ui-doc-enable nil
@@ -92,6 +95,11 @@ values."
                         :fetcher github
                         :files ("shen*.el"))
       :upgrade 't)
+     (helm-fasd
+      :location (recipe :repo "ajsalminen/helm-fasd"
+                        :fetcher github
+                        :files ("*.el"))
+      :upgrade 't)
 
      (shen-mode
       :location (recipe :repo "eschulte/shen-mode"
@@ -113,7 +121,8 @@ values."
      autopair
      inline-docs
      company-box
-     quelpa-use-package)
+     quelpa-use-package
+     dired-recent)
    dotspacemacs-frozen-packages '()
    dotspacemacs-excluded-packages '()
    dotspacemacs-install-packages 'used-only))
@@ -141,7 +150,7 @@ values."
    dotspacemacs-colorize-cursor-according-to-state t
    dotspacemacs-distinguish-gui-tab t
    dotspacemacs-default-font '("DejaVu Sans Mono"
-                               :size 13
+                               :size 12
                                :weight normal
                                :weight normal
                                :width normal
@@ -167,7 +176,7 @@ values."
    dotspacemacs-helm-position 'bottom
    dotspacemacs-helm-use-fuzzy 'source
    dotspacemacs-enable-paste-transient-state t
-   dotspacemacs-which-key-delay 1.0
+   dotspacemacs-which-key-delay 0.5
    dotspacemacs-which-key-position 'bottom
    dotspacemacs-loading-progress-bar nil
    dotspacemacs-fullscreen-at-startup t
@@ -439,9 +448,13 @@ With a prefix ARG invokes `projectile-commander' instead of
           evil-cross-lines t))
 
   (add-hook 'xml-mode-hook 'web-mode)
+  (add-hook 'web-mode-hook 'lsp-java-enable)
 
   (spacemacs/set-leader-keys-for-major-mode 'web-mode
-    "fp" 'my/find-pom-file)
+    "fp" 'my/find-pom-file
+    "rup" 'lsp-java-update-project-configuration
+    "rep" 'my/mvn-dependency-version-to-properties)
+
 
   (defun my/switch-full-screen ()
     (interactive)
@@ -602,6 +615,7 @@ If EXTERNAL is double prefix, browse in new buffer."
   (spacemacs/set-leader-keys "ag" 'browse-url-chrome)
   (spacemacs/set-leader-keys "pp" 'my/projectile-switch-project-dired)
   (spacemacs/set-leader-keys "TE" 'emacs-lisp-mode)
+  (spacemacs/set-leader-keys "fad" 'helm-fasd)
   (spacemacs/set-leader-keys "os" 'my/store-the-default-buffer)
   (spacemacs/set-leader-keys "oo" 'my/go-to-the-default-buffer)
   (spacemacs/set-leader-keys "sm" 'helm-mu)
@@ -975,10 +989,20 @@ Does not delete the prompt."
     (spacemacs/set-leader-keys-for-major-mode 'eshell-mode "k" 'my/eshell-kill-output)
     (spacemacs/set-leader-keys-for-major-mode 'eshell-mode "p" 'helm-eshell-prompts)
     (spacemacs/set-leader-keys-for-major-mode 'eshell-mode "P" 'helm-eshell-prompts-all))
+  (add-to-list 'sp-no-reindent-after-kill-modes 'java-mode)
   (targets-setup t :around-key "R")
+  ;; (define-key evil-operator-state-map "a" evil-outer-text-objects-map)
   (custom-set-faces
    ;; custom-set-faces was added by Custom.
    ;; If you edit it by hand, you could mess it up, so be careful.
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
-   '(lsp-ui-sideline-code-action ((t (:foreground "#659637"))))))
+   '(lsp-ui-sideline-code-action ((t (:foreground "#659637"))))
+   '(helm-xref-file-name ((t (:foreground "#659637")))))
+
+
+  ;; :scope 'line
+  ;; (evilem-make-motion evilem-motion-forward-WORD-begin #'evil-forward-WORD-begin)
+  ;; (evilem-make-motion my/evilem-end-statement 'c-end-of-statement)
+
+  (evilem-default-keybindings "gs"))

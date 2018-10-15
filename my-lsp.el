@@ -11,19 +11,24 @@
   ;; (setq lsp-java-vmargs '("-noverify" "-Xmx1G" "-XX:+UseG1GC" "-XX:+UseStringDeduplication" "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=1044,quiet=y"))
   ;; (setq lsp-java-vmargs '("-noverify" "-Xmx1G" "-XX:+UseG1GC" "-XX:+UseStringDeduplication" "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=1044,quiet=y"))
   (setq lsp-java-favorite-static-members '("org.junit.Assume.*"
+                                           "org.junit.Assert.*"
                                            "java.util.Collections.*"
+                                           "org.easymock.EasyMock.*"
+                                           "java.util.stream.Collectors.*"
                                            "org.junit.jupiter.api.Assertions.*"
                                            "org.junit.jupiter.api.Assumptions.*"
                                            "org.junit.jupiter.api.DynamicContainer.*"
                                            "org.junit.jupiter.api.DynamicTest.*")
-        lsp-java-format-settings-url nil ; "file:///home/kyoncho/Documents/tick42.xml"
+        lsp-java-format-settings-url "file:///home/kyoncho/Documents/tick42.xml"
         lsp-java-format-settings-profile "Tick42"
 
         lsp-java-completion-guess-arguments t)
   (spacemacs/set-leader-keys-for-major-mode 'java-mode
     "fa" 'lsp-workspace-folders-add
     "fr" 'lsp-workspace-folders-remove
+    "gi" 'lsp-goto-implementation
     "fs" 'lsp-workspace-folders-switch
+    "ga" 'helm-lsp-workspace-symbol
     "fp" 'my/find-pom-file)
 
   (defun my/configure-java ()
@@ -33,6 +38,9 @@
 
 (use-package helm-lsp
   :load-path "~/Sources/lsp/helm-lsp/")
+
+(use-package helm-lsp
+  :load-path "~/Sources/lsp/lsp-mode/")
 
 (use-package lsp-java
   :load-path "~/Sources/lsp/lsp-java/")

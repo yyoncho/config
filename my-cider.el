@@ -54,7 +54,7 @@
            cider-auto-jump-to-error nil
            cider-auto-select-test-report-buffer t
            cider-show-error-buffer t
-           cider-lein-command "~/.bin/lein"
+           cider-lein-command "lein"
            cider-prompt-save-file-on-load t
            cider-use-fringe-indicators t
            clojure-enable-fancify-symbols t
@@ -149,8 +149,8 @@
            (let ((cider-interactive-eval-override override))
              (cider-interactive-eval form)))))
 
-     (require 'sayid)
-     (setq sayid-inject-dependencies-at-jack-in nil)
+     ;; (require 'sayid)
+     ;; (setq sayid-inject-dependencies-at-jack-in nil)
 
      (defun my/mount-restart ()
        "Restarts mount"

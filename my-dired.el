@@ -36,6 +36,7 @@ Remove expanded subdir of deleted dir, if any."
                        (setq buf-list (cdr buf-list))))))))
      (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
      (add-hook 'dired-mode-hook 'dired-collapse)
+     (add-hook 'dired-mode-hook 'dired-recent-mode)
 
      (setq delete-by-moving-to-trash t
            dired-recursive-deletes 'always
