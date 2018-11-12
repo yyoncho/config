@@ -6,7 +6,8 @@
   "Configuration Layers declaration.
 You should not put any user code in this function besides modifying the variable
 values."
-  (setq-default
+
+(setq-default
    dotspacemacs-distribution 'spacemacs
    dotspacemacs-enable-lazy-installation 'unused
    dotspacemacs-ask-for-lazy-installation t
@@ -14,6 +15,8 @@ values."
    dotspacemacs-configuration-layers
    '(vimscript
      javascript
+     restclient
+     pdf
      twitter
      vinegar
      (treemacs :variables
@@ -52,7 +55,8 @@ values."
      (spell-checking :variables spell-checking-enable-by-default nil)
      syntax-checking
      ibuffer
-     clojure
+     (clojure :variables
+              clojure-enable-clj-refactor t)
      command-log
      (elfeed :variables
              elfeed-feeds '("http://sachachua.com/blog/feed/"
@@ -65,6 +69,7 @@ values."
    dotspacemacs-additional-packages
    '(flash-region
      tabbar
+     intellij-theme
      (treemacs :location "/home/kyoncho/Sources/lsp/treemacs/src/elisp/")
      lsp-ui
      ubuntu-theme
@@ -88,24 +93,26 @@ values."
      dired-ranger
      dired-filter
      pretty-mode
-     (dired+
-      :fetcher url :url "https://www.emacswiki.org/emacs/download/dired+.el")
+     (dired+ :location (recipe :fetcher url :url "https://www.emacswiki.org/emacs/download/dired+.el"))
      (shen-elisp
       :location (recipe :repo "deech/shen-elisp"
                         :fetcher github
-                        :files ("shen*.el"))
-      :upgrade 't)
+                        :files ("shen*.el")))
      (helm-fasd
       :location (recipe :repo "ajsalminen/helm-fasd"
                         :fetcher github
                         :files ("*.el"))
       :upgrade 't)
+     ;; (awesome-tab
+     ;;  :location (recipe :repo "manateelazycat/awesome-tab"
+     ;;                    :fetcher github
+     ;;                    :files ("*.el"))
+     ;;  :upgrade 't)
 
      (shen-mode
       :location (recipe :repo "eschulte/shen-mode"
                         :fetcher github
-                        :files ("*.el"))
-      :upgrade 't)
+                        :files ("*.el")))
      inf-clojure
      (targets :location
               (recipe :repo "noctuid/targets.el" :fetcher github :files ("*.el")))
@@ -143,7 +150,7 @@ values."
    dotspacemacs-startup-banner 'nil
    dotspacemacs-mode-line-theme 'custom
    dotspacemacs-themes '(spacemacs-light)
-   ;; dotspacemacs-themes '(ubuntu)
+   ;; dotspacemacs-themes '(intellij)
    dotspacemacs-startup-lists '((recents . 5) (projects . 7))
    dotspacemacs-startup-buffer-responsive nil
    dotspacemacs-scratch-mode 'emacs-lisp-mode
@@ -180,7 +187,7 @@ values."
    dotspacemacs-which-key-position 'bottom
    dotspacemacs-loading-progress-bar nil
    dotspacemacs-fullscreen-at-startup t
-   dotspacemacs-fullscreen-use-non-native nil
+   dotspacemacs-fullscreen-use-non-native t
    dotspacemacs-maximized-at-startup t
    dotspacemacs-active-transparency 100
    dotspacemacs-inactive-transparency 100
@@ -310,7 +317,7 @@ values."
     (sp-pair "[" "]" :wrap "M-["))
 
   ;; evil-mc configuration
-  (global-evil-mc-mode t)
+  ;; (global-evil-mc-mode t)
 
   (evil-define-operator my/evil-operator-duplicate (beg end)
     "Duplicate action."
@@ -452,7 +459,7 @@ With a prefix ARG invokes `projectile-commander' instead of
 
   (spacemacs/set-leader-keys-for-major-mode 'web-mode
     "fp" 'my/find-pom-file
-    "rup" 'lsp-java-update-project-configuration
+    "pu" 'lsp-java-update-project-configuration
     "rep" 'my/mvn-dependency-version-to-properties)
 
 
@@ -610,7 +617,6 @@ If EXTERNAL is double prefix, browse in new buffer."
   (spacemacs/set-leader-keys "o=" 'my/format-defun)
   (spacemacs/set-leader-keys "ot" 'projectile-find-test-file)
   (spacemacs/set-leader-keys "ghk" 'diff-hl-revert-hunk)
-  (spacemacs/set-leader-keys "xts" 'transpose-sexps)
   (spacemacs/set-leader-keys "gd" 'magit-diff-buffer-file)
   (spacemacs/set-leader-keys "ag" 'browse-url-chrome)
   (spacemacs/set-leader-keys "pp" 'my/projectile-switch-project-dired)
@@ -619,6 +625,7 @@ If EXTERNAL is double prefix, browse in new buffer."
   (spacemacs/set-leader-keys "os" 'my/store-the-default-buffer)
   (spacemacs/set-leader-keys "oo" 'my/go-to-the-default-buffer)
   (spacemacs/set-leader-keys "sm" 'helm-mu)
+  (spacemacs/set-leader-keys "fyj" 'my/show-and-copy-class-name)
   (spacemacs/set-leader-keys "sR" 'my/helm-ag-recentf)
   (spacemacs/set-leader-keys "mm" (lambda () (interactive)
                                     (mu4e~headers-jump-to-maildir "/Inbox")))
@@ -684,6 +691,7 @@ If EXTERNAL is double prefix, browse in new buffer."
 
 
   (setq-default default-input-method 'bulgarian-phonetic)
+  ;; (setq-default default-input-method nil)
 
   ;; bind key
   (require 'cc-mode)
@@ -729,10 +737,10 @@ If EXTERNAL is double prefix, browse in new buffer."
     (setq evil-move-beyond-eol t
           evil-cross-lines t)
 
-    (define-key evil-motion-state-map (kbd "C-f") 'forward-char)
-    (define-key evil-motion-state-map (kbd "C-e") 'end-of-line)
-    (define-key evil-motion-state-map (kbd "C-b") 'backward-char)
-    (define-key evil-motion-state-map (kbd "C-d") 'delete-char)
+    ;; (define-key evil-motion-state-map (kbd "C-f") 'forward-char)
+    ;; (define-key evil-motion-state-map (kbd "C-e") 'end-of-line)
+    ;; (define-key evil-motion-state-map (kbd "C-b") 'backward-char)
+    ;; (define-key evil-motion-state-map (kbd "C-d") 'delete-char)
 
     (define-key evil-normal-state-map (kbd "<remap> <evil-next-line>") 'evil-next-visual-line)
     (define-key evil-normal-state-map (kbd "<remap> <evil-previous-line>") 'evil-previous-visual-line)
@@ -764,6 +772,11 @@ If EXTERNAL is double prefix, browse in new buffer."
     :config
     (setq imenu-create-index-function 'imenu-default-create-index-function)
     (setq imenu-auto-rescan t))
+
+  (use-package web-mdoe
+    :defer t
+    :config
+    (setq web-mode-auto-close-style 3))
 
   (use-package helm
     :defer t
@@ -895,8 +908,9 @@ If EXTERNAL is double prefix, browse in new buffer."
     :defer t
     :config
     (require 'org-agenda)
-    (setq org-agenda-files (directory-files "~/.org-jira" t "^[[:alpha:])_]+.org"))
+    (setq org-agenda-files (cons "~/org/notes.org" (directory-files "~/.org-jira" t "^[[:alpha:])_]+.org")))
     (require 'org-jira)
+    (setq org-confirm-babel-evaluate nil)
     (spacemacs/set-leader-keys-for-major-mode 'org-mode "jp" 'org-jira-progress-issue)
     (spacemacs/set-leader-keys-for-major-mode 'org-mode "jg" 'org-jira-get-issue)
     (spacemacs/set-leader-keys-for-major-mode 'org-mode "ji" 'org-jira-update-issue)
@@ -943,11 +957,6 @@ If EXTERNAL is double prefix, browse in new buffer."
       (treemacs-filewatch-mode t)))
 
   (helm-flx-mode -1)
-  (require 'nameless)
-  (add-to-list 'nameless-global-aliases (cons "L" "lsp"))
-  (add-to-list 'nameless-global-aliases (cons "D" "dap"))
-  (add-to-list 'nameless-global-aliases (cons "J" "dap-java"))
-  (add-to-list 'nameless-global-aliases (cons "P" "dap-python"))
 
   (evil-set-command-property 'lsp-goto-type-definition :jump t)
   (evil-set-command-property 'lsp-goto-implementation :jump t)
@@ -982,8 +991,8 @@ Does not delete the prompt."
         (insert "*** output flushed ***\n")
         (kill-region (point) (eshell-end-of-output))))
 
-    (evil-define-key 'normal eshell-mode-map  (kbd "C-r") 'helm-eshell-history)
     (evil-define-key 'visual eshell-mode-map  (kbd "C-r") 'helm-eshell-history)
+    (evil-define-key 'normal eshell-mode-map  (kbd "C-r") 'helm-eshell-history)
     (evil-define-key 'insert eshell-mode-map  (kbd "C-r") 'helm-eshell-history)
 
     (spacemacs/set-leader-keys-for-major-mode 'eshell-mode "k" 'my/eshell-kill-output)
@@ -998,11 +1007,21 @@ Does not delete the prompt."
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
    '(lsp-ui-sideline-code-action ((t (:foreground "#659637"))))
-   '(helm-xref-file-name ((t (:foreground "#659637")))))
+   '(helm-xref-file-name ((t (:foreground "#659637"))))
+   '(dired-subtree-depth-1-face ((t (:background "#eeeeee"))))
+   '(dired-subtree-depth-2-face ((t (:background "#e1e1e1"))))
+   '(dired-subtree-depth-3-face ((t (:background "#d8d8d8"))))
+   '(dired-subtree-depth-4-face ((t (:background "#d1d1d1"))))
+   '(dired-subtree-depth-5-face ((t (:background "#c8c8c8"))))
+   '(dired-subtree-depth-6-face ((t (:background "#c1c1c1"))))
+   '(dired-subtree-depth-7-face ((t (:background "#b8b8b8")))))
 
 
   ;; :scope 'line
   ;; (evilem-make-motion evilem-motion-forward-WORD-begin #'evil-forward-WORD-begin)
   ;; (evilem-make-motion my/evilem-end-statement 'c-end-of-statement)
 
-  (evilem-default-keybindings "gs"))
+  (evilem-default-keybindings "gs")
+
+
+  (setq evil-lisp-state-enter-lisp-state-on-command nil))

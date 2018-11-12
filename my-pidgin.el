@@ -61,3 +61,5 @@
          (curr-buf (or (get-buffer (pidgin-chat-get-buffer user))
                        (pidgin-chat-create-buffer user))))
     (switch-to-buffer curr-buf)))
+
+(pidgin-activity-mode t)

@@ -42,6 +42,11 @@
 (use-package helm-lsp
   :load-path "~/Sources/lsp/lsp-mode/")
 
+(use-package lsp-java-treemacs
+  :load-path "~/Sources/lsp/lsp-java/"
+  :config
+  (remove-hook 'treemacs-mode-hook 'lsp-java-treemacs-register))
+
 (use-package lsp-java
   :load-path "~/Sources/lsp/lsp-java/")
 
@@ -82,9 +87,9 @@
   (defun my/show-and-copy-class-name ()
     "Show and copy classname."
     (interactive)
-    (if-let ((class-name (->> (list :cursorOffset (point)
-                                    :sourceUri (lsp--path-to-uri (buffer-file-name)))
-                              (lsp-send-execute-command "che.jdt.ls.extension.findTestByCursor")
+    (if-let ((class-name (->> (vector (lsp--path-to-uri (buffer-file-name))
+                                      (number-to-string (line-number-at-pos)))
+                              (lsp-send-execute-command "che.jdt.ls.extension.debug.identifyFqnInResource")
                               first)))
         (message (kill-new class-name))
       (error "No classname")))
